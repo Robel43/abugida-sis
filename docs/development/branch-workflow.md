@@ -2,66 +2,70 @@
 
 ## Purpose
 
-This document defines how Abugida SIS developers create branches, pull changes, push work, open pull requests, and move tested code toward release.
+This document defines the standard Git workflow for Abugida SIS.
 
-The purpose is to keep `main` stable while allowing several developers to work independently without overwriting each other's changes.
+The workflow is intentionally simple:
+
+- developers work independently on feature branches;
+- developers test their own work locally;
+- completed feature branches are merged into `develop`;
+- `main` is off limits for normal developer work;
+- only the project owner/maintainer promotes tested integrated code from `develop` to `main`.
 
 ## Branch Model
 
 ```text
-main
-  ^
-  |
-develop
-  ^
-  |
 feature/*, fix/*, docs/*
+          |
+          v
+       develop
+          |
+          v
+         main
 ```
 
-For urgent production fixes:
-
-```text
-main -> hotfix/* -> main
-                  -> develop
-```
+`main` is controlled by the project owner/maintainer.
 
 ## 1. main
 
 `main` is the stable release branch.
 
-It should contain only code that has passed integration testing and is approved for release.
-
 Developers must not:
 
-- implement features directly on `main`;
-- commit normal development work directly to `main`;
-- push directly to `main`.
+- work directly on `main`;
+- commit normal development work to `main`;
+- push directly to `main`;
+- merge feature branches directly into `main`.
 
-A release is produced by merging reviewed `develop` into `main`.
+Only the project owner/maintainer should merge `develop` into `main` for a release.
 
 ## 2. develop
 
-`develop` is the integration branch.
+`develop` is the shared integration branch.
 
-It contains completed features that have passed their feature-level review and are ready for combined testing.
+Developers use it as the starting point for new work and as the destination for completed work.
 
-Developers normally pull from `develop` before beginning a task.
+Developers should not build features directly on `develop`.
 
-Developers must not use `develop` as their personal working branch.
+Instead:
 
-## 3. Feature branches
+```text
+develop -> feature branch -> local test -> push feature branch -> PR -> develop
+```
 
-Every development task should have its own branch.
+There is no mandatory code reviewer. The developer who owns a feature may merge their own Pull Request into `develop` after completing local testing and documentation.
+
+## 3. Branch naming
 
 Recommended prefixes:
 
 | Prefix | Purpose |
 | --- | --- |
 | `feature/` | New functionality |
-| `fix/` | Non-production bug fix |
+| `fix/` | Bug fix |
 | `docs/` | Documentation-only change |
-| `refactor/` | Internal code restructuring |
-| `hotfix/` | Urgent fix based on production/main |
+| `refactor/` | Internal restructuring |
+| `hotfix/` | Urgent production fix coordinated by the project owner |
 
 Examples:
 
@@ -76,7 +80,7 @@ docs/installation-guide
 
 Use short lowercase names separated by hyphens.
 
-## 4. Starting new work
+## 4. Start a new feature
 
 Always update `develop` first:
 
@@ -85,25 +89,27 @@ git checkout develop
 git pull origin develop
 ```
 
-Then create a branch:
+Then create your branch:
 
 ```powershell
 git checkout -b feature/payment-verification
 ```
 
-Confirm:
+Confirm the active branch:
 
 ```powershell
 git branch
 ```
 
-The active branch should have `*` beside the feature branch.
+The current feature branch should have `*` beside it.
 
-## 5. Working and committing
+## 5. Develop and test locally
 
-Develop and test locally.
+Work only on the feature branch.
 
-Review changed files:
+Run the application locally, test the feature, and confirm that the intended workflow works before merging.
+
+Check changed files:
 
 ```powershell
 git status
@@ -115,23 +121,23 @@ Stage the intended changes:
 git add .
 ```
 
-Review again before committing:
+Review again:
 
 ```powershell
 git status
 ```
 
-Commit with a clear message:
+Commit:
 
 ```powershell
 git commit -m "Add payment verification workflow"
 ```
 
-A feature should include its related documentation in `docs/` before the pull request is considered complete.
+The same branch should also contain the related documentation under `docs/`.
 
-## 6. Where developers push
+## 6. Push the feature branch
 
-Developers push their own feature branch:
+Push the feature branch to GitHub:
 
 ```powershell
 git push -u origin feature/payment-verification
@@ -143,40 +149,40 @@ After the first push, later updates can use:
 git push
 ```
 
-Do not push normal feature work directly to:
+Developers must not push normal feature work directly to:
 
 ```text
 origin/main
 origin/develop
 ```
 
-## 7. Pull request destination
+## 7. Open a Pull Request to develop
 
-Normal feature pull requests always target:
-
-```text
-feature/* -> develop
-```
-
-Example:
+Create a Pull Request on GitHub:
 
 ```text
-feature/payment-verification -> develop
+base: develop
+compare: feature/payment-verification
 ```
 
-The pull request should explain:
+The PR is the controlled merge step and creates a clear history of the feature entering `develop`.
 
-- what changed;
-- why the change is needed;
-- business rules implemented;
-- database changes;
-- configuration changes;
-- how it was tested;
-- documentation added or updated.
+No separate code-review approval is required.
 
-## 8. Updating a feature with new develop changes
+Before merging their own PR, the developer must confirm:
 
-If other work has already been merged into `develop`, update the feature before final review:
+- the feature works locally;
+- relevant failure/error cases were checked;
+- documentation is included or updated;
+- required database migration/schema changes are included;
+- no passwords, secrets, database dumps, uploaded documents, receipts, or student photos are committed;
+- the branch has no unresolved merge conflicts.
+
+Then the developer may merge the PR into `develop`.
+
+## 8. If develop changed during feature development
+
+Update the local feature branch before merging:
 
 ```powershell
 git checkout develop
@@ -185,9 +191,9 @@ git checkout feature/payment-verification
 git merge develop
 ```
 
-Resolve any conflicts locally.
+Resolve conflicts locally.
 
-Then:
+Then test again:
 
 ```powershell
 git add .
@@ -195,9 +201,9 @@ git commit
 git push
 ```
 
-Run the relevant tests again after resolving conflicts.
+The existing Pull Request updates automatically after the push.
 
-## 9. After a pull request is merged
+## 9. After merging into develop
 
 Update local `develop`:
 
@@ -206,19 +212,19 @@ git checkout develop
 git pull origin develop
 ```
 
-Delete the completed local feature branch:
+Delete the completed local branch:
 
 ```powershell
 git branch -d feature/payment-verification
 ```
 
-The merged remote feature branch can also be deleted.
+The remote feature branch can also be deleted from GitHub after merge.
 
-## 10. Starting the next task
+## 10. Start the next feature
 
-Do not branch from an old feature branch.
+Always start the next task from the latest `develop`.
 
-Always start again from current `develop`:
+Do not branch from a completed feature branch.
 
 ```powershell
 git checkout develop
@@ -228,95 +234,113 @@ git checkout -b feature/next-feature
 
 ## 11. Release process
 
-When a set of features is ready and has passed integration testing/UAT, a maintainer creates a reviewed release merge:
+The normal path is:
+
+```text
+feature/* -> develop -> main
+```
+
+Developers are responsible for:
+
+```text
+feature branch -> develop
+```
+
+The project owner/maintainer is responsible for:
 
 ```text
 develop -> main
 ```
 
-After merging, tag the release as appropriate.
+When the integrated version on `develop` has been tested and accepted, the project owner/maintainer promotes it to `main` and can tag the release.
 
-Developers should not independently merge `develop` into `main` unless they are responsible for the release.
+Developers must not independently merge into `main`.
 
 ## 12. Hotfix process
 
-A genuine urgent production fix starts from `main`:
+A production hotfix starts from `main` only with project-owner coordination.
 
-```powershell
-git checkout main
-git pull origin main
-git checkout -b hotfix/short-description
+Typical flow:
+
+```text
+main -> hotfix/* -> main
+                 -> develop
 ```
 
-After testing, push the branch and open a pull request to `main`.
+The fix must also return to `develop` so future releases retain it.
 
-The completed hotfix must also be merged into `develop` so the fix remains part of future releases.
-
-## 13. Pulling rules summary
+## 13. Pull rules
 
 | Situation | Pull from |
 | --- | --- |
 | Starting a normal feature | `origin/develop` |
-| Continuing feature work | your feature branch, then update from `develop` as needed |
-| Checking latest integrated code | `origin/develop` |
-| Checking production/release baseline | `origin/main` |
-| Starting an urgent production hotfix | `origin/main` |
+| Continuing feature work | own feature branch |
+| Updating feature with team changes | `origin/develop` |
+| Checking latest integrated version | `origin/develop` |
+| Checking stable release | `origin/main` |
 
-## 14. Push rules summary
+## 14. Push and merge rules
 
-| Work | Push to |
-| --- | --- |
-| New feature | own `feature/*` branch |
-| Bug fix | own `fix/*` branch |
-| Documentation-only task | own `docs/*` branch |
-| Hotfix | own `hotfix/*` branch |
-| Integrated development | merge by PR into `develop` |
-| Production release | reviewed merge from `develop` into `main` |
+| Work | Push directly to | Merge destination |
+| --- | --- | --- |
+| New feature | own `feature/*` branch | `develop` |
+| Bug fix | own `fix/*` branch | `develop` |
+| Documentation task | own `docs/*` branch | `develop` |
+| Refactor | own `refactor/*` branch | `develop` |
+| Production release | not a normal developer action | project owner merges `develop` -> `main` |
 
-## 15. Important repository rules
-
-Before every push:
+## 15. Developer checklist before merging to develop
 
 1. Confirm the active branch with `git branch`.
-2. Run `git status`.
-3. Do not commit `config.inc.php`.
-4. Do not commit passwords, secrets, production credentials, database dumps, uploaded documents, student photos, or receipts.
-5. Include database migration files when schema changes are required.
-6. Update documentation for the feature.
-7. Test the feature locally.
-8. Push only the feature/fix/docs/hotfix branch.
+2. Pull current `develop` and merge it into the feature branch if necessary.
+3. Run `git status`.
+4. Test the feature locally.
+5. Test important error/negative paths.
+6. Confirm `config.inc.php` is not committed.
+7. Confirm no secrets or user data are committed.
+8. Include required database changes.
+9. Update the relevant documentation under `docs/`.
+10. Push the feature branch.
+11. Open PR to `develop`.
+12. Merge the PR only after the above checks pass.
 
-## Example complete developer workflow
+## Example complete workflow
 
 ```powershell
-# Get current integration code
+# Update integration branch
 git checkout develop
 git pull origin develop
 
-# Create task branch
+# Create feature branch
 git checkout -b feature/student-application
 
-# Work and test locally
+# Develop and test locally
+
+# Stage and commit
 git status
 git add .
 git status
 git commit -m "Add student application workflow"
 
-# Push task branch
+# Push feature branch
 git push -u origin feature/student-application
 ```
 
-Then create:
+Then on GitHub:
 
 ```text
 Pull Request:
 feature/student-application -> develop
 ```
 
-After review and merge:
+After local testing and documentation are complete, the developer may merge the PR.
+
+Then:
 
 ```powershell
 git checkout develop
 git pull origin develop
 git branch -d feature/student-application
 ```
+
+The developer is now ready to start the next task from the updated `develop`.
