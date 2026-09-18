@@ -68,17 +68,17 @@ A typical development checkout contains:
 
 ```text
 abugida-sis/
-├── rosariosis/            Application source
-├── docs/                  Project and feature documentation
-├── database/              Database migrations and seed data
-├── Dockerfile             Local development PHP/Apache image
-├── docker-compose.yml     Local development services
-├── php.ini                Local PHP settings
+├── app/                    Application source
+├── docs/                   Project and feature documentation
+├── database/               Database migrations and seed data
+├── Dockerfile              Local development PHP/Apache image
+├── docker-compose.yml      Local development services
+├── php.ini                 Local PHP settings
 ├── .gitignore
 └── README.md
 ```
 
-The source directory name may be renamed later as part of project cleanup. The application name used by this project is **Abugida SIS**.
+The application name used by this project is **Abugida SIS**.
 
 ## Local Installation with Docker
 
