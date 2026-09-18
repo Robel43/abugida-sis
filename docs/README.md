@@ -2,11 +2,9 @@
 
 This directory is the official technical and functional documentation area for Abugida SIS.
 
-Every significant feature or change must be documented here as part of the same pull request that introduces the change.
+Every significant feature or change must be documented as part of the same feature branch and pull request that introduces the change.
 
 ## Documentation Structure
-
-Recommended structure:
 
 ```text
 docs/
@@ -14,6 +12,8 @@ docs/
 ├── CHANGELOG.md
 ├── FEATURE_TEMPLATE.md
 ├── architecture/
+├── development/
+│   └── branch-workflow.md
 ├── features/
 ├── workflows/
 ├── database/
@@ -43,6 +43,18 @@ Each implemented feature should document:
 
 Use `FEATURE_TEMPLATE.md` as the starting point.
 
+## Development Documentation
+
+Development process documentation belongs under `docs/development/`.
+
+The branch and pull-request workflow is defined in:
+
+```text
+docs/development/branch-workflow.md
+```
+
+All developers are expected to follow that workflow.
+
 ## Naming Convention
 
 Use lowercase descriptive filenames with hyphens.
@@ -62,9 +74,13 @@ database/001-registration-tables.md
 
 A feature is not considered complete until:
 
-- Code is implemented
-- Local testing is complete
-- Required database migration is included
-- Documentation is updated
-- Pull request is reviewed
-- Changes are merged into `develop`
+- code is implemented;
+- local testing is complete;
+- required database migration is included;
+- documentation is updated on the same feature branch;
+- the feature branch is pushed to GitHub;
+- a pull request to `develop` is reviewed;
+- required corrections are completed;
+- the pull request is merged into `develop`.
+
+Normal feature development must not be pushed directly to `main` or `develop`.
