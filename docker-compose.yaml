@@ -1,0 +1,40 @@
+services:
+
+  db:
+    image: mariadb:10.11
+    container_name: abugida-db
+    restart: unless-stopped
+
+    environment:
+      MARIADB_ROOT_PASSWORD: abugida_root_dev
+      MARIADB_DATABASE: abugida_sis
+      MARIADB_USER: abugida_user
+      MARIADB_PASSWORD: abugida_dev_password
+
+    volumes:
+      - abugida_db_data:/var/lib/mysql
+
+    ports:
+      - "3307:3306"
+
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: abugida-web
+    restart: unless-stopped
+
+    depends_on:
+      - db
+
+    ports:
+      - "8090:80"
+
+    volumes:
+      - ./rosariosis:/var/www/html
+
+
+volumes:
+  abugida_db_data:

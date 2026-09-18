@@ -1,30 +1,94 @@
-# Local and production configuration
+##################################################
+# Abugida SIS - Git Ignore
+##################################################
+
+# ------------------------------------------------
+# Environment-specific configuration / secrets
+# ------------------------------------------------
+
 **/config.inc.php
 .env
 .env.*
+!.env.example
 
-# Logs
+# ------------------------------------------------
+# User-generated files
+# ------------------------------------------------
+
+**/assets/FileUploads/*
+!**/assets/FileUploads/FS_icons/
+
+**/assets/StudentPhotos/*
+**/assets/UserPhotos/*
+**/assets/school_logo*
+
+# ------------------------------------------------
+# Runtime / temporary files
+# ------------------------------------------------
+
 *.log
+*.tmp
+*.swp
+*.bak
+*~
+tmp/
+cache/
+meta/
 
-# Local backups and database exports
+# ------------------------------------------------
+# Database backups / exports
+# ------------------------------------------------
+
 *.sql
 *.dump
-*.bak
 *.backup
 
-# OS files
-.DS_Store
-Thumbs.db
-Desktop.ini
+# ------------------------------------------------
+# Docker local persistent data
+# ------------------------------------------------
 
-# IDE/editor settings
+docker-data/
+
+# ------------------------------------------------
+# IDE / editor files
+# ------------------------------------------------
+
 .vscode/
 .idea/
 
-# Temporary files
-*.tmp
-*.swp
-*~
+.project
+.metadata/
+.settings/
+.classpath
+.buildpath
 
-# Docker/local runtime data
-docker-data/
+# ------------------------------------------------
+# Operating system files
+# ------------------------------------------------
+
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ------------------------------------------------
+# Node dependencies if introduced later
+# ------------------------------------------------
+
+node_modules/
+
+# ------------------------------------------------
+# Python temporary files if tools/scripts are used
+# ------------------------------------------------
+
+__pycache__/
+*.pyc
+*.pyo
+
+# ------------------------------------------------
+# Local generated documentation / reports
+# ------------------------------------------------
+
+phpdoc/
+phpdoc-cache*
