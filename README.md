@@ -93,7 +93,7 @@ Docker Desktop must be running.
 
 ## 1. Clone the repository
 
-Developers should normally clone the repository and switch to `develop`:
+Developers should clone the repository and work from `develop`:
 
 ```powershell
 git clone https://github.com/Robel43/abugida-sis.git
@@ -102,7 +102,7 @@ git checkout develop
 git pull origin develop
 ```
 
-The `main` branch is the stable baseline. Normal development must not be done directly on `main`.
+The `main` branch is the stable release branch and is off limits for normal developer work.
 
 ## 2. Create the local application configuration
 
@@ -216,32 +216,39 @@ unless you intentionally want to remove the local database volume and start agai
 
 # Git Branching and Development Workflow
 
-Abugida SIS uses a protected integration workflow.
+Abugida SIS uses a simple feature-branch workflow.
 
 ## Permanent branches
 
 ### `main`
 
-`main` contains stable, tested code suitable for release or production deployment.
+`main` contains stable code intended for release or production deployment.
 
-Developers must:
+For normal development, `main` is **off limits** to developers.
 
-- pull from `main` only when they need the current stable baseline;
-- never develop directly on `main`;
-- never push feature work directly to `main`.
+Developers must not:
 
-Only reviewed and tested releases are merged into `main`.
+- develop directly on `main`;
+- commit feature work directly to `main`;
+- push directly to `main`;
+- merge feature branches directly into `main`.
+
+Only the project owner/maintainer controls releases from `develop` into `main`.
 
 ### `develop`
 
-`develop` is the shared integration branch containing the latest accepted development work.
+`develop` is the shared integration branch.
 
 Developers should:
 
-- pull the latest `develop` before starting work;
-- create feature branches from `develop`;
-- open pull requests back into `develop`;
-- never push unfinished feature work directly to `develop`.
+- pull the latest `develop` before starting a task;
+- create their own feature/fix branch from `develop`;
+- build and test locally on that branch;
+- document the change under `docs/`;
+- push their branch to GitHub;
+- merge the completed branch into `develop` through a Pull Request.
+
+There is no mandatory code-review step. The developer responsible for the feature may merge their own Pull Request into `develop` after confirming that the feature works locally and its documentation is complete.
 
 ## Feature branches
 
@@ -266,23 +273,33 @@ git pull origin develop
 git checkout -b feature/payment-verification
 ```
 
-Work locally, then:
+Develop and test locally.
+
+Then:
 
 ```powershell
 git add .
+git status
 git commit -m "Add payment verification workflow"
 git push -u origin feature/payment-verification
 ```
 
-Developers push **their feature branch**, not `main` or `develop`.
+Developers push **their own branch**, not `main` or `develop`.
 
-Then create a pull request:
+Then create a Pull Request:
 
 ```text
-feature/payment-verification  ->  develop
+feature/payment-verification -> develop
 ```
 
-The pull request should include the related documentation under `docs/`.
+Before merging their own PR into `develop`, the developer must confirm:
+
+- the feature works locally;
+- relevant error paths have been tested;
+- no secrets or user-generated data are committed;
+- any database changes are included and documented;
+- the relevant documentation under `docs/` is updated;
+- the branch merges cleanly with the current `develop`.
 
 ## Keeping a feature branch current
 
@@ -295,11 +312,11 @@ git checkout feature/payment-verification
 git merge develop
 ```
 
-Resolve conflicts locally, test again, then push the updated feature branch.
+Resolve conflicts locally, test again, commit if required, and push the updated feature branch.
 
 ## After a feature is merged
 
-After the pull request is approved and merged:
+Once the developer merges the Pull Request into `develop`:
 
 ```powershell
 git checkout develop
@@ -309,27 +326,25 @@ git branch -d feature/payment-verification
 
 The remote feature branch can also be deleted after merge.
 
+For the next task, always start again from the latest `develop`.
+
 ## Release flow
 
-After integrated features have passed testing/UAT:
+The normal flow is:
 
 ```text
 feature/* -> develop -> main
 ```
 
-The merge from `develop` to `main` is performed as a reviewed release operation, not as ordinary developer work.
+Developers control their feature work up to `develop`.
+
+The project owner/maintainer controls the move from `develop` to `main`.
+
+A release should only move to `main` after the integrated system has been tested and accepted.
 
 ## Hotfixes
 
-Urgent production fixes should branch from `main`:
-
-```powershell
-git checkout main
-git pull origin main
-git checkout -b hotfix/short-description
-```
-
-After testing, the hotfix must be merged back into both `main` and `develop` so the fix is not lost in future releases.
+Production hotfixes are exceptional and must be coordinated by the project owner/maintainer because they start from `main`.
 
 For the complete branch policy, see `docs/development/branch-workflow.md`.
 
@@ -369,15 +384,16 @@ A tested release from `main` can be deployed to a standard PHP/MySQL or MariaDB 
 
 Typical deployment sequence:
 
-1. Merge the approved release from `develop` into `main`.
-2. Tag the release.
-3. Back up the production files and database.
-4. Upload/deploy the application source.
-5. Create the production `config.inc.php` outside Git history.
-6. Run required database migrations.
-7. Verify PHP extensions and filesystem permissions.
-8. Perform smoke testing.
-9. Confirm registration, finance, academic, reporting, and Moodle integration workflows.
+1. Test and accept the integrated version on `develop`.
+2. Project owner/maintainer merges `develop` into `main`.
+3. Tag the release.
+4. Back up the production files and database.
+5. Upload/deploy the application source.
+6. Create the production `config.inc.php` outside Git history.
+7. Run required database migrations.
+8. Verify PHP extensions and filesystem permissions.
+9. Perform smoke testing.
+10. Confirm registration, finance, academic, reporting, and Moodle integration workflows.
 
 Production credentials must never be committed to GitHub.
 
