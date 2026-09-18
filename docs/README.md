@@ -13,7 +13,8 @@ docs/
 ├── FEATURE_TEMPLATE.md
 ├── architecture/
 ├── development/
-│   └── branch-workflow.md
+│   ├── branch-workflow.md
+│   └── ci-workflow.md
 ├── features/
 ├── workflows/
 ├── database/
@@ -48,7 +49,7 @@ Use `FEATURE_TEMPLATE.md` as the starting point.
 The team follows this model:
 
 ```text
-develop -> feature branch -> local test -> push feature branch -> PR -> develop
+develop -> feature branch -> local test -> push feature branch -> PR -> CI -> develop
 ```
 
 There is no mandatory code-review approval step.
@@ -59,7 +60,8 @@ The developer responsible for a feature may merge their own Pull Request into `d
 - required documentation is complete;
 - database changes are included and documented;
 - no secrets or user-generated data are committed;
-- the branch merges cleanly.
+- the branch merges cleanly;
+- required GitHub Actions checks pass.
 
 `main` is off limits for normal developer work.
 
@@ -69,10 +71,11 @@ Only the project owner/maintainer promotes accepted integrated work from:
 develop -> main
 ```
 
-The detailed branch workflow is documented in:
+Detailed development guides:
 
 ```text
 docs/development/branch-workflow.md
+docs/development/ci-workflow.md
 ```
 
 ## Naming Convention
@@ -100,6 +103,7 @@ A feature is not considered complete until:
 - documentation is updated on the same feature branch;
 - the feature branch is pushed to GitHub;
 - a Pull Request is opened to `develop`;
+- required automated checks pass;
 - the developer confirms the feature is ready;
 - the Pull Request is merged into `develop`.
 
