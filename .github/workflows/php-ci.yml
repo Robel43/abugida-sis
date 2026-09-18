@@ -1,0 +1,90 @@
+name: Abugida SIS CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: PHP syntax and project validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+          coverage: none
+
+      - name: Show PHP version
+        run: php -v
+
+      - name: Validate required project files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_files=(
+            "Dockerfile"
+            "docker-compose.yaml"
+            "php.ini"
+            "rosariosis/index.php"
+            "rosariosis/config.inc.sample.php"
+            "rosariosis/composer.json"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "::error::Required project file is missing: $file"
+              exit 1
+            fi
+          done
+
+          echo "All required project files are present."
+
+      - name: Validate Composer configuration
+        working-directory: rosariosis
+        run: composer validate --no-interaction --no-check-publish
+
+      - name: Check PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -d '' php_files < <(find rosariosis -type f -name "*.php" -print0)
+
+          if [[ ${#php_files[@]} -eq 0 ]]; then
+            echo "::error::No PHP files were found under rosariosis/."
+            exit 1
+          fi
+
+          echo "Checking ${#php_files[@]} PHP files..."
+
+          failed=0
+          for file in "${php_files[@]}"; do
+            if ! php -l "$file"; then
+              failed=1
+            fi
+          done
+
+          if [[ "$failed" -ne 0 ]]; then
+            echo "::error::PHP syntax validation failed."
+            exit 1
+          fi
+
+          echo "PHP syntax validation passed."
+
+      - name: Validate Docker Compose file
+        run: docker compose -f docker-compose.yaml config --quiet
