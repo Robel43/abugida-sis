@@ -1,0 +1,30 @@
+# Local and production configuration
+**/config.inc.php
+.env
+.env.*
+
+# Logs
+*.log
+
+# Local backups and database exports
+*.sql
+*.dump
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Docker/local runtime data
+docker-data/
