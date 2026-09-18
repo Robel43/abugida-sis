@@ -2,7 +2,7 @@
 
 This directory is the official technical and functional documentation area for Abugida SIS.
 
-Every significant feature or change must be documented as part of the same feature branch and pull request that introduces the change.
+Every significant feature or change must be documented on the same feature branch that implements it.
 
 ## Documentation Structure
 
@@ -43,17 +43,37 @@ Each implemented feature should document:
 
 Use `FEATURE_TEMPLATE.md` as the starting point.
 
-## Development Documentation
+## Development Workflow
 
-Development process documentation belongs under `docs/development/`.
+The team follows this model:
 
-The branch and pull-request workflow is defined in:
+```text
+develop -> feature branch -> local test -> push feature branch -> PR -> develop
+```
+
+There is no mandatory code-review approval step.
+
+The developer responsible for a feature may merge their own Pull Request into `develop` after confirming that:
+
+- the feature works locally;
+- required documentation is complete;
+- database changes are included and documented;
+- no secrets or user-generated data are committed;
+- the branch merges cleanly.
+
+`main` is off limits for normal developer work.
+
+Only the project owner/maintainer promotes accepted integrated work from:
+
+```text
+develop -> main
+```
+
+The detailed branch workflow is documented in:
 
 ```text
 docs/development/branch-workflow.md
 ```
-
-All developers are expected to follow that workflow.
 
 ## Naming Convention
 
@@ -76,11 +96,11 @@ A feature is not considered complete until:
 
 - code is implemented;
 - local testing is complete;
-- required database migration is included;
+- required database changes are included;
 - documentation is updated on the same feature branch;
 - the feature branch is pushed to GitHub;
-- a pull request to `develop` is reviewed;
-- required corrections are completed;
-- the pull request is merged into `develop`.
+- a Pull Request is opened to `develop`;
+- the developer confirms the feature is ready;
+- the Pull Request is merged into `develop`.
 
-Normal feature development must not be pushed directly to `main` or `develop`.
+Normal developers must not push or merge feature work into `main`.
