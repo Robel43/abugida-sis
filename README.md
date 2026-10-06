@@ -50,6 +50,227 @@ Moodle is used for:
 
 Approved grades are synchronized from Moodle to Abugida SIS.
 
+
+## Academic Structure and Moodle Mapping
+
+Abugida SIS uses RosarioSIS academic objects in a way that avoids duplicating Moodle courses for school sections.
+
+### Current mapping
+
+| Abugida / RosarioSIS | Purpose | Moodle mapping |
+| --- | --- | --- |
+| Grade Level | Official student enrollment grade | Student grade metadata |
+| Subject, e.g. `Grade 10` | Grade-level course category | Moodle course category |
+| Course, e.g. `Amharic` | One academic subject | One Moodle course |
+| Course Period, e.g. `10A`, `10B` | Section / class instance | Moodle group |
+| Teacher on Course Period | Section teacher assignment | Moodle teacher assignment |
+| Students scheduled into Course Period | Section roster | Moodle group membership |
+
+Example:
+
+```text
+Grade 10
+├── Amharic
+│   ├── 10A
+│   └── 10B
+├── English
+│   ├── 10A
+│   └── 10B
+└── Mathematics
+    ├── 10A
+    └── 10B
+```
+
+Moodle should create only one course for each grade/subject combination, for example **Grade 10 Amharic**. Sections `10A` and `10B` must be created as Moodle groups inside that course, not as duplicate Moodle courses.
+
+### Self-paced online delivery
+
+The platform is designed for self-paced online learning, so RosarioSIS timetable fields are used only where the underlying data model requires them.
+
+Recommended Course Period settings:
+
+- one generic school period such as `Online Learning`;
+- no physical room;
+- no meeting-day requirement unless RosarioSIS validation requires one;
+- attendance disabled unless attendance is intentionally managed in the SIS;
+- course period title/short name used as the section identifier, e.g. `10A`;
+- teacher assigned at the Course Period level;
+- official grading scale selected, with teacher grade-scale changes disabled where Moodle is authoritative.
+
+Course Periods should be understood as **section/class instances**, not as physical timetable periods.
+
+## Registration and Automatic Section Assignment
+
+The intended registration flow asks the user to select only the **grade level**.
+
+Section assignment is planned as custom logic:
+
+1. Student registers and is enrolled in a grade.
+2. The system finds the available sections for that grade, for example `7A` and `7B`.
+3. The system counts active students in each section.
+4. The student is assigned to the least-filled section, subject to configured capacity.
+5. The student is scheduled into every Course Period for that section across the grade's courses.
+6. The Moodle integration enrolls the student into the grade's Moodle courses and adds the student to the matching Moodle group.
+7. Administrators retain a manual override for section transfers.
+
+The section assignment should be deterministic, balanced, capacity-aware, and idempotent so re-running synchronization does not create duplicate schedule records.
+
+## Grade Synchronization and Ranking Model
+
+Moodle is the authoritative system for assessment calculation.
+
+### Moodle responsibilities
+
+- quizzes, assignments, activities, and category weights;
+- gradebook calculation;
+- subject percentage calculation;
+- teacher corrections to assessment results;
+- section-level learning analytics.
+
+### Abugida SIS responsibilities
+
+- official student enrollment and section records;
+- official marking periods;
+- storage of synchronized subject percentages;
+- report cards and transcripts;
+- semester and annual result reporting;
+- official rank output.
+
+The planned marking-period structure is:
+
+- Full Year (`FY`)
+- Semester 1 (`S1`)
+- Semester 2 (`S2`)
+
+Numeric percentages such as `85.0`, `90.0`, or `76.5` are the primary academic result. Letter-grade bands may remain configured in RosarioSIS for compatibility or secondary interpretation, but Moodle percentages are the authoritative values.
+
+### Ranking
+
+The required school ranking model is percentage-based, not subject-by-subject GPA ranking.
+
+- **Semester 1 average**: average of all applicable Semester 1 subject percentages.
+- **Semester 1 rank**: rank students using the Semester 1 overall average.
+- **Semester 2 average**: average of all applicable Semester 2 subject percentages.
+- **Semester 2 rank**: rank students using the Semester 2 overall average.
+- **Full Year average**: combine Semester 1 and Semester 2 according to the approved school formula; the current default assumption is equal weighting.
+- **Final rank**: rank students using the Full Year overall average.
+
+The rank scope must be explicitly configured as either **grade + section** or **whole grade** according to school policy.
+
+RosarioSIS's built-in GPA/Class Rank function should not be treated as the authoritative rank when the school uses this percentage-based model. Semester and annual ranking therefore require custom integration/reporting code.
+
+## Student Import: Setup and Fixes
+
+### Students Import module
+
+Production testing used RosarioSIS 12.9.4 with the Students Import add-on.
+
+The add-on must be installed under:
+
+```text
+modules/Students_Import/
+```
+
+and should contain files such as:
+
+```text
+StudentsImport.php
+Menu.php
+install.sql
+install_mysql.sql
+classes/
+includes/
+js/
+locale/
+```
+
+### PHP parse error fixed in StudentsImport.php
+
+A production installation returned an HTTP 500 error when opening **Students -> Student Import**. With PHP errors enabled, the root cause was:
+
+```text
+Parse error: syntax error, unexpected ';' in modules/Students_Import/StudentsImport.php on line 219
+```
+
+The affected conditional output was missing a closing parenthesis. The corrected pattern is:
+
+```php
+AttrEscape( $alert_txt ) : htmlspecialchars( $alert_txt ) );
+```
+
+The same file also contained uses of the invalid PHP constant:
+
+```text
+ENT_QUOTE
+```
+
+which must be:
+
+```text
+ENT_QUOTES
+```
+
+After correcting the syntax and constants, the file should pass a PHP syntax check before deployment.
+
+### Import-grade behavior
+
+When Student Import is configured with one fixed Grade Level for an import batch, every imported student receives that grade. To preserve different grade levels, either:
+
+- import grade-specific batches; or
+- map the source Grade field to RosarioSIS Grade Level when the import workflow supports it.
+
+Do not re-import existing students solely to fix grade placement, because that can create duplicate accounts. Update the current enrollment record instead.
+
+## Production Image/File Upload Fix
+
+RosarioSIS payment attachments and other uploaded files use the runtime upload tree under:
+
+```text
+assets/FileUploads/<year>/student_<id>/
+```
+
+Observed production errors included:
+
+```text
+Folder not created: assets/FileUploads/2026/student_151/
+Folder not writable: assets/FileUploads/2026/student_151/
+```
+
+A folder manually set to `0777` accepted uploads, confirming a PHP process ownership/write-permission problem. `0777` is only a diagnostic and must not be used as the permanent solution.
+
+### Required production configuration
+
+For cPanel/WHM deployments:
+
+1. Enable PHP-FPM for the Abugida SIS domain.
+2. Run the domain's PHP-FPM pool as the cPanel account user/group.
+3. Ensure PHP 8.3 session storage is writable by PHP. A session error such as the following must be resolved before testing uploads:
+
+   ```text
+   session_start(): open(/var/cpanel/php/sessions/ea-php83/sess_..., O_RDWR) failed: Permission denied (13)
+   ```
+
+4. Keep the application upload tree owned by the deployment account, for example:
+
+   ```text
+   <cpanel-user>:<cpanel-user>
+   ```
+
+5. Use normal writable permissions rather than world-writable permissions. Typical values are:
+   - directories: `0755` when PHP runs as the owner, or `0775` when group write is required;
+   - files: `0644` or `0664` as appropriate.
+
+Example administrative repair:
+
+```bash
+chown -R <cpanel-user>:<cpanel-user> /path/to/abugida-sis/assets/FileUploads
+find /path/to/abugida-sis/assets/FileUploads -type d -exec chmod 775 {} \;
+find /path/to/abugida-sis/assets/FileUploads -type f -exec chmod 664 {} \;
+```
+
+The preferred fix is correct PHP-FPM ownership and filesystem permissions so RosarioSIS can create year and student folders automatically. Do not rely on manually creating `2026/`, `student_<id>/`, or leaving upload directories at `0777`.
+
+
 ## Development Environment
 
 Docker is used to provide a consistent local development environment. Docker is not required for the final production deployment.
