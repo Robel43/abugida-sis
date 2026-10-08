@@ -46,6 +46,35 @@ function AbugidaRegistrarStatusLabel( $status )
 	return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
 }
 
+
+function AbugidaFindConfiguredGradeId( $grade_number )
+{
+	$grade_number = (int) $grade_number;
+
+	$grade_rows = DBGet( "SELECT ID,TITLE,SHORT_NAME
+		FROM school_gradelevels
+		WHERE SCHOOL_ID='" . UserSchool() . "'
+		ORDER BY SORT_ORDER,ID" );
+
+	foreach ( (array) $grade_rows as $grade_row )
+	{
+		$candidates = [
+			(string) issetVal( $grade_row['TITLE'], '' ),
+			(string) issetVal( $grade_row['SHORT_NAME'], '' ),
+		];
+
+		foreach ( $candidates as $candidate )
+		{
+			if ( preg_match( '/(^|[^0-9])' . $grade_number . '([^0-9]|$)/', $candidate ) )
+			{
+				return (int) $grade_row['ID'];
+			}
+		}
+	}
+
+	return 0;
+}
+
 require_once 'ProgramFunctions/AbugidaEmail.fnc.php';
 
 if ( ! empty( $_REQUEST['applicant_id'] ) )
@@ -120,12 +149,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		}
 		elseif ( $decision === 'approve' )
 		{
-			$configured_grade_id = DBGetOne( "SELECT ID
-				FROM school_gradelevels
-				WHERE SCHOOL_ID='" . UserSchool() . "'
-				AND (TITLE='Grade " . (int) $applicant['GRADE_LEVEL'] . "' OR SHORT_NAME='G" . (int) $applicant['GRADE_LEVEL'] . "')
-				ORDER BY ID
-				LIMIT 1" );
+			$configured_grade_id = AbugidaFindConfiguredGradeId( (int) $applicant['GRADE_LEVEL'] );
 
 			$amount = $configured_grade_id ? DBGetOne( "SELECT AMOUNT
 				FROM abugida_registration_fees
@@ -206,12 +230,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		&& $applicant['STATUS'] === 'PAYMENT_VERIFIED' )
 	{
 		$grade = (int) $applicant['GRADE_LEVEL'];
-		$grade_id = DBGetOne( "SELECT ID
-			FROM school_gradelevels
-			WHERE SCHOOL_ID='" . UserSchool() . "'
-			AND (TITLE='Grade " . $grade . "' OR SHORT_NAME='G" . $grade . "')
-			ORDER BY ID
-			LIMIT 1" );
+		$grade_id = AbugidaFindConfiguredGradeId( $grade );
 
 		if ( ! $grade_id )
 		{
