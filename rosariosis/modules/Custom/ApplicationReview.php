@@ -5,24 +5,45 @@
 
 DrawHeader( ProgramTitle() );
 
-if ( ! empty( $_SESSION['abugida_registrar_flash'] ) )
+$abugida_flash = null;
+
+if ( ! empty( $_GET['decision_result'] ) )
 {
-	$flash = $_SESSION['abugida_registrar_flash'];
-	unset( $_SESSION['abugida_registrar_flash'] );
+	$result = (string) $_GET['decision_result'];
+	$email_sent = isset( $_GET['email_sent'] ) && $_GET['email_sent'] === '1';
 
-	$flash_type = issetVal( $flash['type'], 'approved' );
-	$flash_message = issetVal( $flash['message'], '' );
+	if ( $result === 'approved' )
+	{
+		$abugida_flash = [
+			'type' => 'approved',
+			'message' => $email_sent ?
+				'Application approved successfully. Approval email sent to the student.' :
+				'Application approved successfully, but the email could not be sent. Check the SMTP configuration.',
+		];
+	}
+	elseif ( $result === 'rejected' )
+	{
+		$abugida_flash = [
+			'type' => 'rejected',
+			'message' => $email_sent ?
+				'Application rejected successfully. The reason was sent to the student.' :
+				'Application rejected successfully, but the email could not be sent. The student can still see the reason in the registration portal.',
+		];
+	}
+}
 
+if ( $abugida_flash )
+{
 	echo '<style>
-		.abg-toast{position:fixed;top:72px;right:24px;z-index:9999;max-width:430px;padding:16px 18px;border-radius:10px;color:#fff;font-weight:700;box-shadow:0 14px 40px rgba(0,0,0,.22);animation:abgSlideIn .2s ease-out}
+		.abg-toast{position:fixed;top:72px;right:24px;z-index:9999;max-width:470px;padding:16px 18px;border-radius:10px;color:#fff;font-weight:700;box-shadow:0 14px 40px rgba(0,0,0,.22);animation:abgSlideIn .2s ease-out}
 		.abg-toast.approved{background:#0f7a4d}
 		.abg-toast.rejected{background:#b42318}
 		.abg-toast button{margin-left:14px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer}
 		@keyframes abgSlideIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
 	</style>';
-	echo '<div id="abg-toast" class="abg-toast ' . AttrEscape( $flash_type ) . '"><span>' .
-		AttrEscape( $flash_message ) . '</span><button type="button" aria-label="Close" onclick="document.getElementById(\'abg-toast\').remove()">×</button></div>';
-	echo '<script>setTimeout(function(){var e=document.getElementById("abg-toast");if(e)e.remove();},4500);</script>';
+	echo '<div id="abg-toast" class="abg-toast ' . AttrEscape( $abugida_flash['type'] ) . '"><span>' .
+		AttrEscape( $abugida_flash['message'] ) . '</span><button type="button" aria-label="Close" onclick="document.getElementById(\'abg-toast\').remove()">×</button></div>';
+	echo '<script>setTimeout(function(){var e=document.getElementById("abg-toast");if(e)e.remove();},6000);</script>';
 }
 
 if ( User( 'PROFILE' ) !== 'admin' )
@@ -111,14 +132,24 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 					"Open the registration page and use your phone number to update and resubmit your application:\n" .
 					$registration_url;
 
-				AbugidaSendEmail(
+				$email_sent = AbugidaSendEmail(
 					$applicant['EMAIL'],
 					'Abugida SIS application update',
 					$rejection_message
 				);
 
-				$_SESSION['abugida_registrar_flash'] = [ 'type' => 'rejected', 'message' => 'Application rejected successfully. The student can now see the rejection reason.' ];
-				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application rejected.' );
+				$saved_status = DBGetOne( "SELECT STATUS FROM abugida_applicants WHERE ID='" . $applicant_id . "'" );
+
+				if ( $saved_status === 'DECLINED' )
+				{
+					$redirect_url = 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id .
+						'&decision_result=rejected&email_sent=' . ( $email_sent ? '1' : '0' );
+
+					echo '<script>window.location.replace(' . json_encode( $redirect_url ) . ');</script>';
+					exit;
+				}
+
+				$error[] = _( 'The rejection decision could not be saved.' );
 			}
 		}
 		elseif ( $decision === 'approve' )
@@ -156,18 +187,27 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 					"Open the payment page using the link below:\n" . $payment_url . "\n\n" .
 					"After payment, upload your receipt from the payment page.";
 
-				AbugidaSendEmail(
+				$email_sent = AbugidaSendEmail(
 					$applicant['EMAIL'],
 					'Abugida SIS application approved',
 					$approval_message
 				);
 
-				$_SESSION['abugida_registrar_flash'] = [ 'type' => 'approved', 'message' => 'Application approved successfully. The student can now proceed to payment.' ];
-				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application approved for payment.' );
+				$saved_status = DBGetOne( "SELECT STATUS FROM abugida_applicants WHERE ID='" . $applicant_id . "'" );
+
+				if ( $saved_status === 'APPROVED_FOR_PAYMENT' )
+				{
+					$redirect_url = 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id .
+						'&decision_result=approved&email_sent=' . ( $email_sent ? '1' : '0' );
+
+					echo '<script>window.location.replace(' . json_encode( $redirect_url ) . ');</script>';
+					exit;
+				}
+
+				$error[] = _( 'The approval decision could not be saved. Make sure database migration 005 has been applied.' );
 			}
 		}
 
-		RedirectURL( [ 'modfunc', 'decision' ] );
 	}
 
 	if ( $applicant
