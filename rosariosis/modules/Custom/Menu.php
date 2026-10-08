@@ -35,6 +35,7 @@ if ( $RosarioModules['Student_Billing'] )
 
 	$menu['Student_Billing']['admin'] += [
 		'Custom/FinanceApplications.php' => _( 'Application Payments' ),
+		'Custom/RegistrationFees.php' => _( 'Registration Fees' ),
 	];
 }
 
