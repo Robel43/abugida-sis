@@ -221,9 +221,9 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 			{
 				$errors[] = 'Application session not found. Enter your phone number again.';
 			}
-			elseif ( $applicant['STATUS'] !== 'DRAFT' )
+			elseif ( ! in_array( $applicant['STATUS'], [ 'DRAFT', 'DECLINED' ], true ) )
 			{
-				$errors[] = 'This application has already been submitted and cannot be edited.';
+				$errors[] = 'This application is not currently editable.';
 			}
 			else
 			{
@@ -326,6 +326,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 					if ( $action === 'submit' )
 					{
 						$set[] = "STATUS='SUBMITTED'";
+						$set[] = 'REGISTRAR_DECISION_REASON=NULL';
 						$set[] = 'SUBMITTED_AT=NOW()';
 						$set[] = 'CURRENT_STEP=5';
 					}
@@ -505,8 +506,15 @@ elseif ( isset( $_GET['submitted'] ) )
 			<?php $progress = abugida_reg_progress( $applicant ); ?>
 			<div class="panel-head">
 				<div>
-					<h3><?php echo $applicant['STATUS'] === 'DRAFT' ? 'Registration details' : 'Application submitted'; ?></h3>
-					<p><?php echo $applicant['STATUS'] === 'DRAFT' ? 'Complete all required information, then submit when you are ready.' : 'Your information has been saved and is awaiting Registrar review.'; ?></p>
+					<h3><?php
+						echo in_array( $applicant['STATUS'], [ 'DRAFT', 'DECLINED' ], true ) ? 'Registration details' :
+							( $applicant['STATUS'] === 'ACTIVE' ? 'Registration complete' : 'Application status' );
+					?></h3>
+					<p><?php
+						echo in_array( $applicant['STATUS'], [ 'DRAFT', 'DECLINED' ], true ) ?
+							'Complete the required information and submit when you are ready.' :
+							'Follow the status below for the next step in your registration.';
+					?></p>
 				</div>
 				<span class="badge"><?php echo abugida_reg_h( $applicant['STATUS'] ); ?></span>
 			</div>
@@ -521,7 +529,10 @@ elseif ( isset( $_GET['submitted'] ) )
 				<div class="progress"><span style="width:<?php echo (int) $progress; ?>%"></span></div>
 			</div>
 
-			<?php if ( $applicant['STATUS'] === 'DRAFT' ) { ?>
+			<?php if ( in_array( $applicant['STATUS'], [ 'DRAFT', 'DECLINED' ], true ) ) { ?>
+				<?php if ( $applicant['STATUS'] === 'DECLINED' ) { ?>
+					<div class="alert error"><strong>Application returned:</strong> <?php echo abugida_reg_h( $applicant['REGISTRAR_DECISION_REASON'] ); ?><br><span class="help">Correct the requested information and submit the application again.</span></div>
+				<?php } ?>
 				<form method="post" enctype="multipart/form-data">
 					<input type="hidden" name="csrf" value="<?php echo abugida_reg_h( $_SESSION['abugida_reg_csrf'] ); ?>">
 					<div class="grid">
@@ -582,8 +593,29 @@ elseif ( isset( $_GET['submitted'] ) )
 				</form>
 			<?php } else { ?>
 				<div class="submitted">
-					<strong>Application received.</strong>
-					<p>The application is now read-only while it awaits Registrar review.</p>
+					<?php if ( $applicant['STATUS'] === 'SUBMITTED' || $applicant['STATUS'] === 'UNDER_REVIEW' ) { ?>
+						<strong>Application received.</strong>
+						<p>Your application is awaiting Registrar review.</p>
+					<?php } elseif ( $applicant['STATUS'] === 'APPROVED_FOR_PAYMENT' ) { ?>
+						<strong>Application approved.</strong>
+						<p>Your application has been approved. Continue to the payment step.</p>
+						<a class="button primary" href="registration-payment.php">View payment instructions</a>
+					<?php } elseif ( $applicant['STATUS'] === 'PAYMENT_SUBMITTED' ) { ?>
+						<strong>Receipt submitted.</strong>
+						<p>Your payment proof is waiting for Finance verification.</p>
+						<a class="button secondary" href="registration-payment.php">View payment status</a>
+					<?php } elseif ( $applicant['STATUS'] === 'PAYMENT_DECLINED' ) { ?>
+						<strong>Payment needs correction.</strong>
+						<p><?php echo abugida_reg_h( $applicant['FINANCE_DECISION_REASON'] ); ?></p>
+						<a class="button primary" href="registration-payment.php">Upload a new receipt</a>
+					<?php } elseif ( $applicant['STATUS'] === 'PAYMENT_VERIFIED' ) { ?>
+						<strong>Payment verified.</strong>
+						<p>The Registrar will now complete your enrollment and create your student account.</p>
+					<?php } elseif ( $applicant['STATUS'] === 'ACTIVE' ) { ?>
+						<strong>Registration completed.</strong>
+						<p>Your student account has been created. Username: <b><?php echo abugida_reg_h( $applicant['GENERATED_USERNAME'] ); ?></b></p>
+						<a class="button primary" href="index.php">Student login</a>
+					<?php } ?>
 				</div>
 				<div class="grid">
 					<div class="field"><label>First Name</label><input class="readonly" value="<?php echo abugida_reg_h( $applicant['FIRST_NAME'] ); ?>" readonly></div>
