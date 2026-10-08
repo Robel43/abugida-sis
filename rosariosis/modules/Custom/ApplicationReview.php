@@ -120,14 +120,30 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		}
 		elseif ( $decision === 'approve' )
 		{
-			$amount = (float) issetVal( $_POST['payment_amount'] );
+			$configured_grade_id = DBGetOne( "SELECT ID
+				FROM school_gradelevels
+				WHERE SCHOOL_ID='" . UserSchool() . "'
+				AND (TITLE='Grade " . (int) $applicant['GRADE_LEVEL'] . "' OR SHORT_NAME='G" . (int) $applicant['GRADE_LEVEL'] . "')
+				ORDER BY ID
+				LIMIT 1" );
 
-			if ( $amount <= 0 )
+			$amount = $configured_grade_id ? DBGetOne( "SELECT AMOUNT
+				FROM abugida_registration_fees
+				WHERE SCHOOL_ID='" . UserSchool() . "'
+				AND SYEAR='" . UserSyear() . "'
+				AND GRADE_ID='" . (int) $configured_grade_id . "'
+				LIMIT 1" ) : null;
+
+			if ( $amount === null || $amount === false || $amount === '' )
 			{
-				$error[] = _( 'Enter a valid payment amount.' );
+				$error[] = sprintf(
+					_( 'No registration fee is configured for Grade %d. Set it under Student Billing > Registration Fees.' ),
+					(int) $applicant['GRADE_LEVEL']
+				);
 			}
 			else
 			{
+				$amount = (float) $amount;
 				$payment_token = bin2hex( random_bytes( 32 ) );
 				$instructions = 'Your application has been approved. Please complete the required payment and upload your payment receipt.';
 				DBUpdate(
@@ -382,8 +398,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
 			echo '<input type="hidden" name="decision" value="approve">';
-			echo '<p><label><b>' . _( 'Payment Amount (ETB)' ) . '</b><br><input type="number" min="0" step="0.01" name="payment_amount" required></label></p>';
-
+			echo '<p>' . _( 'The payment amount will be taken automatically from the Registration Fees configured for this grade.' ) . '</p>';
 			echo '<button class="abg-btn abg-success" type="submit">' . _( 'Approve Application' ) . '</button>';
 			echo '</form>';
 
