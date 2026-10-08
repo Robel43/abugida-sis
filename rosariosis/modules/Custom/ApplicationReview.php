@@ -5,46 +5,7 @@
 
 DrawHeader( ProgramTitle() );
 
-$abugida_flash = null;
-
-if ( ! empty( $_GET['decision_result'] ) )
-{
-	$result = (string) $_GET['decision_result'];
-	$email_sent = isset( $_GET['email_sent'] ) && $_GET['email_sent'] === '1';
-
-	if ( $result === 'approved' )
-	{
-		$abugida_flash = [
-			'type' => 'approved',
-			'message' => $email_sent ?
-				'Application approved successfully. Approval email sent to the student.' :
-				'Application approved successfully, but the email could not be sent. Check the SMTP configuration.',
-		];
-	}
-	elseif ( $result === 'rejected' )
-	{
-		$abugida_flash = [
-			'type' => 'rejected',
-			'message' => $email_sent ?
-				'Application rejected successfully. The reason was sent to the student.' :
-				'Application rejected successfully, but the email could not be sent. The student can still see the reason in the registration portal.',
-		];
-	}
-}
-
-if ( $abugida_flash )
-{
-	echo '<style>
-		.abg-toast{position:fixed;top:72px;right:24px;z-index:9999;max-width:470px;padding:16px 18px;border-radius:10px;color:#fff;font-weight:700;box-shadow:0 14px 40px rgba(0,0,0,.22);animation:abgSlideIn .2s ease-out}
-		.abg-toast.approved{background:#0f7a4d}
-		.abg-toast.rejected{background:#b42318}
-		.abg-toast button{margin-left:14px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer}
-		@keyframes abgSlideIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
-	</style>';
-	echo '<div id="abg-toast" class="abg-toast ' . AttrEscape( $abugida_flash['type'] ) . '"><span>' .
-		AttrEscape( $abugida_flash['message'] ) . '</span><button type="button" aria-label="Close" onclick="document.getElementById(\'abg-toast\').remove()">×</button></div>';
-	echo '<script>setTimeout(function(){var e=document.getElementById("abg-toast");if(e)e.remove();},6000);</script>';
-}
+$abugida_decision_feedback = null;
 
 if ( User( 'PROFILE' ) !== 'admin' )
 {
@@ -98,10 +59,11 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 
 
 	if ( $applicant
-		&& $_REQUEST['modfunc'] === 'decision'
+		&& $_SERVER['REQUEST_METHOD'] === 'POST'
+		&& issetVal( $_REQUEST['modfunc'] ) === 'decision'
 		&& AllowEdit() )
 	{
-		$decision = issetVal( $_POST['decision'] );
+		$decision = issetVal( $_POST['decision'], '' );
 		$reason = trim( (string) issetVal( $_POST['reason'], '' ) );
 		$from = $applicant['STATUS'];
 
@@ -142,14 +104,18 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 
 				if ( $saved_status === 'DECLINED' )
 				{
-					$redirect_url = 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id .
-						'&decision_result=rejected&email_sent=' . ( $email_sent ? '1' : '0' );
-
-					echo '<script>window.location.replace(' . json_encode( $redirect_url ) . ');</script>';
-					exit;
+					$abugida_decision_feedback = [
+						'type' => 'rejected',
+						'title' => 'Application Rejected',
+						'message' => $email_sent ?
+							'The application was rejected successfully and the rejection reason was emailed to the student.' :
+							'The application was rejected successfully, but the email could not be sent. The student can still see the reason in the registration portal.',
+					];
 				}
-
-				$error[] = _( 'The rejection decision could not be saved.' );
+				else
+				{
+					$error[] = _( 'The rejection decision could not be saved.' );
+				}
 			}
 		}
 		elseif ( $decision === 'approve' )
@@ -197,15 +163,23 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 
 				if ( $saved_status === 'APPROVED_FOR_PAYMENT' )
 				{
-					$redirect_url = 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id .
-						'&decision_result=approved&email_sent=' . ( $email_sent ? '1' : '0' );
-
-					echo '<script>window.location.replace(' . json_encode( $redirect_url ) . ');</script>';
-					exit;
+					$abugida_decision_feedback = [
+						'type' => 'approved',
+						'title' => 'Application Approved',
+						'message' => $email_sent ?
+							'The application was approved successfully and the payment link was emailed to the student.' :
+							'The application was approved successfully, but the email could not be sent. Check the SMTP configuration.',
+					];
 				}
-
-				$error[] = _( 'The approval decision could not be saved. Make sure database migration 005 has been applied.' );
+				else
+				{
+					$error[] = _( 'The approval decision could not be saved. Make sure database migration 005 has been applied.' );
+				}
 			}
+		}
+		elseif ( $decision === '' )
+		{
+			$error[] = _( 'No Registrar decision was received. Please try again.' );
 		}
 
 	}
@@ -336,8 +310,28 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			.abg-decision textarea,.abg-decision input{max-width:720px;width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px}
 			.abg-decision details{margin-top:12px;border-top:1px solid #eceff3;padding-top:12px}
 			.abg-decision summary{cursor:pointer;font-weight:700;color:#b42318}
+			.abg-modal-backdrop{position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.58);display:flex;align-items:center;justify-content:center;padding:20px}
+			.abg-modal{width:min(520px,100%);background:#fff;border-radius:14px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.3)}
+			.abg-modal h3{margin:0 0 10px;font-size:24px}
+			.abg-modal p{margin:0 0 18px;line-height:1.5;color:#475467}
+			.abg-modal.approved{border-top:6px solid #0f7a4d}
+			.abg-modal.rejected{border-top:6px solid #b42318}
 			@media(max-width:760px){.abg-review-grid,.abg-docs{grid-template-columns:1fr}}
 		</style>';
+
+
+
+		if ( $abugida_decision_feedback )
+		{
+			echo '<div class="abg-modal-backdrop">';
+			echo '<div class="abg-modal ' . AttrEscape( $abugida_decision_feedback['type'] ) . '">';
+			echo '<h3>' . AttrEscape( $abugida_decision_feedback['title'] ) . '</h3>';
+			echo '<p>' . AttrEscape( $abugida_decision_feedback['message'] ) . '</p>';
+			echo '<a class="abg-btn abg-primary" href="' .
+				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id ) .
+				'">' . _( 'OK' ) . '</a>';
+			echo '</div></div>';
+		}
 
 		echo '<div class="abg-review-grid">';
 		echo '<div class="abg-card"><h3>' . _( 'Applicant Information' ) . '</h3>';
@@ -387,18 +381,20 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			echo '<div class="abg-decision"><h3>' . _( 'Registrar Decision' ) . '</h3>';
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo '<input type="hidden" name="decision" value="approve">';
 			echo '<p><label><b>' . _( 'Payment Amount (ETB)' ) . '</b><br><input type="number" min="0" step="0.01" name="payment_amount" required></label></p>';
 
-			echo '<button class="abg-btn abg-success" type="submit" name="decision" value="approve">' . _( 'Approve Application' ) . '</button>';
+			echo '<button class="abg-btn abg-success" type="submit">' . _( 'Approve Application' ) . '</button>';
 			echo '</form>';
 
 			echo '<details>';
 			echo '<summary>' . _( 'Reject Application' ) . '</summary>';
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo '<input type="hidden" name="decision" value="reject">';
 			echo '<p>' . _( 'Explain why the application is being returned. The applicant will see this reason when they return to the registration page, and it will also be emailed when outgoing email is configured.' ) . '</p>';
 			echo '<textarea name="reason" rows="4" required placeholder="' . AttrEscape( _( 'Write the rejection reason here...' ) ) . '"></textarea><br><br>';
-			echo '<button class="abg-btn abg-danger" type="submit" name="decision" value="reject">' . _( 'Reject and Send Reason' ) . '</button>';
+			echo '<button class="abg-btn abg-danger" type="submit">' . _( 'Reject and Send Reason' ) . '</button>';
 			echo '</form>';
 			echo '</details>';
 			echo '</div>';
