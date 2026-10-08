@@ -36,11 +36,11 @@ function AbugidaApplicationEmail( $email, $subject, $message )
 	}
 }
 
-function AbugidaApplicationDownload( $row, $type )
+function AbugidaApplicationFile( $row, $type, $inline = false )
 {
 	$map = [
-		'document' => [ 'DOCUMENT_STORED_NAME', 'DOCUMENT_ORIGINAL_NAME' ],
-		'fayda' => [ 'FAYDA_STORED_NAME', 'FAYDA_ORIGINAL_NAME' ],
+		'document' => [ 'DOCUMENT_STORED_NAME', 'DOCUMENT_ORIGINAL_NAME', 'DOCUMENT_MIME_TYPE' ],
+		'fayda' => [ 'FAYDA_STORED_NAME', 'FAYDA_ORIGINAL_NAME', 'FAYDA_MIME_TYPE' ],
 	];
 
 	if ( empty( $map[ $type ] ) )
@@ -50,6 +50,7 @@ function AbugidaApplicationDownload( $row, $type )
 
 	$stored = $row[ $map[ $type ][0] ];
 	$original = $row[ $map[ $type ][1] ];
+	$mime = $row[ $map[ $type ][2] ];
 
 	if ( ! $stored )
 	{
@@ -63,8 +64,10 @@ function AbugidaApplicationDownload( $row, $type )
 		return;
 	}
 
-	header( 'Content-Type: application/octet-stream' );
-	header( 'Content-Disposition: attachment; filename="' . str_replace( '"', '', basename( $original ) ) . '"' );
+	$disposition = $inline ? 'inline' : 'attachment';
+
+	header( 'Content-Type: ' . ( $mime ? $mime : 'application/octet-stream' ) );
+	header( 'Content-Disposition: ' . $disposition . '; filename="' . str_replace( '"', '', basename( $original ) ) . '"' );
 	header( 'Content-Length: ' . filesize( $file ) );
 	readfile( $file );
 	exit;
@@ -79,9 +82,14 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		LIMIT 1" );
 	$applicant = ! empty( $applicant_RET[1] ) ? $applicant_RET[1] : null;
 
+	if ( $applicant && ! empty( $_REQUEST['view'] ) )
+	{
+		AbugidaApplicationFile( $applicant, $_REQUEST['view'], true );
+	}
+
 	if ( $applicant && ! empty( $_REQUEST['download'] ) )
 	{
-		AbugidaApplicationDownload( $applicant, $_REQUEST['download'] );
+		AbugidaApplicationFile( $applicant, $_REQUEST['download'], false );
 	}
 
 	if ( $applicant
@@ -268,41 +276,89 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			AttrEscape( $applicant['APPLICATION_REFERENCE'] )
 		);
 
-		echo '<table class="width-100p cellpadding-5">';
-		echo '<tr><td><b>' . _( 'Applicant' ) . '</b></td><td>' .
-			AttrEscape( $applicant['FIRST_NAME'] . ' ' . $applicant['LAST_NAME'] ) . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Phone' ) . '</b></td><td>' . AttrEscape( $applicant['PHONE'] ) . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Email' ) . '</b></td><td>' . AttrEscape( $applicant['EMAIL'] ) . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Grade' ) . '</b></td><td>Grade ' . (int) $applicant['GRADE_LEVEL'] . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Learning Approach' ) . '</b></td><td>' .
-			( $applicant['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Status' ) . '</b></td><td>' . AttrEscape( $applicant['STATUS'] ) . '</td></tr>';
-		echo '</table>';
+		echo '<style>
+			.abg-review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+			.abg-card{background:#fff;border:1px solid #d9e1ea;border-radius:10px;padding:14px}
+			.abg-card h3{margin:0 0 12px;font-size:18px}
+			.abg-field{margin:0 0 10px}.abg-label{display:block;font-size:12px;color:#667085;margin-bottom:3px}
+			.abg-value{font-weight:600;color:#1f2937}
+			.abg-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+			.abg-btn{display:inline-block;padding:9px 13px;border-radius:7px;text-decoration:none;border:0;cursor:pointer;font-weight:700}
+			.abg-primary{background:#1677c8;color:#fff}.abg-secondary{background:#eef2f6;color:#253247}
+			.abg-danger{background:#b42318;color:#fff}.abg-success{background:#0f7a4d;color:#fff}
+			.abg-docs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+			.abg-doc{border:1px solid #d9e1ea;border-radius:10px;padding:14px;background:#fafbfd}
+			.abg-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef4ff;color:#174ea6;font-weight:700;font-size:12px}
+			.abg-decision{border:1px solid #d9e1ea;border-radius:10px;padding:16px;margin-top:18px;background:#fff}
+			.abg-decision textarea,.abg-decision input{max-width:720px;width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px}
+			.abg-decision details{margin-top:12px;border-top:1px solid #eceff3;padding-top:12px}
+			.abg-decision summary{cursor:pointer;font-weight:700;color:#b42318}
+			@media(max-width:760px){.abg-review-grid,.abg-docs{grid-template-columns:1fr}}
+		</style>';
 
-		echo '<br /><div>';
+		echo '<div class="abg-review-grid">';
+		echo '<div class="abg-card"><h3>' . _( 'Applicant Information' ) . '</h3>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Application Reference' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['APPLICATION_REFERENCE'] ) . '</div></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Full Name' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['FIRST_NAME'] . ' ' . $applicant['LAST_NAME'] ) . '</div></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Phone' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['PHONE'] ) . '</div></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Email' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['EMAIL'] ) . '</div></div>';
+		echo '</div>';
+
+		echo '<div class="abg-card"><h3>' . _( 'Application Details' ) . '</h3>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Grade' ) . '</span><div class="abg-value">Grade ' . (int) $applicant['GRADE_LEVEL'] . '</div></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Learning Approach' ) . '</span><div class="abg-value">' .
+			( $applicant['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</div></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Submitted' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['SUBMITTED_AT'] ) . '</div></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Status' ) . '</span><span class="abg-status">' . AttrEscape( $applicant['STATUS'] ) . '</span></div>';
+		echo '</div>';
+		echo '</div>';
+
+		echo '<h3>' . _( 'Uploaded Documents' ) . '</h3>';
+		echo '<div class="abg-docs">';
+
+		echo '<div class="abg-doc"><b>' . _( 'Supporting Document' ) . '</b><br><small>' .
+			AttrEscape( $applicant['DOCUMENT_ORIGINAL_NAME'] ? $applicant['DOCUMENT_ORIGINAL_NAME'] : _( 'Not uploaded' ) ) . '</small>';
 		if ( $applicant['DOCUMENT_STORED_NAME'] )
 		{
-			echo '<a class="button" href="' . URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&download=document' ) . '">' .
-				_( 'Download Supporting Document' ) . '</a> ';
+			echo '<div class="abg-actions"><a class="abg-btn abg-primary" target="_blank" href="' .
+				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&view=document' ) . '">' . _( 'View Document' ) . '</a>';
+			echo '<a class="abg-btn abg-secondary" href="' .
+				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&download=document' ) . '">' . _( 'Download' ) . '</a></div>';
 		}
+		echo '</div>';
+
+		echo '<div class="abg-doc"><b>' . _( 'Fayda ID' ) . '</b><br><small>' .
+			AttrEscape( $applicant['FAYDA_ORIGINAL_NAME'] ? $applicant['FAYDA_ORIGINAL_NAME'] : _( 'Not uploaded' ) ) . '</small>';
 		if ( $applicant['FAYDA_STORED_NAME'] )
 		{
-			echo '<a class="button" href="' . URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&download=fayda' ) . '">' .
-				_( 'Download Fayda ID' ) . '</a>';
+			echo '<div class="abg-actions"><a class="abg-btn abg-primary" target="_blank" href="' .
+				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&view=fayda' ) . '">' . _( 'View Fayda ID' ) . '</a>';
+			echo '<a class="abg-btn abg-secondary" href="' .
+				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&download=fayda' ) . '">' . _( 'Download' ) . '</a></div>';
 		}
+		echo '</div>';
 		echo '</div>';
 
 		if ( in_array( $applicant['STATUS'], [ 'SUBMITTED', 'UNDER_REVIEW' ], true ) && AllowEdit() )
 		{
-			echo '<br /><form method="POST" action="' .
+			echo '<div class="abg-decision"><h3>' . _( 'Registrar Decision' ) . '</h3>';
+			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
-			echo '<fieldset><legend>' . _( 'Registrar Decision' ) . '</legend>';
-			echo '<p><label>' . _( 'Payment Amount' ) . '<br><input type="number" min="0" step="0.01" name="payment_amount"></label></p>';
-			echo '<p><label>' . _( 'Payment Instructions' ) . '<br><textarea name="payment_instructions" rows="4" class="width-100p"></textarea></label></p>';
-			echo '<p><label>' . _( 'Reason (required when rejecting)' ) . '<br><textarea name="reason" rows="3" class="width-100p"></textarea></label></p>';
-			echo '<button type="submit" name="decision" value="approve">' . _( 'Approve for Payment' ) . '</button> ';
-			echo '<button type="submit" name="decision" value="reject">' . _( 'Reject Application' ) . '</button>';
-			echo '</fieldset></form>';
+			echo '<p><label><b>' . _( 'Payment Amount (ETB)' ) . '</b><br><input type="number" min="0" step="0.01" name="payment_amount" required></label></p>';
+			echo '<p><label><b>' . _( 'Payment Instructions' ) . '</b><br><textarea name="payment_instructions" rows="4" required placeholder="' . AttrEscape( _( 'Enter where and how the applicant should make payment.' ) ) . '"></textarea></label></p>';
+			echo '<button class="abg-btn abg-success" type="submit" name="decision" value="approve">' . _( 'Approve Application' ) . '</button>';
+			echo '</form>';
+
+			echo '<details>';
+			echo '<summary>' . _( 'Reject Application' ) . '</summary>';
+			echo '<form method="POST" action="' .
+				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo '<p>' . _( 'Explain why the application is being returned. The applicant will see this reason when they return to the registration page, and it will also be emailed when outgoing email is configured.' ) . '</p>';
+			echo '<textarea name="reason" rows="4" required placeholder="' . AttrEscape( _( 'Write the rejection reason here...' ) ) . '"></textarea><br><br>';
+			echo '<button class="abg-btn abg-danger" type="submit" name="decision" value="reject">' . _( 'Reject and Send Reason' ) . '</button>';
+			echo '</form>';
+			echo '</details>';
+			echo '</div>';
 		}
 		elseif ( $applicant['STATUS'] === 'DECLINED' )
 		{
@@ -310,10 +366,12 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		}
 		elseif ( $applicant['STATUS'] === 'PAYMENT_VERIFIED' && AllowEdit() )
 		{
-			echo '<br /><form method="POST" action="' .
+			echo '<div class="abg-decision"><h3>' . _( 'Final Registration Confirmation' ) . '</h3>';
+			echo '<p>' . _( 'Finance has verified payment. Final confirmation will create the permanent student account.' ) . '</p>';
+			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=final_confirm' ) . '">';
-			echo '<button type="submit">' . _( 'Final Confirm & Create Student Account' ) . '</button>';
-			echo '</form>';
+			echo '<button class="abg-btn abg-success" type="submit">' . _( 'Final Confirm & Create Student Account' ) . '</button>';
+			echo '</form></div>';
 		}
 		elseif ( $applicant['STATUS'] === 'ACTIVE' )
 		{
@@ -332,21 +390,46 @@ $rows = DBGet( "SELECT ID,APPLICATION_REFERENCE,FIRST_NAME,LAST_NAME,PHONE,EMAIL
 	FROM abugida_applicants
 	ORDER BY ID DESC" );
 
-$columns = [
-	'APPLICATION_REFERENCE' => _( 'Reference' ),
-	'FIRST_NAME' => _( 'First Name' ),
-	'LAST_NAME' => _( 'Last Name' ),
-	'PHONE' => _( 'Phone' ),
-	'GRADE_LEVEL' => _( 'Grade' ),
-	'STUDY_APPROACH' => _( 'Approach' ),
-	'STATUS' => _( 'Status' ),
-	'CREATED_AT' => _( 'Created' ),
-];
+echo '<style>
+	.abg-app-table{width:100%;border-collapse:collapse;background:#fff}
+	.abg-app-table th,.abg-app-table td{padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:left}
+	.abg-app-table th{background:#f7f9fc;color:#344054;font-size:12px;text-transform:uppercase}
+	.abg-view{display:inline-block;padding:7px 11px;border-radius:6px;background:#1677c8;color:#fff;text-decoration:none;font-weight:700}
+	.abg-empty{padding:18px;background:#fff;border:1px solid #e5e7eb;border-radius:8px}
+</style>';
 
-$link = [
-	'FULL_NAME' => false,
-	'link' => 'Modules.php?modname=Custom/ApplicationReview.php',
-	'variables' => [ 'applicant_id' => 'ID' ],
-];
+if ( empty( $rows ) )
+{
+	echo '<div class="abg-empty">' . _( 'No online applications were found.' ) . '</div>';
+	return;
+}
 
-ListOutput( $rows, $columns, 'Application', 'Applications', $link );
+echo '<table class="abg-app-table">';
+echo '<thead><tr>';
+echo '<th>' . _( 'Reference' ) . '</th>';
+echo '<th>' . _( 'Applicant' ) . '</th>';
+echo '<th>' . _( 'Phone' ) . '</th>';
+echo '<th>' . _( 'Grade' ) . '</th>';
+echo '<th>' . _( 'Approach' ) . '</th>';
+echo '<th>' . _( 'Status' ) . '</th>';
+echo '<th>' . _( 'Created' ) . '</th>';
+echo '<th>' . _( 'Action' ) . '</th>';
+echo '</tr></thead><tbody>';
+
+foreach ( (array) $rows as $row )
+{
+	echo '<tr>';
+	echo '<td>' . AttrEscape( $row['APPLICATION_REFERENCE'] ) . '</td>';
+	echo '<td>' . AttrEscape( trim( $row['FIRST_NAME'] . ' ' . $row['LAST_NAME'] ) ) . '</td>';
+	echo '<td>' . AttrEscape( $row['PHONE'] ) . '</td>';
+	echo '<td>Grade ' . (int) $row['GRADE_LEVEL'] . '</td>';
+	echo '<td>' . ( $row['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</td>';
+	echo '<td>' . AttrEscape( $row['STATUS'] ) . '</td>';
+	echo '<td>' . AttrEscape( $row['CREATED_AT'] ) . '</td>';
+	echo '<td><a class="abg-view" href="' .
+		URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . (int) $row['ID'] ) .
+		'">' . _( 'View Application' ) . '</a></td>';
+	echo '</tr>';
+}
+
+echo '</tbody></table>';
