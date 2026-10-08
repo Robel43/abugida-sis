@@ -14,7 +14,10 @@ function AbugidaSendEmail( $to, $subject, $message )
 		$AbugidaMailFrom,
 		$AbugidaMailFromName,
 		$AbugidaMailEncryption,
-		$error;
+		$error,
+		$AbugidaMailLastError;
+
+	$AbugidaMailLastError = '';
 
 	if ( ! filter_var( $to, FILTER_VALIDATE_EMAIL ) )
 	{
@@ -26,7 +29,9 @@ function AbugidaSendEmail( $to, $subject, $message )
 		|| empty( $AbugidaMailPassword )
 		|| empty( $AbugidaMailFrom ) )
 	{
+		$AbugidaMailLastError = 'SMTP configuration is incomplete.';
 		$error[] = _( 'Abugida SMTP email is not configured. Add the mail settings to config.inc.php.' );
+		error_log( '[Abugida SMTP] ' . $AbugidaMailLastError );
 
 		return false;
 	}
@@ -40,6 +45,8 @@ function AbugidaSendEmail( $to, $subject, $message )
 		$mail->Username = $AbugidaMailUsername;
 		$mail->Password = $AbugidaMailPassword;
 		$mail->Port = ! empty( $AbugidaMailPort ) ? (int) $AbugidaMailPort : 587;
+		$mail->Timeout = 15;
+		$mail->SMTPKeepAlive = false;
 
 		if ( ! empty( $AbugidaMailEncryption ) )
 		{
@@ -58,9 +65,11 @@ function AbugidaSendEmail( $to, $subject, $message )
 
 		return $mail->send();
 	}
-	catch ( PHPMailer\PHPMailer\Exception $e )
+	catch ( Throwable $e )
 	{
-		$error[] = $e->getMessage();
+		$AbugidaMailLastError = $e->getMessage();
+		$error[] = $AbugidaMailLastError;
+		error_log( '[Abugida SMTP] ' . $AbugidaMailLastError );
 
 		return false;
 	}
