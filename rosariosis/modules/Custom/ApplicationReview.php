@@ -5,6 +5,26 @@
 
 DrawHeader( ProgramTitle() );
 
+if ( ! empty( $_SESSION['abugida_registrar_flash'] ) )
+{
+	$flash = $_SESSION['abugida_registrar_flash'];
+	unset( $_SESSION['abugida_registrar_flash'] );
+
+	$flash_type = issetVal( $flash['type'], 'approved' );
+	$flash_message = issetVal( $flash['message'], '' );
+
+	echo '<style>
+		.abg-toast{position:fixed;top:72px;right:24px;z-index:9999;max-width:430px;padding:16px 18px;border-radius:10px;color:#fff;font-weight:700;box-shadow:0 14px 40px rgba(0,0,0,.22);animation:abgSlideIn .2s ease-out}
+		.abg-toast.approved{background:#0f7a4d}
+		.abg-toast.rejected{background:#b42318}
+		.abg-toast button{margin-left:14px;background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer}
+		@keyframes abgSlideIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+	</style>';
+	echo '<div id="abg-toast" class="abg-toast ' . AttrEscape( $flash_type ) . '"><span>' .
+		AttrEscape( $flash_message ) . '</span><button type="button" aria-label="Close" onclick="document.getElementById(\'abg-toast\').remove()">×</button></div>';
+	echo '<script>setTimeout(function(){var e=document.getElementById("abg-toast");if(e)e.remove();},4500);</script>';
+}
+
 if ( User( 'PROFILE' ) !== 'admin' )
 {
 	exit;
@@ -25,6 +45,23 @@ function AbugidaApplicationHistory( $applicant_id, $from, $to, $action, $reason 
 			'REASON' => $reason,
 		]
 	);
+}
+
+
+function AbugidaRegistrarStatusLabel( $status )
+{
+	$labels = [
+		'SUBMITTED' => 'PENDING',
+		'UNDER_REVIEW' => 'PENDING',
+		'APPROVED_FOR_PAYMENT' => 'APPROVED',
+		'DECLINED' => 'REJECTED',
+		'PAYMENT_SUBMITTED' => 'PAYMENT SUBMITTED',
+		'PAYMENT_DECLINED' => 'PAYMENT REJECTED',
+		'PAYMENT_VERIFIED' => 'PAYMENT VERIFIED',
+		'ACTIVE' => 'ACTIVE',
+	];
+
+	return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
 }
 
 require_once 'ProgramFunctions/AbugidaEmail.fnc.php';
@@ -80,6 +117,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 					$rejection_message
 				);
 
+				$_SESSION['abugida_registrar_flash'] = [ 'type' => 'rejected', 'message' => 'Application rejected successfully. The student can now see the rejection reason.' ];
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application rejected.' );
 			}
 		}
@@ -124,6 +162,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 					$approval_message
 				);
 
+				$_SESSION['abugida_registrar_flash'] = [ 'type' => 'approved', 'message' => 'Application approved successfully. The student can now proceed to payment.' ];
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application approved for payment.' );
 			}
 		}
@@ -273,7 +312,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		echo '<div class="abg-field"><span class="abg-label">' . _( 'Learning Approach' ) . '</span><div class="abg-value">' .
 			( $applicant['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</div></div>';
 		echo '<div class="abg-field"><span class="abg-label">' . _( 'Submitted' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['SUBMITTED_AT'] ) . '</div></div>';
-		echo '<div class="abg-field"><span class="abg-label">' . _( 'Status' ) . '</span><span class="abg-status">' . AttrEscape( $applicant['STATUS'] ) . '</span></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Status' ) . '</span><span class="abg-status">' . AttrEscape( AbugidaRegistrarStatusLabel( $applicant['STATUS'] ) ) . '</span></div>';
 		echo '</div>';
 		echo '</div>';
 
@@ -388,7 +427,7 @@ foreach ( (array) $rows as $row )
 	echo '<td>' . AttrEscape( $row['PHONE'] ) . '</td>';
 	echo '<td>Grade ' . (int) $row['GRADE_LEVEL'] . '</td>';
 	echo '<td>' . ( $row['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</td>';
-	echo '<td>' . AttrEscape( $row['STATUS'] ) . '</td>';
+	echo '<td>' . AttrEscape( AbugidaRegistrarStatusLabel( $row['STATUS'] ) ) . '</td>';
 	echo '<td>' . AttrEscape( $row['CREATED_AT'] ) . '</td>';
 	echo '<td><a class="abg-view" href="' .
 		URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . (int) $row['ID'] ) .
