@@ -10,14 +10,7 @@ if ( User( 'PROFILE' ) !== 'admin' )
 	exit;
 }
 
-function AbugidaFinanceEmail( $email, $subject, $message )
-{
-	if ( filter_var( $email, FILTER_VALIDATE_EMAIL ) )
-	{
-		require_once 'ProgramFunctions/SendEmail.fnc.php';
-		SendEmail( $email, $subject, $message );
-	}
-}
+require_once 'ProgramFunctions/AbugidaEmail.fnc.php';
 
 function AbugidaFinanceHistory( $applicant_id, $from, $to, $action, $reason = '' )
 {
@@ -80,7 +73,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			);
 
 			AbugidaFinanceHistory( $applicant_id, $from, 'PAYMENT_VERIFIED', 'Payment verified' );
-			AbugidaFinanceEmail( $applicant['EMAIL'], 'Abugida SIS payment verified', "Your payment has been verified. The Registrar will now complete your enrollment and create your student account." );
+			AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS payment verified', "Your payment has been verified. The Registrar will now complete your enrollment and create your student account." );
 			$note[] = button( 'check' ) . '&nbsp;' . _( 'Payment verified.' );
 		}
 		elseif ( $decision === 'reject'
@@ -105,7 +98,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 				);
 
 				AbugidaFinanceHistory( $applicant_id, $from, 'PAYMENT_DECLINED', 'Payment rejected', $reason );
-				AbugidaFinanceEmail( $applicant['EMAIL'], 'Abugida SIS payment update', "Your payment proof was not approved.\n\nReason: " . $reason . "\n\nReturn to the registration portal using your phone number and upload a corrected receipt." );
+				AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS payment update', "Your payment proof was not approved.\n\nReason: " . $reason . "\n\nReturn to the registration portal using your phone number and upload a corrected receipt." );
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Payment rejected.' );
 			}
 		}
