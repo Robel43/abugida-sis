@@ -65,6 +65,7 @@ function abugida_reg_progress( $applicant )
 		! empty( $applicant['LAST_NAME'] ),
 		! empty( $applicant['EMAIL'] ),
 		! empty( $applicant['GRADE_LEVEL'] ),
+		! empty( $applicant['STUDY_APPROACH'] ),
 		! empty( $applicant['DOCUMENT_STORED_NAME'] ),
 		! empty( $applicant['FAYDA_STORED_NAME'] ),
 	];
@@ -230,6 +231,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 				$last_name = trim( (string) ( $_POST['last_name'] ?? '' ) );
 				$email = trim( (string) ( $_POST['email'] ?? '' ) );
 				$grade = (int) ( $_POST['grade_level'] ?? 0 );
+				$study_approach = trim( (string) ( $_POST['study_approach'] ?? '' ) );
 
 				if ( $email !== '' && ! filter_var( $email, FILTER_VALIDATE_EMAIL ) )
 				{
@@ -239,6 +241,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 				if ( $grade !== 0 && ( $grade < 7 || $grade > 12 ) )
 				{
 					$errors[] = 'Select a grade from Grade 7 to Grade 12.';
+				}
+
+				if ( $study_approach !== '' && ! in_array( $study_approach, [ 'ONLINE', 'DISTANCE_LEARNING' ], true ) )
+				{
+					$errors[] = 'Select a valid learning approach.';
 				}
 
 				$document_upload = null;
@@ -277,6 +284,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 					if ( $last_name === '' ) $errors[] = 'Last name is required.';
 					if ( $email === '' ) $errors[] = 'Email is required.';
 					if ( $grade < 7 || $grade > 12 ) $errors[] = 'Grade is required.';
+					if ( $study_approach === '' ) $errors[] = 'Select Online or Distance Learning.';
 					if ( ! $has_document ) $errors[] = 'Upload the required supporting document.';
 					if ( ! $has_fayda ) $errors[] = 'Upload the Fayda ID file.';
 				}
@@ -288,6 +296,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 						"LAST_NAME='" . DBEscapeString( $last_name ) . "'",
 						"EMAIL='" . DBEscapeString( $email ) . "'",
 						'GRADE_LEVEL=' . ( $grade ? (int) $grade : 'NULL' ),
+						"STUDY_APPROACH='" . DBEscapeString( $study_approach ) . "'",
 						'UPDATED_AT=NOW()',
 					];
 
@@ -309,7 +318,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 
 					$current_step = 1;
 					if ( $first_name !== '' && $last_name !== '' && $email !== '' ) $current_step = 2;
-					if ( $current_step >= 2 && $grade >= 7 && $grade <= 12 ) $current_step = 3;
+					if ( $current_step >= 2 && $grade >= 7 && $grade <= 12 && $study_approach !== '' ) $current_step = 3;
 					if ( $has_document && $has_fayda ) $current_step = 4;
 
 					$set[] = 'CURRENT_STEP=' . $current_step;
@@ -465,7 +474,7 @@ elseif ( isset( $_GET['submitted'] ) )
 			<p>Complete the form once, save your progress whenever you need, and return later using the same phone number.</p>
 			<ul class="steps">
 				<li><span class="stepdot">1</span><span>Enter your contact and personal information.</span></li>
-				<li><span class="stepdot">2</span><span>Select the grade you are applying for.</span></li>
+				<li><span class="stepdot">2</span><span>Select your grade and preferred learning approach.</span></li>
 				<li><span class="stepdot">3</span><span>Upload your supporting document and Fayda ID.</span></li>
 				<li><span class="stepdot">4</span><span>Review and submit your application.</span></li>
 			</ul>
@@ -537,6 +546,15 @@ elseif ( isset( $_GET['submitted'] ) )
 								<?php } ?>
 							</select>
 						</div>
+						<div class="field full">
+							<label for="study_approach">Learning Approach *</label>
+							<select id="study_approach" name="study_approach">
+								<option value="">Select learning approach</option>
+								<option value="ONLINE"<?php echo $applicant['STUDY_APPROACH'] === 'ONLINE' ? ' selected' : ''; ?>>Online</option>
+								<option value="DISTANCE_LEARNING"<?php echo $applicant['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? ' selected' : ''; ?>>Distance Learning</option>
+							</select>
+							<div class="help">Choose how you want to attend your studies.</div>
+						</div>
 
 						<div class="upload-card">
 							<div class="upload-title"><strong>Supporting Document *</strong><span class="file-chip">PDF / PNG</span></div>
@@ -572,6 +590,7 @@ elseif ( isset( $_GET['submitted'] ) )
 					<div class="field"><label>Last Name</label><input class="readonly" value="<?php echo abugida_reg_h( $applicant['LAST_NAME'] ); ?>" readonly></div>
 					<div class="field"><label>Email</label><input class="readonly" value="<?php echo abugida_reg_h( $applicant['EMAIL'] ); ?>" readonly></div>
 					<div class="field"><label>Grade</label><input class="readonly" value="Grade <?php echo (int) $applicant['GRADE_LEVEL']; ?>" readonly></div>
+					<div class="field"><label>Learning Approach</label><input class="readonly" value="<?php echo $applicant['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? 'Distance Learning' : 'Online'; ?>" readonly></div>
 					<div class="field"><label>Supporting Document</label><input class="readonly" value="<?php echo abugida_reg_h( $applicant['DOCUMENT_ORIGINAL_NAME'] ); ?>" readonly></div>
 					<div class="field"><label>Fayda ID</label><input class="readonly" value="<?php echo abugida_reg_h( $applicant['FAYDA_ORIGINAL_NAME'] ); ?>" readonly></div>
 				</div>
@@ -579,6 +598,7 @@ elseif ( isset( $_GET['submitted'] ) )
 					<a class="button secondary" href="registration.php?switch=1">Use another phone number</a>
 				</div>
 			<?php } ?>
+		<?php } ?>
 		</main>
 	</div>
 	<div class="footer-note">Abugida SIS • Student Registration Portal</div>
