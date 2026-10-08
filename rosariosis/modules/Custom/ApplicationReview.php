@@ -27,51 +27,7 @@ function AbugidaApplicationHistory( $applicant_id, $from, $to, $action, $reason 
 	);
 }
 
-function AbugidaApplicationEmail( $email, $subject, $message )
-{
-	if ( filter_var( $email, FILTER_VALIDATE_EMAIL ) )
-	{
-		require_once 'ProgramFunctions/SendEmail.fnc.php';
-		SendEmail( $email, $subject, $message );
-	}
-}
-
-function AbugidaApplicationFile( $row, $type, $inline = false )
-{
-	$map = [
-		'document' => [ 'DOCUMENT_STORED_NAME', 'DOCUMENT_ORIGINAL_NAME', 'DOCUMENT_MIME_TYPE' ],
-		'fayda' => [ 'FAYDA_STORED_NAME', 'FAYDA_ORIGINAL_NAME', 'FAYDA_MIME_TYPE' ],
-	];
-
-	if ( empty( $map[ $type ] ) )
-	{
-		return;
-	}
-
-	$stored = $row[ $map[ $type ][0] ];
-	$original = $row[ $map[ $type ][1] ];
-	$mime = $row[ $map[ $type ][2] ];
-
-	if ( ! $stored )
-	{
-		return;
-	}
-
-	$file = 'assets/FileUploads/ApplicantDocuments/' . basename( $stored );
-
-	if ( ! is_file( $file ) )
-	{
-		return;
-	}
-
-	$disposition = $inline ? 'inline' : 'attachment';
-
-	header( 'Content-Type: ' . ( $mime ? $mime : 'application/octet-stream' ) );
-	header( 'Content-Disposition: ' . $disposition . '; filename="' . str_replace( '"', '', basename( $original ) ) . '"' );
-	header( 'Content-Length: ' . filesize( $file ) );
-	readfile( $file );
-	exit;
-}
+require_once 'ProgramFunctions/AbugidaEmail.fnc.php';
 
 if ( ! empty( $_REQUEST['applicant_id'] ) )
 {
@@ -82,15 +38,6 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		LIMIT 1" );
 	$applicant = ! empty( $applicant_RET[1] ) ? $applicant_RET[1] : null;
 
-	if ( $applicant && ! empty( $_REQUEST['view'] ) )
-	{
-		AbugidaApplicationFile( $applicant, $_REQUEST['view'], true );
-	}
-
-	if ( $applicant && ! empty( $_REQUEST['download'] ) )
-	{
-		AbugidaApplicationFile( $applicant, $_REQUEST['download'], false );
-	}
 
 	if ( $applicant
 		&& $_REQUEST['modfunc'] === 'decision'
@@ -120,25 +67,34 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 				);
 
 				AbugidaApplicationHistory( $applicant_id, $from, 'DECLINED', 'Application rejected', $reason );
-				AbugidaApplicationEmail( $applicant['EMAIL'], 'Abugida SIS application update', "Your application was returned for correction.\n\nReason: " . $reason . "\n\nUse your phone number on the registration page to update and resubmit your application." );
+
+				$registration_url = AbugidaPublicURL( 'registration.php' );
+				$rejection_message = "Your Abugida SIS application requires correction.\n\n" .
+					"Reason: " . $reason . "\n\n" .
+					"Open the registration page and use your phone number to update and resubmit your application:\n" .
+					$registration_url;
+
+				AbugidaSendEmail(
+					$applicant['EMAIL'],
+					'Abugida SIS application update',
+					$rejection_message
+				);
+
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application rejected.' );
 			}
 		}
 		elseif ( $decision === 'approve' )
 		{
 			$amount = (float) issetVal( $_POST['payment_amount'] );
-			$instructions = trim( issetVal( $_POST['payment_instructions'] ) );
 
 			if ( $amount <= 0 )
 			{
 				$error[] = _( 'Enter a valid payment amount.' );
 			}
-			elseif ( $instructions === '' )
-			{
-				$error[] = _( 'Payment instructions are required.' );
-			}
 			else
 			{
+				$payment_token = bin2hex( random_bytes( 32 ) );
+				$instructions = 'Your application has been approved. Please complete the required payment and upload your payment receipt.';
 				DBUpdate(
 					'abugida_applicants',
 					[
@@ -149,12 +105,25 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 						'PAYMENT_AMOUNT' => $amount,
 						'PAYMENT_INSTRUCTIONS' => $instructions,
 						'PAYMENT_STATUS' => 'PENDING',
+						'PAYMENT_ACCESS_TOKEN' => $payment_token,
 					],
 					[ 'ID' => $applicant_id ]
 				);
 
 				AbugidaApplicationHistory( $applicant_id, $from, 'APPROVED_FOR_PAYMENT', 'Application approved for payment' );
-				AbugidaApplicationEmail( $applicant['EMAIL'], 'Abugida SIS application approved', "Your application has been approved for payment.\n\nAmount: ETB " . number_format( $amount, 2 ) . "\n\nReturn to the registration portal using your phone number to view payment instructions and submit payment proof." );
+
+				$payment_url = AbugidaPublicURL( 'registration-payment.php', [ 'token' => $payment_token ] );
+				$approval_message = "Your Abugida SIS application has been approved.\n\n" .
+					"Amount to pay: ETB " . number_format( $amount, 2 ) . "\n\n" .
+					"Open the payment page using the link below:\n" . $payment_url . "\n\n" .
+					"After payment, upload your receipt from the payment page.";
+
+				AbugidaSendEmail(
+					$applicant['EMAIL'],
+					'Abugida SIS application approved',
+					$approval_message
+				);
+
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application approved for payment.' );
 			}
 		}
@@ -245,17 +214,12 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 
 			AbugidaApplicationHistory( $applicant_id, $from, 'ACTIVE', 'Final registration confirmed' );
 
-			if ( filter_var( $applicant['EMAIL'], FILTER_VALIDATE_EMAIL ) )
-			{
-				require_once 'ProgramFunctions/SendEmail.fnc.php';
+			$message = "Your Abugida SIS student account has been created.\n\n" .
+				"Username: " . $username . "\n" .
+				"Temporary password: " . $temp_password . "\n\n" .
+				"Please sign in and change your password.";
 
-				$message = "Your Abugida SIS student account has been created.\n\n" .
-					"Username: " . $username . "\n" .
-					"Temporary password: " . $temp_password . "\n\n" .
-					"Please sign in and change your password.";
-
-				SendEmail( $applicant['EMAIL'], 'Abugida SIS account created', $message );
-			}
+			AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS account created', $message );
 
 			$note[] = button( 'check' ) . '&nbsp;' . _( 'Student account created and registration completed.' );
 		}
@@ -321,9 +285,9 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		if ( $applicant['DOCUMENT_STORED_NAME'] )
 		{
 			echo '<div class="abg-actions"><a class="abg-btn abg-primary" target="_blank" href="' .
-				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&view=document' ) . '">' . _( 'View Document' ) . '</a>';
+				URLEscape( 'application-file.php?applicant_id=' . $applicant_id . '&type=document&mode=inline' ) . '">' . _( 'View Document' ) . '</a>';
 			echo '<a class="abg-btn abg-secondary" href="' .
-				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&download=document' ) . '">' . _( 'Download' ) . '</a></div>';
+				URLEscape( 'application-file.php?applicant_id=' . $applicant_id . '&type=document&mode=download' ) . '">' . _( 'Download' ) . '</a></div>';
 		}
 		echo '</div>';
 
@@ -332,9 +296,9 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		if ( $applicant['FAYDA_STORED_NAME'] )
 		{
 			echo '<div class="abg-actions"><a class="abg-btn abg-primary" target="_blank" href="' .
-				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&view=fayda' ) . '">' . _( 'View Fayda ID' ) . '</a>';
+				URLEscape( 'application-file.php?applicant_id=' . $applicant_id . '&type=fayda&mode=inline' ) . '">' . _( 'View Fayda ID' ) . '</a>';
 			echo '<a class="abg-btn abg-secondary" href="' .
-				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&download=fayda' ) . '">' . _( 'Download' ) . '</a></div>';
+				URLEscape( 'application-file.php?applicant_id=' . $applicant_id . '&type=fayda&mode=download' ) . '">' . _( 'Download' ) . '</a></div>';
 		}
 		echo '</div>';
 		echo '</div>';
@@ -345,7 +309,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
 			echo '<p><label><b>' . _( 'Payment Amount (ETB)' ) . '</b><br><input type="number" min="0" step="0.01" name="payment_amount" required></label></p>';
-			echo '<p><label><b>' . _( 'Payment Instructions' ) . '</b><br><textarea name="payment_instructions" rows="4" required placeholder="' . AttrEscape( _( 'Enter where and how the applicant should make payment.' ) ) . '"></textarea></label></p>';
+
 			echo '<button class="abg-btn abg-success" type="submit" name="decision" value="approve">' . _( 'Approve Application' ) . '</button>';
 			echo '</form>';
 
