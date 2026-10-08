@@ -44,6 +44,7 @@ if ( $RosarioModules['Users'] )
 {
 	$menu['Users']['admin'][] = _( 'Utilities' );
 	$menu['Users']['admin']['Custom/NotifyParents.php'] = _( 'Notify Parents' );
+	$menu['Users']['admin']['Custom/EmailTest.php'] = _( 'Email Test' );
 
 	$exceptions['Users']['Custom/NotifyParents.php'] = true;
 }
