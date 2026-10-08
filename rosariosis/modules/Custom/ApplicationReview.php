@@ -27,6 +27,15 @@ function AbugidaApplicationHistory( $applicant_id, $from, $to, $action, $reason 
 	);
 }
 
+function AbugidaApplicationEmail( $email, $subject, $message )
+{
+	if ( filter_var( $email, FILTER_VALIDATE_EMAIL ) )
+	{
+		require_once 'ProgramFunctions/SendEmail.fnc.php';
+		SendEmail( $email, $subject, $message );
+	}
+}
+
 function AbugidaApplicationDownload( $row, $type )
 {
 	$map = [
@@ -103,6 +112,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 				);
 
 				AbugidaApplicationHistory( $applicant_id, $from, 'DECLINED', 'Application rejected', $reason );
+				AbugidaApplicationEmail( $applicant['EMAIL'], 'Abugida SIS application update', "Your application was returned for correction.\n\nReason: " . $reason . "\n\nUse your phone number on the registration page to update and resubmit your application." );
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application rejected.' );
 			}
 		}
@@ -136,6 +146,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 				);
 
 				AbugidaApplicationHistory( $applicant_id, $from, 'APPROVED_FOR_PAYMENT', 'Application approved for payment' );
+				AbugidaApplicationEmail( $applicant['EMAIL'], 'Abugida SIS application approved', "Your application has been approved for payment.\n\nAmount: ETB " . number_format( $amount, 2 ) . "\n\nReturn to the registration portal using your phone number to view payment instructions and submit payment proof." );
 				$note[] = button( 'check' ) . '&nbsp;' . _( 'Application approved for payment.' );
 			}
 		}
