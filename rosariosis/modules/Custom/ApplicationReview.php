@@ -44,7 +44,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		&& AllowEdit() )
 	{
 		$decision = issetVal( $_POST['decision'] );
-		$reason = trim( issetVal( $_POST['reason'] ) );
+		$reason = trim( (string) issetVal( $_POST['reason'], '' ) );
 		$from = $applicant['STATUS'];
 
 		if ( $decision === 'reject' )
