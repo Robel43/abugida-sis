@@ -12,6 +12,25 @@ function abugida_payment_h( $value )
 	return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' );
 }
 
+if ( ! empty( $_GET['token'] ) )
+{
+	$token = preg_replace( '/[^a-f0-9]/i', '', (string) $_GET['token'] );
+
+	if ( strlen( $token ) === 64 )
+	{
+		$token_RET = DBGet( "SELECT ID,PHONE
+			FROM abugida_applicants
+			WHERE PAYMENT_ACCESS_TOKEN='" . DBEscapeString( $token ) . "'
+			LIMIT 1" );
+
+		if ( ! empty( $token_RET[1]['ID'] ) )
+		{
+			$_SESSION['abugida_applicant_id'] = (int) $token_RET[1]['ID'];
+			$_SESSION['abugida_applicant_phone'] = $token_RET[1]['PHONE'];
+		}
+	}
+}
+
 $applicant_id = (int) ( $_SESSION['abugida_applicant_id'] ?? 0 );
 $phone = (string) ( $_SESSION['abugida_applicant_phone'] ?? '' );
 
