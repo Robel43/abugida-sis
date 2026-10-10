@@ -88,7 +88,7 @@ if ( UserStudentID()
 
 		if ( $do_stats && $_REQUEST['do_stats'] )
 		{
-			$LO_columns += [ 'BAR1' => _( 'Grade Range' ), 'BAR2' => _( 'Class Rank' ) ];
+			$LO_columns += [ 'BAR1' => _( 'Grade Range' ) ];
 		}
 
 		if ( ! empty( $courses_RET ) )
