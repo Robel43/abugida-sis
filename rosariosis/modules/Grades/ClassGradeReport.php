@@ -121,6 +121,44 @@ function AbugidaReportClassStudents( $grade_id, $course_period_id, $semester_id 
 		ORDER BY s.LAST_NAME,s.FIRST_NAME,s.STUDENT_ID" );
 }
 
+
+function AbugidaReportCanAccessCoursePeriod( $course_period_id )
+{
+	if ( ! $course_period_id )
+	{
+		return false;
+	}
+
+	$where_teacher = '';
+
+	if ( User( 'PROFILE' ) === 'teacher' )
+	{
+		$where_teacher = " AND (cp.TEACHER_ID='" . User( 'STAFF_ID' ) . "'
+			OR cp.SECONDARY_TEACHER_ID='" . User( 'STAFF_ID' ) . "')";
+	}
+
+	return (bool) DBGetOne( "SELECT cp.COURSE_PERIOD_ID
+		FROM course_periods cp
+		WHERE cp.COURSE_PERIOD_ID='" . (int) $course_period_id . "'
+		AND cp.SCHOOL_ID='" . UserSchool() . "'
+		AND cp.SYEAR='" . UserSyear() . "'" .
+		$where_teacher . "
+		LIMIT 1" );
+}
+
+function AbugidaReportAllowedStudentIds( $grade_id, $course_period_id, $semester_id )
+{
+	$rows = AbugidaReportClassStudents( $grade_id, $course_period_id, $semester_id );
+	$ids = [];
+
+	foreach ( (array) $rows as $row )
+	{
+		$ids[] = (int) $row['STUDENT_ID'];
+	}
+
+	return $ids;
+}
+
 function AbugidaReportStudentHTML( $student_id, $semester_id )
 {
 	$name = AbugidaReportStudentName( $student_id );
@@ -186,9 +224,25 @@ function AbugidaReportStudentHTML( $student_id, $semester_id )
 
 if ( $_REQUEST['report_action'] === 'student_pdf'
 	&& ! empty( $_REQUEST['student_ids'] )
+	&& $_REQUEST['grade_id']
+	&& $_REQUEST['course_period_id']
 	&& $_REQUEST['semester_id'] )
 {
 	$student_ids = array_values( array_filter( array_map( 'intval', (array) $_REQUEST['student_ids'] ) ) );
+
+	if ( ! AbugidaReportCanAccessCoursePeriod( $_REQUEST['course_period_id'] ) )
+	{
+		echo ErrorMessage( [ _( 'You are not allowed to access reports for this class.' ) ] );
+		exit;
+	}
+
+	$allowed_student_ids = AbugidaReportAllowedStudentIds(
+		$_REQUEST['grade_id'],
+		$_REQUEST['course_period_id'],
+		$_REQUEST['semester_id']
+	);
+
+	$student_ids = array_values( array_intersect( $student_ids, $allowed_student_ids ) );
 
 	if ( $student_ids )
 	{
@@ -199,7 +253,13 @@ if ( $_REQUEST['report_action'] === 'student_pdf'
 			$reports[] = AbugidaReportStudentHTML( $student_id, $_REQUEST['semester_id'] );
 		}
 
-		$handle = PDFStart();
+		$handle = PDFStart( [ 'mode' => 0 ] );
+
+		if ( empty( $GLOBALS['wkhtmltopdfPath'] ) )
+		{
+			echo '<div class="abg-browser-print"><button type="button" onclick="window.print()">' .
+				_( 'Print / Save as PDF' ) . '</button></div>';
+		}
 
 		echo '<style>
 			.abg-student-report{font-family:Arial,sans-serif;font-size:12px}
@@ -209,6 +269,7 @@ if ( $_REQUEST['report_action'] === 'student_pdf'
 			.abg-report-table th,.abg-report-table td{border:1px solid #777;padding:7px}
 			.abg-report-table th{background:#eee}
 			.abg-summary{margin-top:14px;border:1px solid #999;padding:10px}
+			@media print{.abg-browser-print{display:none}}
 		</style>';
 
 		echo implode( '<div style="page-break-after:always"></div>', $reports );
@@ -222,17 +283,7 @@ if ( $_REQUEST['report_action'] === 'class_pdf'
 	&& $_REQUEST['course_period_id']
 	&& $_REQUEST['semester_id'] )
 {
-	$allowed = true;
-
-	if ( User( 'PROFILE' ) === 'teacher' )
-	{
-		$allowed = (bool) DBGetOne( "SELECT COURSE_PERIOD_ID
-			FROM course_periods
-			WHERE COURSE_PERIOD_ID='" . (int) $_REQUEST['course_period_id'] . "'
-			AND (TEACHER_ID='" . User( 'STAFF_ID' ) . "'
-				OR SECONDARY_TEACHER_ID='" . User( 'STAFF_ID' ) . "')
-			LIMIT 1" );
-	}
+	$allowed = AbugidaReportCanAccessCoursePeriod( $_REQUEST['course_period_id'] );
 
 	if ( $allowed )
 	{
@@ -248,7 +299,14 @@ if ( $_REQUEST['report_action'] === 'class_pdf'
 			$_REQUEST['semester_id']
 		);
 
-		$handle = PDFStart();
+		$handle = PDFStart( [ 'mode' => 0 ] );
+
+		if ( empty( $GLOBALS['wkhtmltopdfPath'] ) )
+		{
+			echo '<div class="abg-browser-print"><button type="button" onclick="window.print()">' .
+				_( 'Print / Save as PDF' ) . '</button></div>';
+		}
+
 
 		echo '<style>
 			body{font-family:Arial,sans-serif;font-size:11px}
@@ -256,6 +314,7 @@ if ( $_REQUEST['report_action'] === 'class_pdf'
 			table{width:100%;border-collapse:collapse;margin-top:12px}
 			th,td{border:1px solid #777;padding:6px;text-align:left}
 			th{background:#eee}
+			@media print{.abg-browser-print{display:none}}
 		</style>';
 
 		echo '<h2>' . AttrEscape( SchoolInfo( 'TITLE' ) ) . '</h2>';
@@ -295,6 +354,12 @@ if ( $_REQUEST['report_action'] === 'class_pdf'
 
 DrawHeader( ProgramTitle() );
 
+echo '<script src="assets/js/csp/modules/grades/ClassGradeReport.js?v=1"></script>';
+
+global $wkhtmltopdfPath;
+$pdf_available = ! empty( $wkhtmltopdfPath );
+
+
 $grades = DBGet( "SELECT ID,TITLE,SORT_ORDER
 	FROM school_gradelevels
 	WHERE SCHOOL_ID='" . UserSchool() . "'
@@ -322,18 +387,26 @@ echo '<style>
 	.abg-table th,.abg-table td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}
 	.abg-table th{background:#f8fafc}
 	.abg-muted{color:#667085}
+	.abg-print-note{margin-top:12px;padding:10px 12px;border:1px solid #f2c94c;border-radius:8px;background:#fff8db;color:#6b5900}
 	@media(max-width:800px){.abg-grid{grid-template-columns:1fr}}
 </style>';
 
 echo '<div class="abg-class-report">';
 echo '<div class="abg-card"><h3>' . _( 'Class Grade Report' ) . '</h3>';
-echo '<p class="abg-muted">' . _( 'Select a grade, class / subject and semester to view official percentages. You can generate printable PDF grade reports for selected students.' ) . '</p>';
+echo '<p class="abg-muted">' . _( 'Select a grade, class / subject and semester to view official percentages. You can generate printable reports for a full class or selected students.' ) . '</p>';
 
-echo '<form method="GET" action="Modules.php">';
+if ( ! $pdf_available )
+{
+	echo '<div class="abg-print-note">' .
+		_( 'PDF conversion is not configured on this server. Reports will open as print-ready HTML; use your browser Print command and choose Save as PDF. When wkhtmltopdf is configured, these buttons download PDF files directly.' ) .
+		'</div>';
+}
+
+echo '<form method="GET" action="Modules.php" id="abugida-class-grade-report-form">';
 echo '<input type="hidden" name="modname" value="Grades/ClassGradeReport.php">';
 echo '<div class="abg-grid">';
 
-echo '<div class="abg-field"><label>' . _( 'Grade' ) . '</label><select name="grade_id">';
+echo '<div class="abg-field"><label>' . _( 'Grade' ) . '</label><select name="grade_id" id="abugida-class-grade-report-grade">';
 echo '<option value="">' . _( 'Select Grade' ) . '</option>';
 foreach ( (array) $grades as $grade )
 {
@@ -376,19 +449,9 @@ if ( $_REQUEST['grade_id'] && $_REQUEST['course_period_id'] && $_REQUEST['semest
 		AND cp.SYEAR='" . UserSyear() . "'
 		LIMIT 1" );
 
-	if ( User( 'PROFILE' ) === 'teacher' )
+	if ( ! AbugidaReportCanAccessCoursePeriod( $_REQUEST['course_period_id'] ) )
 	{
-		$allowed_cp = DBGetOne( "SELECT COURSE_PERIOD_ID
-			FROM course_periods
-			WHERE COURSE_PERIOD_ID='" . (int) $_REQUEST['course_period_id'] . "'
-			AND (TEACHER_ID='" . User( 'STAFF_ID' ) . "'
-				OR SECONDARY_TEACHER_ID='" . User( 'STAFF_ID' ) . "')
-			LIMIT 1" );
-
-		if ( ! $allowed_cp )
-		{
-			$selected_cp = [];
-		}
+		$selected_cp = [];
 	}
 
 	if ( ! empty( $selected_cp[1] ) )
@@ -409,11 +472,13 @@ if ( $_REQUEST['grade_id'] && $_REQUEST['course_period_id'] && $_REQUEST['semest
 			'&grade_id=' . (int) $_REQUEST['grade_id'] .
 			'&course_period_id=' . (int) $_REQUEST['course_period_id'] .
 			'&semester_id=' . (int) $_REQUEST['semester_id']
-		) . '">' . _( 'Download / Print Class Report' ) . '</a>';
+		) . '">' . ( $pdf_available ? _( 'Download Class Report PDF' ) : _( 'Print / Save Class Report as PDF' ) ) . '</a>';
 		echo '</div>';
 
 		echo '<form method="POST" action="Modules.php?modname=Grades/ClassGradeReport.php&_ROSARIO_PDF=true" target="_blank">';
 		echo '<input type="hidden" name="report_action" value="student_pdf">';
+		echo '<input type="hidden" name="grade_id" value="' . (int) $_REQUEST['grade_id'] . '">';
+		echo '<input type="hidden" name="course_period_id" value="' . (int) $_REQUEST['course_period_id'] . '">';
 		echo '<input type="hidden" name="semester_id" value="' . (int) $_REQUEST['semester_id'] . '">';
 		echo '<table class="abg-table"><thead><tr>';
 		echo '<th><input type="checkbox" class="onclick-checkall" data-name-like="student_ids"></th>';
@@ -447,7 +512,9 @@ if ( $_REQUEST['grade_id'] && $_REQUEST['course_period_id'] && $_REQUEST['semest
 		if ( $students )
 		{
 			echo '<div class="abg-actions">';
-			echo '<button class="abg-btn" type="submit">' . _( 'Download / Print Selected Student Reports' ) . '</button>';
+			echo '<button class="abg-btn" type="submit">' .
+				( $pdf_available ? _( 'Download Selected Student Reports PDF' ) : _( 'Print / Save Selected Student Reports as PDF' ) ) .
+				'</button>';
 			echo '</div>';
 		}
 
