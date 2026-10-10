@@ -32,7 +32,7 @@ Custom roles can be adjusted under **Users > Profiles**.
 
 Staff select:
 
-1. Grade;
+1. Grade — the Class / Subject list reloads automatically when the Grade changes;
 2. Class / Subject;
 3. Semester.
 
@@ -117,3 +117,30 @@ The report follows the Abugida high-school grading model:
 - Full Year Cumulative Average is the average of Semester 1 Average and Semester 2 Average;
 - Full Year Class Rank is based on the cumulative average;
 - no GPA is used.
+
+
+## PDF behavior
+
+When `wkhtmltopdf` is configured in RosarioSIS, report actions use download mode and return PDF files directly.
+
+If `wkhtmltopdf` is not configured, RosarioSIS cannot create a true PDF. In that environment the feature intentionally opens a print-ready HTML version and displays **Print / Save as PDF**, allowing the browser's print dialog to save the report as PDF.
+
+This fallback avoids labeling an HTML response as a PDF download.
+
+## Teacher authorization
+
+Teacher access is validated again inside both report-generation handlers, not only when displaying the report page.
+
+For selected-student reports the request must include:
+
+- Grade;
+- Course Period;
+- Semester;
+- selected Student IDs.
+
+The server verifies that:
+
+- the teacher is assigned as primary or secondary teacher to the Course Period;
+- every generated student report belongs to the selected Grade / Course Period / Semester roster.
+
+Student IDs outside the authorized roster are discarded before report generation. This prevents a teacher from posting another student's ID directly to the report handler.
