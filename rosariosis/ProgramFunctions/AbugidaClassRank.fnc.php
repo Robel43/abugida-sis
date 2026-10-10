@@ -84,24 +84,40 @@ function AbugidaRankSaveCohort( $rows, $period_type, $marking_period_id )
 				$last_average = $average;
 			}
 
-			DBUpsert(
-				'abugida_student_academic_rank',
-				[
-					'AVERAGE_PERCENT' => number_format( $average, 2, '.', '' ),
-					'SUBJECT_COUNT' => (int) $student['SUBJECT_COUNT'],
-					'RANK_POSITION' => $current_rank,
-					'COHORT_SIZE' => $cohort_size,
-					'CALCULATED_AT' => date( 'Y-m-d H:i:s' ),
-				],
-				[
-					'SCHOOL_ID' => UserSchool(),
-					'SYEAR' => UserSyear(),
-					'STUDENT_ID' => (int) $student['STUDENT_ID'],
-					'GRADE_ID' => (int) $grade_id,
-					'PERIOD_TYPE' => $period_type,
-					'MARKING_PERIOD_ID' => (int) $marking_period_id,
-				]
-			);
+			$where = [
+				'SCHOOL_ID' => UserSchool(),
+				'SYEAR' => UserSyear(),
+				'STUDENT_ID' => (int) $student['STUDENT_ID'],
+				'PERIOD_TYPE' => $period_type,
+				'MARKING_PERIOD_ID' => (int) $marking_period_id,
+			];
+
+			$values = [
+				'GRADE_ID' => (int) $grade_id,
+				'AVERAGE_PERCENT' => number_format( $average, 2, '.', '' ),
+				'SUBJECT_COUNT' => (int) $student['SUBJECT_COUNT'],
+				'RANK_POSITION' => $current_rank,
+				'COHORT_SIZE' => $cohort_size,
+				'CALCULATED_AT' => date( 'Y-m-d H:i:s' ),
+			];
+
+			$existing_id = DBGetOne( "SELECT id
+				FROM abugida_student_academic_rank
+				WHERE school_id='" . UserSchool() . "'
+				AND syear='" . UserSyear() . "'
+				AND student_id='" . (int) $student['STUDENT_ID'] . "'
+				AND period_type='" . DBEscapeString( $period_type ) . "'
+				AND marking_period_id='" . (int) $marking_period_id . "'
+				LIMIT 1" );
+
+			if ( $existing_id )
+			{
+				DBUpdate( 'abugida_student_academic_rank', $values, [ 'ID' => (int) $existing_id ] );
+			}
+			else
+			{
+				DBInsert( 'abugida_student_academic_rank', $where + $values );
+			}
 
 			$saved++;
 		}
