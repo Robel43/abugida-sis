@@ -32,8 +32,9 @@ $DatabaseName = 'database_name_here';
 /**
  * Full path to wkhtmltopdf binary file
  *
- * An empty string means wkhtmltopdf will not be called
- * and reports will be rendered in HTML instead of PDF
+ * An empty string means wkhtmltopdf will not be called unless
+ * WKHTMLTOPDF_PATH is provided as an environment variable.
+ * Without either setting, reports are rendered in HTML instead of PDF
  *
  * @link http://wkhtmltopdf.org
  *

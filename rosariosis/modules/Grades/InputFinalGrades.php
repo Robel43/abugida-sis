@@ -228,14 +228,14 @@ if ( $_REQUEST['modfunc'] === 'gradebook' )
 {
 	if ( ! empty( $_REQUEST['mp'] ) )
 	{
-		if ( in_array( GetMP( $_REQUEST['mp'], 'MP' ), [ 'QTR', 'PRO' ] ) )
+		if ( GetMP( $_REQUEST['mp'], 'MP' ) === 'SEM' )
 		{
-			$import_RET = FinalGradesQtrOrProCalculate(
+			$import_RET = FinalGradesSemesterCalculate(
 				$course_period_id,
 				$_REQUEST['mp']
 			);
 		}
-		elseif ( in_array( GetMP( $_REQUEST['mp'], 'MP' ), [ 'SEM', 'FY' ] ) )
+		elseif ( GetMP( $_REQUEST['mp'], 'MP' ) === 'FY' )
 		{
 			// Do not fail on warning "Final Grading Percentages are not configured."
 			$import_RET = FinalGradesSemOrFYCalculate(
@@ -1171,13 +1171,13 @@ if ( ! isset( $_REQUEST['_ROSARIO_PDF'] ) )
 
 		$prev_mp = issetVal( $prev_mp[1], [] );
 
-		// Remove Get previous MP Grades & Comments if course period's marking period is a quarter.
-		$mp_is_quarter = DBGetOne( "SELECT 1
+		// Remove Get previous MP Grades & Comments if course period's marking period is a semester.
+		$mp_is_semester = DBGetOne( "SELECT 1
 			FROM course_periods
-			WHERE MP='QTR'
+			WHERE MP='SEM'
 			AND COURSE_PERIOD_ID='" . (int) $course_period_id . "'" );
 
-		if ( $prev_mp && ! $mp_is_quarter )
+		if ( $prev_mp && ! $mp_is_semester )
 		{
 			$gb_header[] = '<a href="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] .
 				'&include_inactive=' . $_REQUEST['include_inactive'] .

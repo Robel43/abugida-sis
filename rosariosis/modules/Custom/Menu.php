@@ -20,6 +20,7 @@ if ( $RosarioModules['Students'] )
 		// @since 6.6 Add Registration program for Administrators.
 		'Custom/Registration.php' => _( 'Registration' ),
 		'Custom/ApplicationReview.php' => _( 'Online Applications' ),
+		'Custom/ReRegistrationReview.php' => _( 'Re-Registration Requests' ),
 		'Custom/RemoveAccess.php' => _( 'Remove Access' ),
 	];
 
@@ -35,6 +36,7 @@ if ( $RosarioModules['Student_Billing'] )
 
 	$menu['Student_Billing']['admin'] += [
 		'Custom/FinanceApplications.php' => _( 'Application Payments' ),
+		'Custom/ReRegistrationPayments.php' => _( 'Re-Registration Payments' ),
 		'Custom/RegistrationFees.php' => _( 'Registration Fees' ),
 	];
 }

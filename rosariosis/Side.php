@@ -24,7 +24,7 @@ function SideMarkingPeriodSelect()
 {
 	$mp_RET = DBGet( "SELECT MARKING_PERIOD_ID,TITLE
 		FROM school_marking_periods
-		WHERE MP='QTR'
+		WHERE MP='SEM'
 		AND SCHOOL_ID='" . UserSchool() . "'
 		AND SYEAR='" . UserSyear() . "'
 		ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
@@ -38,11 +38,11 @@ function SideMarkingPeriodSelect()
 
 		$mp_array = [];
 
-		foreach ( $mp_RET as $quarter ) : ?>
-			<option value="<?php echo AttrEscape( $quarter['MARKING_PERIOD_ID'] ); ?>"<?php echo ( UserMP() == $quarter['MARKING_PERIOD_ID'] ? ' selected' : '' ); ?>><?php
-				echo $quarter['TITLE'];
+		foreach ( $mp_RET as $semester ) : ?>
+			<option value="<?php echo AttrEscape( $semester['MARKING_PERIOD_ID'] ); ?>"<?php echo ( UserMP() == $semester['MARKING_PERIOD_ID'] ? ' selected' : '' ); ?>><?php
+				echo $semester['TITLE'];
 			?></option>
-		<?php $mp_array[] = $quarter['MARKING_PERIOD_ID'];
+		<?php $mp_array[] = $semester['MARKING_PERIOD_ID'];
 
 		endforeach;
 
@@ -53,11 +53,11 @@ function SideMarkingPeriodSelect()
 			$_SESSION['UserMP'] = $mp_RET[1]['MARKING_PERIOD_ID'];
 		endif;
 
-	// Error if no quarters.
+	// Error if no semesters.
 	else : ?>
 
 			<option value=""><?php
-				echo _( 'Error' ) . ': ' . _( 'No quarters found' );
+				echo _( 'Error' ) . ': ' . _( 'No semesters found' );
 			?></option>
 
 	<?php endif; ?>
@@ -109,7 +109,7 @@ if ( isset( $_REQUEST['sidefunc'] )
 		);
 
 		// Reset current MarkingPeriod.
-		$_SESSION['UserMP'] = GetCurrentMP( 'QTR', DBDate(), false );
+		$_SESSION['UserMP'] = GetCurrentMP( 'SEM', DBDate(), false );
 	}
 
 	// Update current SchoolYear.
@@ -121,7 +121,7 @@ if ( isset( $_REQUEST['sidefunc'] )
 			AND ID='" . UserSchool() . "'" );
 
 		// Reset current MarkingPeriod.
-		$_SESSION['UserMP'] = GetCurrentMP( 'QTR', DBDate(), false );
+		$_SESSION['UserMP'] = GetCurrentMP( 'SEM', DBDate(), false );
 
 		/**
 		 * If current User
@@ -233,7 +233,7 @@ if ( isset( $_REQUEST['sidefunc'] )
 			AND COURSE_PERIOD_ID='" . UserCoursePeriod() . "'
 			AND '" . DBDate() . "'>=START_DATE
 			AND ('" . DBDate() . "'<=END_DATE OR END_DATE IS NULL)
-			AND MARKING_PERIOD_ID IN (" . GetAllMP( 'QTR', UserMP() ) . ")" );
+			AND MARKING_PERIOD_ID IN (" . GetAllMP( 'SEM', UserMP() ) . ")" );
 
 		// If student not scheduled in new Course Period or MP, remove.
 		$unset_student = ! $is_student_scheduled;
@@ -315,10 +315,10 @@ else
 		// Do not set here if user is parent (set later on depending on current Student).
 	}
 
-	// Set current MarkingPeriod (Quarter).
+	// Set current MarkingPeriod (Semester).
 	if ( ! UserMP() )
 	{
-		$_SESSION['UserMP'] = GetCurrentMP( 'QTR', DBDate(), false );
+		$_SESSION['UserMP'] = GetCurrentMP( 'SEM', DBDate(), false );
 	}
 }
 
@@ -546,7 +546,7 @@ if ( ! isset( $_REQUEST['sidefunc'] )
 			// @since 6.9 Add Secondary Teacher.
 			$_SESSION['is_secondary_teacher'] = false;
 
-			$all_mp = GetAllMP( 'QTR', UserMP() );
+			$all_mp = GetAllMP( 'SEM', UserMP() );
 
 			$cp_RET = DBGet( "SELECT cp.COURSE_PERIOD_ID,cp.MARKING_PERIOD_ID,
 				c.TITLE AS COURSE_TITLE,cp.SHORT_NAME AS CP_SHORT_NAME,cp.SECONDARY_TEACHER_ID

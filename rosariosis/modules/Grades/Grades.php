@@ -33,9 +33,9 @@ DrawHeader( _( 'Gradebook' ) . ' - ' . ProgramTitle() . ' - ' . GetMP( UserMP() 
 // if running as a teacher program then rosario[allow_edit] will already be set according to admin permissions
 
 if ( ! isset( $_ROSARIO['allow_edit'] )
-	// Do not allow edit past quarter grades for Teachers according to Program Config.
+	// Do not allow edit past semester grades for Teachers according to Program Config.
 	&& ( ProgramConfig( 'grades', 'GRADES_GRADEBOOK_TEACHER_ALLOW_EDIT' )
-		|| GetCurrentMP( 'QTR', DBDate(), false ) == UserMP()
+		|| GetCurrentMP( 'SEM', DBDate(), false ) == UserMP()
 		|| GetMP( 'END_DATE' ) > DBDate() ) )
 {
 	$_ROSARIO['allow_edit'] = true;
@@ -474,7 +474,7 @@ else
 			$points_RET = FinalGradesGetAssignmentsPoints( UserCoursePeriod(), UserMP(), $_REQUEST['type_id'] );
 
 			// @global variable used by _makeExtraAssnCols()
-			$import_RET = FinalGradesQtrOrProCalculate( UserCoursePeriod(), UserMP(), $_REQUEST['type_id'] );
+			$import_RET = FinalGradesSemesterCalculate( UserCoursePeriod(), UserMP(), $_REQUEST['type_id'] );
 
 			$extra['SELECT'] = $sql_start_end_epoch .
 				",'' AS POINTS,'' AS PERCENT_GRADE,'' AS LETTER_GRADE";

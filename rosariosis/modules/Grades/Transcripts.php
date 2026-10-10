@@ -1,7 +1,6 @@
 <?php
 
 // Should be included first, in case modfunc is Class Rank Calculate AJAX.
-require_once 'modules/Grades/includes/ClassRank.inc.php';
 require_once 'modules/Grades/includes/Transcripts.fnc.php';
 
 require_once 'ProgramFunctions/MarkDownHTML.fnc.php';
@@ -96,9 +95,6 @@ if ( ! $_REQUEST['modfunc'] )
 	$extra['ASSOCIATED'] = User( 'STAFF_ID' );
 
 	Widgets( 'course' );
-	Widgets( 'gpa' );
-	Widgets( 'class_rank' );
-	Widgets( 'letter_grade' );
 
 	Search( 'student_id', $extra );
 
@@ -107,17 +103,5 @@ if ( ! $_REQUEST['modfunc'] )
 		echo '<br /><div class="center">' . Buttons( _( 'Create Transcripts for Selected Students' ) ) . '</div>';
 		echo '</form>';
 
-		// MPs, including History MPs, excluding Progress Periods.
-		$mps_RET = DBGet( "SELECT MARKING_PERIOD_ID
-			FROM marking_periods
-			WHERE SCHOOL_ID='" . UserSchool() . "'
-			AND MP_TYPE IN ('semester','year','quarter')
-			AND DOES_GRADES='Y'" );
-
-		foreach ( (array) $mps_RET as $mp )
-		{
-			// @since 4.7 Automatic Class Rank calculation.
-			ClassRankMaybeCalculate( $mp['MARKING_PERIOD_ID'] );
-		}
 	}
 }

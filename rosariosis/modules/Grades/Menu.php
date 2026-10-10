@@ -12,9 +12,8 @@
 
 $menu['Grades']['admin'] = [
 	'title' => _( 'Grades' ),
-	'default' => 'Grades/GPARankList.php',
+	'default' => 'Grades/FinalGrades.php',
 	'Grades/ReportCards.php' => _( 'Report Cards' ),
-	'Grades/HonorRoll.php' => _( 'Honor Roll' ),
 	'Grades/Transcripts.php' => _( 'Transcripts' ),
 	1 => _( 'Reports' ),
 	'Grades/StudentGrades.php' => _( 'Student Grades' ),
@@ -22,16 +21,17 @@ $menu['Grades']['admin'] = [
 	'Grades/TeacherCompletion.php' => _( 'Teacher Completion' ),
 	'Grades/GradeBreakdown.php' => _( 'Grade Breakdown' ),
 	'Grades/FinalGrades.php' => _( 'Final Grades' ),
-	'Grades/GPARankList.php' => _( 'GPA / Class Rank List' ),
+	'Grades/ClassRank.php' => _( 'Class Rank' ),
+	'Grades/ClassGradeReport.php' => _( 'Class Grade Reports' ),
 	2 => _( 'Setup' ),
 	'Grades/Configuration.php' => _( 'Configuration' ),
-	'Grades/ReportCardGrades.php' => _( 'Grading Scales' ),
 	'Grades/ReportCardComments.php' => _( 'Report Card Comments' ),
 	'Grades/ReportCardCommentCodes.php' => _( 'Comment Codes' ),
 	'Grades/EditHistoryMarkingPeriods.php' => _( 'History Marking Periods' ),
 	3 => _( 'Utilities' ),
 	'Grades/EditReportCardGrades.php' => _( 'Historical Grades' ),
 	'Grades/MassCreateAssignments.php' => _( 'Mass Create Assignments' ),
+	'Grades/GradeImport.php' => _( 'Grade Import' ),
 ] + issetVal( $menu['Grades']['admin'], [] );
 
 $menu['Grades']['teacher'] = [
@@ -50,7 +50,7 @@ $menu['Grades']['teacher'] = [
 	2 => _( 'Reports' ),
 	'Grades/StudentGrades.php' => _( 'Student Grades' ),
 	'Grades/FinalGrades.php' => _( 'Final Grades' ),
-	'Grades/GPARankList.php' => _( 'GPA / Class Rank List' ),
+	'Grades/ClassGradeReport.php' => _( 'Class Grade Reports' ),
 	3 => _( 'Setup' ),
 	'Grades/Configuration.php' => _( 'Configuration' ),
 	'Grades/ReportCardGrades.php' => _( 'Grading Scales' ),
@@ -58,17 +58,24 @@ $menu['Grades']['teacher'] = [
 	'Grades/ReportCardCommentCodes.php' => _( 'Comment Codes' ),
 ] + issetVal( $menu['Grades']['teacher'], [] );
 
-$menu['Grades']['parent'] = [
-	'title' => _( 'Grades' ),
-	'default' => 'Grades/StudentGrades.php',
-	'Grades/StudentGrades.php' => _( 'Gradebook Grades' ),
-	'Grades/StudentAssignments.php' => _( 'Assignments' ),
-	'Grades/FinalGrades.php' => _( 'Final Grades' ),
-	'Grades/ReportCards.php' => _( 'Report Cards' ),
-	'Grades/ProgressReports.php' => _( 'Progress Reports' ),
-	'Grades/Transcripts.php' => _( 'Transcripts' ),
-	'Grades/GPARankList.php' => _( 'GPA / Class Rank' ),
-] + issetVal( $menu['Grades']['parent'], [] );
+// Student Portal provides the student-facing grade view.
+if ( User( 'PROFILE' ) === 'student' )
+{
+	$menu['Grades']['parent'] = [];
+}
+else
+{
+	$menu['Grades']['parent'] = [
+		'title' => _( 'Grades' ),
+		'default' => 'Grades/StudentGrades.php',
+		'Grades/StudentGrades.php' => _( 'Gradebook Grades' ),
+		'Grades/StudentAssignments.php' => _( 'Assignments' ),
+		'Grades/FinalGrades.php' => _( 'Final Grades' ),
+		'Grades/ReportCards.php' => _( 'Report Cards' ),
+		'Grades/ProgressReports.php' => _( 'Progress Reports' ),
+		'Grades/Transcripts.php' => _( 'Transcripts' ),
+	] + issetVal( $menu['Grades']['parent'], [] );
+}
 
 if ( $RosarioModules['Users'] )
 {

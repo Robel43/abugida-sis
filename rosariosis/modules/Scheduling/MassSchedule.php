@@ -28,13 +28,33 @@ if ( $_REQUEST['modfunc'] === 'save'
 						WHERE COURSE_PERIOD_ID='" . (int) $course_to_add['course_period_id'] . "'
 						AND SYEAR='" . UserSyear() . "'" );
 
-					// Fix Marking Period not found in user School Year (multiple tabs case).
+					// Abugida uses Semester as the scheduling term.
+					// Always schedule the student into the Course Period's own Semester.
 					$course_mp = empty( $course_period_RET ) ? null : $course_period_RET[1]['MARKING_PERIOD_ID'];
-					$course_mp_table = GetMP( $course_mp,'MP' );
+					$course_mp_table = GetMP( $course_mp, 'MP' );
 
-					if ( $course_mp_table === 'FY'
-						|| $course_mp === $_REQUEST['marking_period_id']
-						|| mb_strpos( GetChildrenMP( $course_mp_table, $course_mp ), "'" . $_REQUEST['marking_period_id'] . "'" ) !== false )
+					if ( $course_mp_table !== 'SEM' )
+					{
+						$error[] = _( 'The selected course period must be assigned to a Semester.' );
+						unset( $_SESSION['MassSchedule.php'][ $cp_id ] );
+						continue;
+					}
+
+					$semester_start = GetMP( $course_mp, 'START_DATE' );
+					$semester_end = GetMP( $course_mp, 'END_DATE' );
+
+					if ( $start_date < $semester_start || $start_date > $semester_end )
+					{
+						$error[] = sprintf(
+							_( 'The start date must fall within %s (%s - %s).' ),
+							GetMP( $course_mp ),
+							ProperDate( $semester_start ),
+							ProperDate( $semester_end )
+						);
+						unset( $_SESSION['MassSchedule.php'][ $cp_id ] );
+						continue;
+					}
+
 					{
 						// Check available seats:
 						if ( $course_period_RET[1]['TOTAL_SEATS'] )
@@ -55,9 +75,9 @@ if ( $_REQUEST['modfunc'] === 'save'
 								ErrorMessage( $warnings, 'warning' )
 							) )
 						{
-							$mp_table = GetMP( $_REQUEST['marking_period_id'], 'MP' );
+							$mp_table = 'SEM';
 
-							$mps = GetAllMP( GetMP( $course_mp, 'MP' ), $course_mp );
+							$mps = GetAllMP( 'SEM', $course_mp );
 
 							// @since 11.3 Refuse to enroll student twice in the same course period
 							// if marking periods overlap and dates overlap (already scheduled course does not end or ends after $date) then not okay
@@ -87,7 +107,7 @@ if ( $_REQUEST['modfunc'] === 'save'
 										'COURSE_ID' => (int) $course_to_add['course_id'],
 										'COURSE_PERIOD_ID' => (int) $course_to_add['course_period_id'],
 										'MP' => $mp_table,
-										'MARKING_PERIOD_ID' => (int) $_REQUEST['marking_period_id'],
+										'MARKING_PERIOD_ID' => (int) $course_mp,
 										'START_DATE' => $start_date,
 									]
 								);
@@ -117,11 +137,6 @@ if ( $_REQUEST['modfunc'] === 'save'
 						}
 						else
 							exit();
-					}
-					else
-					{
-						$error[] = _( 'You cannot schedule a student into this course during this marking period.' ) .
-							' ' . sprintf( _( 'The %s course meets on %s.' ), $course_to_add['course_title'], GetMP( $course_mp ) );
 					}
 
 					unset( $_SESSION['MassSchedule.php'][ $cp_id ] );
@@ -190,33 +205,10 @@ if ( ! $_REQUEST['modfunc'] )
 			false
 		) . '</td></tr>';
 
-		// @since 11.1 SQL Use GetFullYearMP() & GetChildrenMP() functions to limit Marking Periods
-		$fy_and_children_mp = "'" . GetFullYearMP() . "'";
-
-		if ( GetChildrenMP( 'FY' ) )
-		{
-			$fy_and_children_mp .= "," . GetChildrenMP( 'FY' );
-		}
-
-		$mp_RET = DBGet( "SELECT MARKING_PERIOD_ID,TITLE," .
-			db_case( [ 'MP', "'FY'", "'0'", "'SEM'", "'1'", "'QTR'", "'2'" ] ) . " AS TBL
-			FROM school_marking_periods
-			WHERE (MP='FY' OR MP='SEM' OR MP='QTR')
-			AND MARKING_PERIOD_ID IN(" . $fy_and_children_mp . ")
-			AND SCHOOL_ID='" . UserSchool() . "'
-			AND SYEAR='" . UserSyear() . "'
-			ORDER BY TBL,SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
-
-		echo '<tr><td><select name="marking_period_id" id="marking_period_id">';
-
-		foreach ( (array) $mp_RET as $mp )
-		{
-			echo '<option value="' . AttrEscape( $mp['MARKING_PERIOD_ID'] ) . '">' . $mp['TITLE'] . '</option>';
-		}
-
-		echo '</select>';
-
-		echo FormatInputTitle( _( 'Marking Period' ), 'marking_period_id' );
+		// The course period determines the Semester automatically.
+		echo '<tr><td><div class="note">' .
+			_( 'Semester is determined automatically from each selected course period.' ) .
+			'</div>';
 
 		echo '</td></tr></table>';
 

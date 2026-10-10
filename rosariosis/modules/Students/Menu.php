@@ -42,11 +42,27 @@ $menu['Students']['teacher'] = [
 	'Students/Letters.php' => _( 'Print Letters' ),
 ] + issetVal( $menu['Students']['teacher'], [] );
 
-$menu['Students']['parent'] = [
-	'title' => _( 'Students' ),
-	'default' => 'Students/Student.php',
-	'Students/Student.php' => _( 'Student Info' ),
-] + issetVal( $menu['Students']['parent'], [] );
+if ( User( 'PROFILE' ) === 'student' )
+{
+	$menu['Students']['parent'] = [
+		'title' => _( 'Student Portal' ),
+		'default' => 'Students/StudentDashboard.php',
+		'Students/StudentDashboard.php' => _( 'Dashboard' ),
+		'Students/MyCourses.php' => _( 'My Courses' ),
+		'Students/MyGrades.php' => _( 'My Grades' ),
+		'Students/MyPayments.php' => _( 'Payments' ),
+		'Students/MyProfile.php' => _( 'My Profile' ),
+		'Students/ReRegistration.php' => _( 'Re-Registration' ),
+	] + issetVal( $menu['Students']['parent'], [] );
+}
+else
+{
+	$menu['Students']['parent'] = [
+		'title' => _( 'Students' ),
+		'default' => 'Students/Student.php',
+		'Students/Student.php' => _( 'Student Info' ),
+	] + issetVal( $menu['Students']['parent'], [] );
+}
 
 $exceptions['Students'] = [
 	'Students/Student.php&include=General_Info&student_id=new' => true,

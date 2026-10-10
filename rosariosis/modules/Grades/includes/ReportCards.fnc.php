@@ -64,7 +64,7 @@ if ( ! function_exists( 'ReportCardsIncludeForm' ) )
 		$return .= '</tr><tr class="st">';
 
 		// Percents.
-		$return .= '<td><label><input type="checkbox" name="elements[percents]" value="Y"> ' .
+		$return .= '<td><label><input type="checkbox" name="elements[percents]" value="Y" checked /> ' .
 		_( 'Percents' ) . '</label></td>';
 
 		// Add Min. and Max. Grades.
@@ -75,24 +75,11 @@ if ( ! function_exists( 'ReportCardsIncludeForm' ) )
 
 		if ( $_REQUEST['modname'] !== 'Grades/FinalGrades.php' )
 		{
-			// Credits.
+			// Credits remain available for report cards, but grading is percentage-based.
 			$return .= '<td><label><input type="checkbox" name="elements[credits]" value="Y"> ' .
-			_( 'Credits' ) . '</label></td>';
-
-			// @since 11.0 Add Class Average (Course Period)
-			$return .= '<td><label><input type="checkbox" name="elements[average]" value="Y"> ' .
-			_( 'Class average' ) . '</label></td>';
-
-			$return .= '</tr><tr class="st">';
-
-			// @since 11.0 Add Class Rank (Course Period)
-			$return .= '<td><label><input type="checkbox" name="elements[rank]" value="Y"> ' .
-			_( 'Class Rank' ) . '</label></td>';
-
-			// @since 11.4 Add Group courses by subject
-			$return .= '<td colspan="2"><label><input type="checkbox" name="elements[group_subjects]" value="Y"> ' .
-				_( 'Group courses by subject' ) . '</label></td>';
+				_( 'Credits' ) . '</label></td>';
 		}
+
 
 		$return .= '</tr><tr class="st">';
 
@@ -137,31 +124,6 @@ if ( ! function_exists( 'ReportCardsIncludeForm' ) )
 		$return .= '<td><label><input type="checkbox" name="elements[period_absences]" value="Y" /> ' .
 		_( 'Period-by-period absences' ) . '</label></td>';
 
-		if ( $_REQUEST['modname'] !== 'Grades/FinalGrades.php' )
-		{
-			$return .= '</tr><tr class="st">';
-
-			// Add GPA and/or Total row.
-			$gpa_or_total_options = [
-				'total' => _( 'Total' ),
-				'gpa' => _( 'GPA' ),
-			];
-
-			AllowEditTemporary( 'start' );
-
-			$return .= '<td>' . MultipleCheckboxInput( '', 'elements[last_row][]', _( 'Last row' ), $gpa_or_total_options ) . '</td>';
-
-			// Class Rank and/or Average.
-			// @since 10.7 Add Class Average row.
-			$class_rank_or_average_options = [
-				'average' => _( 'Class average' ),
-				'rank' => _( 'Class Rank' ),
-			];
-
-			$return .= '<td>' . MultipleCheckboxInput( '', 'elements[last_row][]', _( 'Last row' ), $class_rank_or_average_options ) . '</td>';
-
-			AllowEditTemporary( 'stop' );
-		}
 
 		$return .= '</tr></table></td></tr>';
 
@@ -205,75 +167,27 @@ if ( ! function_exists( 'ReportCardsIncludeForm' ) )
 			$return .= '</table></div></td></tr>';
 		}
 
-		// Get the title instead of the short marking period name.
-		// @since 11.1 SQL Use GetChildrenMP() function to limit Marking Periods
-		$mps_RET = DBGet( "SELECT PARENT_ID,MARKING_PERIOD_ID,SHORT_NAME,TITLE
+		// Abugida high school calendar: semesters only.
+		$semesters_RET = DBGet( "SELECT MARKING_PERIOD_ID,TITLE,SHORT_NAME
 			FROM school_marking_periods
-			WHERE MP='QTR'
+			WHERE MP='SEM'
+			AND DOES_GRADES='Y'
 			AND SYEAR='" . UserSyear() . "'
 			AND SCHOOL_ID='" . UserSchool() . "'
-			AND MARKING_PERIOD_ID IN(" . ( GetChildrenMP( 'FY' ) ? GetChildrenMP( 'FY' ) : '0' ) . ")
-			ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE", [], [ 'PARENT_ID' ] );
+			ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
 
-		// Marking Periods.
-		$return .= '<tr class="st"><td colspan="2"><hr><table class="cellpadding-5">';
+		$return .= '<tr class="st"><td colspan="2"><hr><table class="cellpadding-5"><tr class="st">';
 
-		foreach ( (array) $mps_RET as $sem => $quarters )
+		foreach ( (array) $semesters_RET as $semester )
 		{
-			$return .= '<tr class="st">';
-
-			foreach ( (array) $quarters as $qtr )
-			{
-				$pro = GetChildrenMP( 'PRO', $qtr['MARKING_PERIOD_ID'] );
-
-				if ( $pro )
-				{
-					$pros = explode( ',', str_replace( "'", '', $pro ) );
-
-					foreach ( (array) $pros as $pro )
-					{
-						if ( GetMP( $pro, 'DOES_GRADES' ) === 'Y' )
-						{
-							$return .= '<td><label>
-								<input type="checkbox" name="mp_arr[]" value="' . AttrEscape( $pro ) . '" /> ' .
-							GetMP( $pro, 'TITLE' ) . '</label></td>';
-						}
-					}
-				}
-
-				$return .= '<td><label>
-					<input type="checkbox" name="mp_arr[]" value="' . AttrEscape( $qtr['MARKING_PERIOD_ID'] ) . '" /> ' .
-					$qtr['TITLE'] . '</label></td>';
-			}
-
-			if ( GetMP( $sem, 'DOES_GRADES' ) === 'Y' )
-			{
-				$return .= '<td><label>
-					<input type="checkbox" name="mp_arr[]" value="' . AttrEscape( $sem ) . '" /> ' .
-				GetMP( $sem, 'TITLE' ) . '</label></td>';
-			}
-
-			$return .= '</tr>';
+			$return .= '<td><label>
+				<input type="checkbox" name="mp_arr[]" value="' .
+				AttrEscape( $semester['MARKING_PERIOD_ID'] ) . '" /> ' .
+				$semester['TITLE'] . '</label></td>';
 		}
 
-		if ( $sem )
-		{
-			$fy = GetParentMP( 'FY', $sem );
-
-			$return .= '<tr>';
-
-			if ( GetMP( $fy, 'DOES_GRADES' ) === 'Y' )
-			{
-				$return .= '<td><label>
-					<input type="checkbox" name="mp_arr[]" value="' . AttrEscape( $fy ) . '" /> ' .
-				GetMP( $fy, 'TITLE' ) . '</label></td>';
-			}
-
-			$return .= '</tr>';
-		}
-
-		$return .= '</table>' .
-			FormatInputTitle( _( 'Marking Periods' ), '', false, '' ) .
+		$return .= '</tr></table>' .
+			FormatInputTitle( _( 'Semesters' ), '', false, '' ) .
 			'<hr></td></tr>';
 
 		if ( $mailing_labels )

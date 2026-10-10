@@ -27,15 +27,14 @@ if ( UserStudentID()
 	&& ! $_REQUEST['modfunc'] )
 {
 	//FJ multiple school periods for a course period
-	/*$courses_RET = DBGet( "SELECT c.TITLE AS COURSE_TITLE,cp.TITLE,cp.COURSE_PERIOD_ID,cp.COURSE_ID,cp.TEACHER_ID AS STAFF_ID FROM schedule s,course_periods cp,courses c WHERE s.SYEAR='".UserSyear()."' AND cp.COURSE_PERIOD_ID=s.COURSE_PERIOD_ID AND s.MARKING_PERIOD_ID IN (".GetAllMP('QTR',UserMP()).") AND ('".DBDate()."'>=s.START_DATE AND (s.END_DATE IS NULL OR '".DBDate()."'<=s.END_DATE)) AND s.STUDENT_ID='".UserStudentID()."' AND cp.GRADE_SCALE_ID IS NOT NULL".(User( 'PROFILE' ) === 'teacher'?' AND cp.TEACHER_ID=\''.User('STAFF_ID').'\'':'')." AND c.COURSE_ID=cp.COURSE_ID ORDER BY (SELECT SORT_ORDER FROM school_periods WHERE PERIOD_ID=cp.PERIOD_ID)",array(),array('COURSE_PERIOD_ID'));*/
-
+	
 	// @since 10.9.1 SQL Show Gradebook Grades of Inactive Students (Course status, maybe dropped as of today) (Only if has grades)
 	$courses_RET = DBGet( "SELECT c.TITLE AS COURSE_TITLE,cp.TITLE,cp.COURSE_PERIOD_ID,cp.COURSE_ID,
 	cp.TEACHER_ID AS STAFF_ID,cp.SECONDARY_TEACHER_ID
 	FROM schedule s,course_periods cp,courses c
 	WHERE s.SYEAR='" . UserSyear() . "'
 	AND cp.COURSE_PERIOD_ID=s.COURSE_PERIOD_ID
-	AND s.MARKING_PERIOD_ID IN (" . GetAllMP( 'QTR', UserMP() ) . ")
+	AND s.MARKING_PERIOD_ID IN (" . GetAllMP( 'SEM', UserMP() ) . ")
 	AND '" . DBDate() . "'>=s.START_DATE
 	AND ((s.END_DATE IS NULL OR '" . DBDate() . "'<=s.END_DATE)
 		OR EXISTS(SELECT 1 FROM gradebook_grades gg
@@ -76,19 +75,11 @@ if ( UserStudentID()
 
 		$LO_columns = [ 'TITLE' => _( 'Course Title' ), 'TEACHER' => _( 'Teacher' ), 'UNGRADED' => _( 'Ungraded' ) ];
 
-		if ( ProgramConfig( 'grades', 'GRADES_DOES_LETTER_PERCENT' ) >= 0 )
-		{
-			$LO_columns['PERCENT'] = _( 'Percent' );
-		}
-
-		if ( ProgramConfig( 'grades', 'GRADES_DOES_LETTER_PERCENT' ) <= 0 )
-		{
-			$LO_columns['GRADE'] = _( 'Letter' );
-		}
+		$LO_columns['PERCENT'] = _( 'Percent' );
 
 		if ( $do_stats && $_REQUEST['do_stats'] )
 		{
-			$LO_columns += [ 'BAR1' => _( 'Grade Range' ), 'BAR2' => _( 'Class Rank' ) ];
+			$LO_columns += [ 'BAR1' => _( 'Grade Range' ) ];
 		}
 
 		if ( ! empty( $courses_RET ) )
@@ -125,7 +116,7 @@ if ( UserStudentID()
 				JOIN schedule ss ON (ss.STUDENT_ID=s.STUDENT_ID AND ss.SYEAR='" . UserSyear() . "'";
 
 				// @since 10.9.1 SQL Show Gradebook Grades of Inactive Students (Course status, maybe dropped as of today)
-				$sql .= " AND ss.MARKING_PERIOD_ID IN (" . GetAllMP( 'QTR', UserMP() ) . ") AND CURRENT_DATE>=ss.START_DATE";
+				$sql .= " AND ss.MARKING_PERIOD_ID IN (" . GetAllMP( 'SEM', UserMP() ) . ") AND CURRENT_DATE>=ss.START_DATE";
 
 				$sql .= ") JOIN course_periods cp ON (cp.COURSE_PERIOD_ID=ss.COURSE_PERIOD_ID AND cp.COURSE_PERIOD_ID='" . (int) $course_period_id . "')
 				JOIN student_enrollment ssm ON (ssm.STUDENT_ID=s.STUDENT_ID AND ssm.SYEAR=ss.SYEAR AND ssm.SCHOOL_ID='" . UserSchool() . "'";
@@ -178,7 +169,7 @@ if ( UserStudentID()
 					}
 
 					// @since 12.7.2 Fix Final Grade when assignments are weighted
-					$import_RET = FinalGradesQtrOrProCalculate( $course_period_id, UserMP() );
+					$import_RET = FinalGradesSemesterCalculate( $course_period_id, UserMP() );
 
 					$percent = false;
 
@@ -283,13 +274,10 @@ if ( UserStudentID()
 						'PERCENT' => ( $percent !== false ?
 							(float) number_format( 100 * $percent, 2, '.', '' ) . '%' :
 							_( 'N/A' ) ),
-						'GRADE' => $percent !== false ?
-						'<b>' . _makeLetterGrade( $percent, $course_period_id, $staff_id ) . '</b>' :
-						_( 'N/A' ),
 						'UNGRADED' => $ungraded,
 					]
 					 	+ ( $do_stats && $_REQUEST['do_stats'] ?
-						[ 'BAR1' => $bargraph1, 'BAR2' => $bargraph2 ] :
+						[ 'BAR1' => $bargraph1 ] :
 						[]
 					);
 				}
@@ -459,7 +447,7 @@ if ( UserStudentID()
 
 				if ( $do_stats && $_REQUEST['do_stats'] )
 				{
-					$LO_columns += [ 'BAR1' => _( 'Grade Range' ), 'BAR2' => _( 'Class Rank' ) ];
+					$LO_columns += [ 'BAR1' => _( 'Grade Range' ) ];
 				}
 
 				$LO_ret = [ 0 => [] ];
