@@ -116,10 +116,11 @@ Each import batch is recorded in:
 
 The audit data records the source workbook, importer, import time, row number, student, previous percentage, new percentage, action, and result message.
 
-Migration:
+Migrations:
 
 ```text
 database/migrations/007_excel_grade_import.sql
+database/migrations/008_semester_class_rank.sql
 ```
 
 ## XLSX processing
@@ -139,6 +140,18 @@ Course periods should be assigned to Semester 1 or Semester 2.
 In Group Schedule, the Semester is taken automatically from the selected course period. Staff do not separately choose a grading period when scheduling students.
 
 The schedule start date must fall inside the selected course period's Semester dates.
+
+## Average and class-rank recalculation
+
+After a successful Semester grade import, Abugida recalculates:
+
+- each student's average across all official subject percentages for that Semester;
+- Semester class rank within the student's grade level;
+- Full Year cumulative average and class rank when both Semesters are available.
+
+Class rank is not calculated per subject.
+
+There is no GPA conversion.
 
 ## Current limitations
 
