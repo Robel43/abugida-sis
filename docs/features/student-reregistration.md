@@ -309,3 +309,8 @@ reregistration-receipt.php
 The endpoint requires an authenticated admin-type staff account with permission to use the Re-Registration Payments program, restricts the request to the current school, validates the stored MIME type, and returns the file directly with the correct download headers.
 
 This avoids binary receipt content being rendered inside the normal RosarioSIS Modules page.
+
+
+### Semester dropdown dates
+
+Semester option dates are formatted as plain text before HTML escaping. This prevents RosarioSIS date-formatting markup from appearing literally inside the HTML `<option>` label.
