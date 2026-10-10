@@ -63,34 +63,6 @@ function AbugidaGradeImportGradeNumber( $grade_id )
 	return 0;
 }
 
-function AbugidaGradeImportSubjectIdsForGrade( $grade_id )
-{
-	$grade_number = AbugidaGradeImportGradeNumber( $grade_id );
-
-	if ( ! $grade_number )
-	{
-		return [];
-	}
-
-	$subjects = DBGet( "SELECT SUBJECT_ID,TITLE
-		FROM course_subjects
-		WHERE SCHOOL_ID='" . UserSchool() . "'
-		AND SYEAR='" . UserSyear() . "'
-		ORDER BY SORT_ORDER IS NULL,SORT_ORDER,TITLE" );
-
-	$subject_ids = [];
-
-	foreach ( (array) $subjects as $subject )
-	{
-		if ( preg_match( '/(^|[^0-9])' . $grade_number . '([^0-9]|$)/', (string) $subject['TITLE'] ) )
-		{
-			$subject_ids[] = (int) $subject['SUBJECT_ID'];
-		}
-	}
-
-	return $subject_ids;
-}
-
 function AbugidaGradeImportName( $student_id )
 {
 	return DBGetOne( "SELECT CONCAT(FIRST_NAME,' ',LAST_NAME)
@@ -101,9 +73,7 @@ function AbugidaGradeImportName( $student_id )
 
 function AbugidaGradeImportRecord( $student_id, $course_period_id, $mp_id, $score )
 {
-	$course_RET = DBGet( "SELECT cp.COURSE_ID,c.TITLE AS COURSE_NAME,cp.GRADE_SCALE_ID,
-		credit('" . (int) $course_period_id . "','" . (int) $mp_id . "') AS CREDITS,
-		cp.DOES_CLASS_RANK AS CLASS_RANK,c.CREDIT_HOURS
+	$course_RET = DBGet( "SELECT cp.COURSE_ID,c.TITLE AS COURSE_NAME,cp.GRADE_SCALE_ID
 		FROM course_periods cp,courses c
 		WHERE cp.COURSE_ID=c.COURSE_ID
 		AND cp.COURSE_PERIOD_ID='" . (int) $course_period_id . "'
@@ -199,7 +169,7 @@ if ( isset( $_POST['grade_import_action'] )
 {
 	if ( ! $_REQUEST['grade_id'] || ! $_REQUEST['course_period_id'] || ! $_REQUEST['mp_id'] )
 	{
-		$error[] = _( 'Select the grade, subject / section, and marking period before uploading the Excel file.' );
+		$error[] = _( 'Select the grade, subject / section, and semester before uploading the Excel file.' );
 	}
 	elseif ( empty( $_FILES['grade_file']['tmp_name'] ) )
 	{
@@ -607,8 +577,8 @@ if ( $_REQUEST['grade_id'] && empty( $course_periods ) )
 }
 echo '</div>';
 
-echo '<div class="abg-import-field"><label>' . _( 'Semester / Marking Period' ) . '</label>';
-echo '<select name="mp_id"><option value="">' . _( 'Select Marking Period' ) . '</option>';
+echo '<div class="abg-import-field"><label>' . _( 'Semester' ) . '</label>';
+echo '<select name="mp_id"><option value="">' . _( 'Select Semester' ) . '</option>';
 foreach ( (array) $marking_periods as $mp )
 {
 	$selected = $_REQUEST['mp_id'] == $mp['MARKING_PERIOD_ID'] ? ' selected' : '';
