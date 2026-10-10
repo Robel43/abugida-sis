@@ -45,6 +45,51 @@ function AbugidaGradeImportNormalizeHeader( $value )
 	return trim( $value );
 }
 
+
+function AbugidaGradeImportGradeNumber( $grade_id )
+{
+	$grade_title = DBGetOne( "SELECT TITLE
+		FROM school_gradelevels
+		WHERE ID='" . (int) $grade_id . "'
+		AND SCHOOL_ID='" . UserSchool() . "'
+		LIMIT 1" );
+
+	if ( preg_match( '/([0-9]+)/', (string) $grade_title, $matches ) )
+	{
+		return (int) $matches[1];
+	}
+
+	return 0;
+}
+
+function AbugidaGradeImportSubjectIdsForGrade( $grade_id )
+{
+	$grade_number = AbugidaGradeImportGradeNumber( $grade_id );
+
+	if ( ! $grade_number )
+	{
+		return [];
+	}
+
+	$subjects = DBGet( "SELECT SUBJECT_ID,TITLE
+		FROM course_subjects
+		WHERE SCHOOL_ID='" . UserSchool() . "'
+		AND SYEAR='" . UserSyear() . "'
+		ORDER BY SORT_ORDER IS NULL,SORT_ORDER,TITLE" );
+
+	$subject_ids = [];
+
+	foreach ( (array) $subjects as $subject )
+	{
+		if ( preg_match( '/(^|[^0-9])' . $grade_number . '([^0-9]|$)/', (string) $subject['TITLE'] ) )
+		{
+			$subject_ids[] = (int) $subject['SUBJECT_ID'];
+		}
+	}
+
+	return $subject_ids;
+}
+
 function AbugidaGradeImportName( $student_id )
 {
 	return DBGetOne( "SELECT CONCAT(FIRST_NAME,' ',LAST_NAME)
@@ -127,20 +172,21 @@ $course_periods = [];
 
 if ( $_REQUEST['grade_id'] )
 {
-	$course_periods = DBGet( "SELECT DISTINCT cp.COURSE_PERIOD_ID,
-		CONCAT(c.TITLE,' - ',cp.TITLE) AS TITLE
-		FROM course_periods cp
-		JOIN courses c ON c.COURSE_ID=cp.COURSE_ID
-		JOIN schedule s ON s.COURSE_PERIOD_ID=cp.COURSE_PERIOD_ID
-			AND s.SCHOOL_ID='" . UserSchool() . "'
-			AND s.SYEAR='" . UserSyear() . "'
-		JOIN student_enrollment se ON se.STUDENT_ID=s.STUDENT_ID
-			AND se.SCHOOL_ID=s.SCHOOL_ID
-			AND se.SYEAR=s.SYEAR
-			AND se.GRADE_ID='" . (int) $_REQUEST['grade_id'] . "'
-		WHERE cp.SCHOOL_ID='" . UserSchool() . "'
-		AND cp.SYEAR='" . UserSyear() . "'
-		ORDER BY c.TITLE,cp.TITLE" );
+	$subject_ids = AbugidaGradeImportSubjectIdsForGrade( $_REQUEST['grade_id'] );
+
+	if ( $subject_ids )
+	{
+		$subject_id_list = implode( ',', array_map( 'intval', $subject_ids ) );
+
+		$course_periods = DBGet( "SELECT DISTINCT cp.COURSE_PERIOD_ID,
+			CONCAT(c.TITLE,' - ',cp.TITLE) AS TITLE
+			FROM course_periods cp
+			JOIN courses c ON c.COURSE_ID=cp.COURSE_ID
+			WHERE cp.SCHOOL_ID='" . UserSchool() . "'
+			AND cp.SYEAR='" . UserSyear() . "'
+			AND c.SUBJECT_ID IN(" . $subject_id_list . ")
+			ORDER BY c.TITLE,cp.TITLE" );
+	}
 }
 
 if ( isset( $_POST['grade_import_action'] )
@@ -493,6 +539,7 @@ echo '<style>
 	.abg-import-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px;align-items:end}
 	.abg-import-field{min-width:0}
 	.abg-import-field label{display:block;font-weight:700;margin:0 0 7px;color:#101828;font-size:15px;line-height:1.35}
+	.abg-field-help{margin-top:6px;color:#667085;font-size:13px;line-height:1.4}
 	.abg-import-field select{display:block;width:100%;height:46px;min-height:46px;padding:0 42px 0 13px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#101828;font:inherit;font-size:15px;line-height:46px;box-sizing:border-box;vertical-align:middle}
 	.abg-import-field select:focus,.abg-file-control:focus-within{outline:0;border-color:#1677c8;box-shadow:0 0 0 3px rgba(22,119,200,.12)}
 	.abg-file-input{display:block;width:100%;min-height:46px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#344054;font:inherit;font-size:14px;line-height:normal;box-sizing:border-box;overflow:visible;white-space:nowrap}
@@ -538,13 +585,20 @@ foreach ( (array) $grades as $grade )
 echo '</select></div>';
 
 echo '<div class="abg-import-field"><label>' . _( 'Subject / Section' ) . '</label>';
-echo '<select name="course_period_id"><option value="">' . _( 'Select Subject / Section' ) . '</option>';
+echo '<select name="course_period_id"><option value="">' .
+	( $_REQUEST['grade_id'] && empty( $course_periods ) ? _( 'No Subject / Section Found' ) : _( 'Select Subject / Section' ) ) .
+	'</option>';
 foreach ( (array) $course_periods as $cp )
 {
 	$selected = $_REQUEST['course_period_id'] == $cp['COURSE_PERIOD_ID'] ? ' selected' : '';
 	echo '<option value="' . (int) $cp['COURSE_PERIOD_ID'] . '"' . $selected . '>' . AttrEscape( $cp['TITLE'] ) . '</option>';
 }
-echo '</select></div>';
+echo '</select>';
+if ( $_REQUEST['grade_id'] && empty( $course_periods ) )
+{
+	echo '<div class="abg-field-help">' . _( 'No course periods were found under the course subject for the selected grade.' ) . '</div>';
+}
+echo '</div>';
 
 echo '<div class="abg-import-field"><label>' . _( 'Semester / Marking Period' ) . '</label>';
 echo '<select name="mp_id"><option value="">' . _( 'Select Marking Period' ) . '</option>';
