@@ -76,15 +76,7 @@ if ( UserStudentID()
 
 		$LO_columns = [ 'TITLE' => _( 'Course Title' ), 'TEACHER' => _( 'Teacher' ), 'UNGRADED' => _( 'Ungraded' ) ];
 
-		if ( ProgramConfig( 'grades', 'GRADES_DOES_LETTER_PERCENT' ) >= 0 )
-		{
-			$LO_columns['PERCENT'] = _( 'Percent' );
-		}
-
-		if ( ProgramConfig( 'grades', 'GRADES_DOES_LETTER_PERCENT' ) <= 0 )
-		{
-			$LO_columns['GRADE'] = _( 'Letter' );
-		}
+		$LO_columns['PERCENT'] = _( 'Percent' );
 
 		if ( $do_stats && $_REQUEST['do_stats'] )
 		{
@@ -283,9 +275,6 @@ if ( UserStudentID()
 						'PERCENT' => ( $percent !== false ?
 							(float) number_format( 100 * $percent, 2, '.', '' ) . '%' :
 							_( 'N/A' ) ),
-						'GRADE' => $percent !== false ?
-						'<b>' . _makeLetterGrade( $percent, $course_period_id, $staff_id ) . '</b>' :
-						_( 'N/A' ),
 						'UNGRADED' => $ungraded,
 					]
 					 	+ ( $do_stats && $_REQUEST['do_stats'] ?
