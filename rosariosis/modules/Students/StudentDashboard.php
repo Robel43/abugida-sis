@@ -99,6 +99,7 @@ echo '<a class="abg-student-link" href="Modules.php?modname=Students/MyCourses.p
 echo '<a class="abg-student-link" href="Modules.php?modname=Students/MyGrades.php">' . _( 'My Grades' ) . '</a>';
 echo '<a class="abg-student-link" href="Modules.php?modname=Students/MyPayments.php">' . _( 'Payments' ) . '</a>';
 echo '<a class="abg-student-link secondary" href="Modules.php?modname=Students/MyProfile.php">' . _( 'My Profile' ) . '</a>';
+echo '<a class="abg-student-link secondary" href="Modules.php?modname=Students/ReRegistration.php">' . _( 'Re-Registration' ) . '</a>';
 echo '</div></div>';
 
 echo '</div>';
