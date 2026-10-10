@@ -210,3 +210,27 @@ Verify:
 5. Payments shows only that student's billing records;
 6. My Profile shows only that student's enrollment;
 7. attempts to add `student_id` to any URL do not change the displayed student.
+
+
+## UI design
+
+The student portal uses a dedicated modern presentation layer while keeping RosarioSIS data and permission logic intact.
+
+The visual system includes:
+
+- responsive summary cards;
+- modern page hero headers;
+- consistent section cards;
+- status and payment badges;
+- responsive table containers;
+- mobile-friendly two-column / one-column breakpoints;
+- read-only profile information cards;
+- clearer empty and pending states.
+
+The styling is centralized in:
+
+```text
+ProgramFunctions/AbugidaStudentPortal.fnc.php
+```
+
+This keeps the student-facing look consistent across Dashboard, My Courses, My Grades, Payments, and My Profile.
