@@ -235,7 +235,7 @@ if ( $_REQUEST['modfunc'] === 'gradebook' )
 				$_REQUEST['mp']
 			);
 		}
-		elseif ( in_array( GetMP( $_REQUEST['mp'], 'MP' ), [ 'SEM', 'FY' ] ) )
+		elseif ( GetMP( $_REQUEST['mp'], 'MP' ) === 'FY' )
 		{
 			// Do not fail on warning "Final Grading Percentages are not configured."
 			$import_RET = FinalGradesSemOrFYCalculate(
