@@ -497,11 +497,10 @@ echo '<p class="abg-import-help">' .
 	'</p>';
 
 echo '<form method="POST" enctype="multipart/form-data">';
-echo '<input type="hidden" name="grade_import_action" value="preview">';
 echo '<div class="abg-import-grid">';
 
 echo '<div class="abg-import-field"><label>' . _( 'Grade' ) . '</label>';
-echo '<select name="grade_id" onchange="this.form.submit()"><option value="">' . _( 'Select Grade' ) . '</option>';
+echo '<select name="grade_id"><option value="">' . _( 'Select Grade' ) . '</option>';
 foreach ( (array) $grades as $grade )
 {
 	$selected = $_REQUEST['grade_id'] == $grade['ID'] ? ' selected' : '';
@@ -530,7 +529,10 @@ echo '</select></div>';
 echo '<div class="abg-import-field"><label>' . _( 'Excel File (.xlsx)' ) . '</label>';
 echo '<input type="file" name="grade_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div>';
 echo '</div>';
-echo '<p style="margin-top:16px"><button class="abg-import-btn" type="submit">' . _( 'Validate & Preview' ) . '</button></p>';
+echo '<p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">';
+echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="load_context">' . _( 'Load Subjects / Sections' ) . '</button>';
+echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="preview">' . _( 'Validate & Preview' ) . '</button>';
+echo '</p>';
 echo '</form>';
 echo '</div>';
 
