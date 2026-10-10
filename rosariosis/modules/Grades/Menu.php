@@ -12,9 +12,8 @@
 
 $menu['Grades']['admin'] = [
 	'title' => _( 'Grades' ),
-	'default' => 'Grades/GPARankList.php',
+	'default' => 'Grades/FinalGrades.php',
 	'Grades/ReportCards.php' => _( 'Report Cards' ),
-	'Grades/HonorRoll.php' => _( 'Honor Roll' ),
 	'Grades/Transcripts.php' => _( 'Transcripts' ),
 	1 => _( 'Reports' ),
 	'Grades/StudentGrades.php' => _( 'Student Grades' ),
@@ -22,7 +21,6 @@ $menu['Grades']['admin'] = [
 	'Grades/TeacherCompletion.php' => _( 'Teacher Completion' ),
 	'Grades/GradeBreakdown.php' => _( 'Grade Breakdown' ),
 	'Grades/FinalGrades.php' => _( 'Final Grades' ),
-	'Grades/GPARankList.php' => _( 'GPA / Class Rank List' ),
 	2 => _( 'Setup' ),
 	'Grades/Configuration.php' => _( 'Configuration' ),
 	'Grades/ReportCardGrades.php' => _( 'Grading Scales' ),
@@ -68,7 +66,6 @@ $menu['Grades']['parent'] = [
 	'Grades/ReportCards.php' => _( 'Report Cards' ),
 	'Grades/ProgressReports.php' => _( 'Progress Reports' ),
 	'Grades/Transcripts.php' => _( 'Transcripts' ),
-	'Grades/GPARankList.php' => _( 'GPA / Class Rank' ),
 ] + issetVal( $menu['Grades']['parent'], [] );
 
 if ( $RosarioModules['Users'] )
