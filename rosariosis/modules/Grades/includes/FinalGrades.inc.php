@@ -45,7 +45,7 @@ if ( $_REQUEST['modfunc'] === 'final_grades_all_mp_save_ajax' )
  * @since 11.8
  *
  * @param int|array $cp_id  Course Period ID or Course Period IDs array.
- * @param int       $qtr_id Quarter ID.
+ * @param int       $semester_id Semester ID.
  *
  * @return boolean True.
  */
@@ -133,8 +133,7 @@ function FinalGradesAllMPSave( $cp_id, $semester_id )
 
 
 /**
- * Automatically calculate Course Period's Final Grades using Gradebook Grades
- * (Quarter or Progress Period)
+ * Automatically calculate Course Period's Semester Final Grades using Gradebook Grades
  *
  * @uses FinalGradesGetAssignmentsPoints()
  * @uses _makeLetterGrade()
@@ -400,8 +399,7 @@ function FinalGradesSemOrFYCalculate( $cp_id, $mp_id, $mode = 'continue' )
 
 
 /**
- * Get Assignments Points in order to calculate Course Period's Final Grades
- * (Quarter or Progress Period)
+ * Get Assignment Points used to calculate Course Period Semester final grades
  *
  * @since 11.8
  * @since 11.8.5 Fix Final Grade calculation when "Weight Assignments" checked & excused
@@ -530,7 +528,7 @@ function FinalGradesGetAssignmentsPoints( $cp_id, $mp_id, $assignment_type_id = 
 
 /**
  * Save Final Grades to database
- * Adapted for call after FinalGradesSemOrFYCalculate() or FinalGradesQtrOrProCalculate()
+ * Save calculated percentage final grades
  * Should work even for a Course Period not in current School / Year.
  *
  * @since 11.8
