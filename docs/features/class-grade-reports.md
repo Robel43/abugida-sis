@@ -144,3 +144,25 @@ The server verifies that:
 - every generated student report belongs to the selected Grade / Course Period / Semester roster.
 
 Student IDs outside the authorized roster are discarded before report generation. This prevents a teacher from posting another student's ID directly to the report handler.
+
+
+## Local Docker PDF setup
+
+The local Docker web image now installs `wkhtmltopdf`.
+
+`docker-compose.yaml` provides:
+
+```text
+WKHTMLTOPDF_PATH=/usr/bin/wkhtmltopdf
+```
+
+RosarioSIS reads this environment variable when `$wkhtmltopdfPath` is empty in `config.inc.php`.
+
+After pulling this change, the web image must be rebuilt rather than only restarted:
+
+```powershell
+docker compose build web
+docker compose up -d
+```
+
+When the converter is available, report actions use PDF download mode. If it is unavailable, the print-ready HTML fallback remains available.
