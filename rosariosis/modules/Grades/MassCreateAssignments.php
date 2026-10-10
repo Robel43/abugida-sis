@@ -115,7 +115,7 @@ if ( AllowEdit()
 					|| $column === 'ASSIGNED_DATE' )
 				&& $value !== '' )
 			{
-				$end_of_quarter_date = GetMP( UserMP(), 'END_DATE' );
+				$end_of_semester_date = GetMP( UserMP(), 'END_DATE' );
 
 				if ( ! VerifyDate( $value ) )
 				{
@@ -128,15 +128,15 @@ if ( AllowEdit()
 						$error[] = _( 'Due date is before assigned date!' );
 					}
 
-					if ( str_replace( '-', '', $end_of_quarter_date ) + 1 < $value )
+					if ( str_replace( '-', '', $end_of_semester_date ) + 1 < $value )
 					{
-						$error[] = _( 'Due date is after end of quarter!' );
+						$error[] = _( 'Due date is after end of semester!' );
 					}
 				}
 				elseif ( $column === 'ASSIGNED_DATE'
-					&& $end_of_quarter_date < $value )
+					&& $end_of_semester_date < $value )
 				{
-					$error[] = _( 'Assigned date is after end of quarter!' );
+					$error[] = _( 'Assigned date is after end of semester!' );
 				}
 			}
 			elseif ( $column == 'FINAL_GRADE_PERCENT'
@@ -484,7 +484,7 @@ if ( ! $_REQUEST['modfunc'] )
 
 	// DISPLAY THE MENU
 	// ASSIGNMENT TYPES.
-	// @since 4.5 Hide previous quarters assignment types.
+	// @since 4.5 Hide previous semesters assignment types.
 	$assignment_types_sql = "SELECT DISTINCT TRIM(TITLE) AS TITLE,TRIM(TITLE) AS TITLE_FOR_LINK
 	FROM gradebook_assignment_types
 	WHERE COURSE_ID IN (SELECT COURSE_ID
@@ -598,7 +598,7 @@ if ( ! $_REQUEST['modfunc'] )
 					WHERE SYEAR='" . UserSyear() . "'
 					AND SCHOOL_ID='" . UserSchool() . "')
 				AND gat.COURSE_ID=cp2.COURSE_ID
-				AND cp2.MARKING_PERIOD_ID IN (" . GetAllMP( 'QTR', UserMP() ) . "))";
+				AND cp2.MARKING_PERIOD_ID IN (" . GetAllMP( 'SEM', UserMP() ) . "))";
 
 			$columns = [
 				'COURSE_PERIOD_ID' => MakeChooseCheckbox( 'required', '', 'cp_arr' ),
