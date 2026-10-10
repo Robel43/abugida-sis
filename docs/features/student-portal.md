@@ -15,6 +15,7 @@ For an authenticated student the **Student Portal** menu contains:
 - My Grades
 - Payments
 - My Profile
+- Re-Registration
 
 The normal RosarioSIS portal landing page redirects students to the Student Dashboard after login.
 
@@ -234,3 +235,18 @@ ProgramFunctions/AbugidaStudentPortal.fnc.php
 ```
 
 This keeps the student-facing look consistent across Dashboard, My Courses, My Grades, Payments, and My Profile.
+
+
+## Re-Registration
+
+Existing students can continue into a future Semester or academic year through:
+
+```text
+Student Portal > Re-Registration
+```
+
+This workflow retains the student's existing account and Student ID. See:
+
+```text
+docs/features/student-reregistration.md
+```
