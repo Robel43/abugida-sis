@@ -29,6 +29,9 @@ services:
     depends_on:
       - db
 
+    environment:
+      WKHTMLTOPDF_PATH: /usr/bin/wkhtmltopdf
+
     ports:
       - "8090:80"
 
