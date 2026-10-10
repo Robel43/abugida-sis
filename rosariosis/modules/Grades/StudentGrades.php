@@ -35,7 +35,7 @@ if ( UserStudentID()
 	FROM schedule s,course_periods cp,courses c
 	WHERE s.SYEAR='" . UserSyear() . "'
 	AND cp.COURSE_PERIOD_ID=s.COURSE_PERIOD_ID
-	AND s.MARKING_PERIOD_ID IN (" . GetAllMP( 'QTR', UserMP() ) . ")
+	AND s.MARKING_PERIOD_ID IN (" . GetAllMP( 'SEM', UserMP() ) . ")
 	AND '" . DBDate() . "'>=s.START_DATE
 	AND ((s.END_DATE IS NULL OR '" . DBDate() . "'<=s.END_DATE)
 		OR EXISTS(SELECT 1 FROM gradebook_grades gg
@@ -125,7 +125,7 @@ if ( UserStudentID()
 				JOIN schedule ss ON (ss.STUDENT_ID=s.STUDENT_ID AND ss.SYEAR='" . UserSyear() . "'";
 
 				// @since 10.9.1 SQL Show Gradebook Grades of Inactive Students (Course status, maybe dropped as of today)
-				$sql .= " AND ss.MARKING_PERIOD_ID IN (" . GetAllMP( 'QTR', UserMP() ) . ") AND CURRENT_DATE>=ss.START_DATE";
+				$sql .= " AND ss.MARKING_PERIOD_ID IN (" . GetAllMP( 'SEM', UserMP() ) . ") AND CURRENT_DATE>=ss.START_DATE";
 
 				$sql .= ") JOIN course_periods cp ON (cp.COURSE_PERIOD_ID=ss.COURSE_PERIOD_ID AND cp.COURSE_PERIOD_ID='" . (int) $course_period_id . "')
 				JOIN student_enrollment ssm ON (ssm.STUDENT_ID=s.STUDENT_ID AND ssm.SYEAR=ss.SYEAR AND ssm.SCHOOL_ID='" . UserSchool() . "'";
@@ -178,7 +178,7 @@ if ( UserStudentID()
 					}
 
 					// @since 12.7.2 Fix Final Grade when assignments are weighted
-					$import_RET = FinalGradesQtrOrProCalculate( $course_period_id, UserMP() );
+					$import_RET = FinalGradesSemesterCalculate( $course_period_id, UserMP() );
 
 					$percent = false;
 
