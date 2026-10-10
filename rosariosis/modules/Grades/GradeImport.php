@@ -122,11 +122,9 @@ function AbugidaGradeImportRecord( $student_id, $course_period_id, $mp_id, $scor
 		return false;
 	}
 
-	$grade_RET = DBGet( "SELECT rcg.ID,rcg.TITLE,rcg.GPA_VALUE AS WEIGHTED_GP,
-		rcg.UNWEIGHTED_GP,gs.GP_SCALE,gs.GP_PASSING_VALUE
-		FROM report_card_grades rcg,report_card_grade_scales gs
-		WHERE rcg.GRADE_SCALE_ID=gs.ID
-		AND rcg.ID='" . (int) $grade_id . "'
+	$grade_RET = DBGet( "SELECT rcg.ID,rcg.TITLE
+		FROM report_card_grades rcg
+		WHERE rcg.ID='" . (int) $grade_id . "'
 		LIMIT 1" );
 
 	if ( empty( $grade_RET[1] ) )
@@ -146,14 +144,7 @@ function AbugidaGradeImportRecord( $student_id, $course_period_id, $mp_id, $scor
 		'GRADE_PERCENT' => number_format( (float) $score, 2, '.', '' ),
 		'COMMENT' => '',
 		'GRADE_LETTER' => DBEscapeString( $grade['TITLE'] ),
-		'WEIGHTED_GP' => $grade['WEIGHTED_GP'],
-		'UNWEIGHTED_GP' => $grade['UNWEIGHTED_GP'],
-		'GP_SCALE' => $grade['GP_SCALE'],
 		'COURSE_TITLE' => DBEscapeString( $course['COURSE_NAME'] ),
-		'CREDIT_ATTEMPTED' => $course['CREDITS'],
-		'CREDIT_EARNED' => ( (float) $grade['WEIGHTED_GP'] && $grade['WEIGHTED_GP'] >= $grade['GP_PASSING_VALUE'] ? $course['CREDITS'] : '0' ),
-		'CLASS_RANK' => $course['CLASS_RANK'],
-		'CREDIT_HOURS' => $course['CREDIT_HOURS'],
 	];
 }
 
