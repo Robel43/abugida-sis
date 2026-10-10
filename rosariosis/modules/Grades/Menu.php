@@ -21,6 +21,7 @@ $menu['Grades']['admin'] = [
 	'Grades/TeacherCompletion.php' => _( 'Teacher Completion' ),
 	'Grades/GradeBreakdown.php' => _( 'Grade Breakdown' ),
 	'Grades/FinalGrades.php' => _( 'Final Grades' ),
+	'Grades/ClassRank.php' => _( 'Class Rank' ),
 	2 => _( 'Setup' ),
 	'Grades/Configuration.php' => _( 'Configuration' ),
 	'Grades/ReportCardComments.php' => _( 'Report Card Comments' ),
