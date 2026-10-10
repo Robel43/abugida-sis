@@ -661,12 +661,11 @@ if ( ! $_REQUEST['modfunc'] )
 
 		echo '</div>';
 
-		// QUARTERS
-
-		if ( ( $_REQUEST['mp_term'] === 'SEM'
+		// Abugida uses Semesters only. Legacy Quarter / Progress setup is hidden.
+		if ( false && ( $_REQUEST['mp_term'] === 'SEM'
 				&& $_REQUEST['marking_period_id'] !== 'new' )
 			|| $_REQUEST['mp_term'] === 'QTR'
-			|| $_REQUEST['mp_term'] === 'PRO' )
+			|| $_REQUEST['mp_term'] === 'PRO' ) )
 		{
 			$qtr_RET = DBGet( "SELECT MARKING_PERIOD_ID,TITLE
 				FROM school_marking_periods
