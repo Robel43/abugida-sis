@@ -1,4 +1,16 @@
-# Student Dashboard - Planned Scope
+# Student Dashboard - Implementation Plan
+
+## Implementation status
+
+The first student-facing version is now implemented on `feature/student-dashboard`.
+
+See:
+
+```text
+docs/features/student-portal.md
+```
+
+The implemented first version includes Dashboard, My Courses, My Grades, Payments, and My Profile.
 
 ## Purpose
 
