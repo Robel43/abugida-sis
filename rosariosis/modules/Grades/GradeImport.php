@@ -7,6 +7,7 @@
  */
 
 require_once 'modules/Grades/includes/Grades.fnc.php';
+require_once 'modules/Grades/includes/ClassRank.inc.php';
 require_once 'ProgramFunctions/_makeLetterGrade.fnc.php';
 require_once 'ProgramFunctions/AbugidaXlsx.fnc.php';
 
@@ -119,6 +120,7 @@ $marking_periods = DBGet( "SELECT MARKING_PERIOD_ID,TITLE,MP,START_DATE,END_DATE
 	FROM school_marking_periods
 	WHERE SCHOOL_ID='" . UserSchool() . "'
 	AND SYEAR='" . UserSyear() . "'
+	AND MP='SEM'
 	ORDER BY SORT_ORDER,START_DATE,MARKING_PERIOD_ID" );
 
 $course_periods = [];
@@ -228,8 +230,8 @@ if ( isset( $_POST['grade_import_action'] )
 						$row = $rows[$i];
 						$raw_id = isset( $row[$indexes['student_id']] ) ? $row[$indexes['student_id']] : '';
 						$student_id = AbugidaGradeImportStudentId( $raw_id );
-						$excel_name = trim( (string) issetVal( $row[$indexes['student_name']], '' ) );
-						$score_raw = trim( (string) issetVal( $row[$indexes['final_score']], '' ) );
+						$excel_name = trim( (string) ( isset( $row[$indexes['student_name']] ) ? $row[$indexes['student_name']] : '' ) );
+						$score_raw = trim( (string) ( isset( $row[$indexes['final_score']] ) ? $row[$indexes['final_score']] : '' ) );
 
 						if ( $raw_id === '' && $excel_name === '' && $score_raw === '' )
 						{
@@ -269,6 +271,14 @@ if ( isset( $_POST['grade_import_action'] )
 						if ( $student_id )
 						{
 							$seen[$student_id] = true;
+						}
+
+						if ( $status === 'VALID'
+							&& $excel_name !== ''
+							&& $sis_name !== ''
+							&& strtolower( preg_replace( '/\s+/', ' ', $excel_name ) ) !== strtolower( preg_replace( '/\s+/', ' ', $sis_name ) ) )
+						{
+							$message = 'Student name differs from the SIS record; Student ID will be used for matching.';
 						}
 
 						$existing = $student_id ? DBGetOne( "SELECT GRADE_PERCENT
@@ -462,6 +472,7 @@ if ( isset( $_POST['grade_import_action'] )
 				);
 
 				DBQuery( 'COMMIT' );
+				ClassRankCalculateAddMP( (int) $session_import['mp_id'] );
 				unset( $_SESSION['AbugidaGradeImportPreview'] );
 				$note[] = sprintf( _( '%d grades imported successfully. %d rows skipped.' ), $imported, $skipped );
 			}
