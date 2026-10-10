@@ -58,16 +58,24 @@ $menu['Grades']['teacher'] = [
 	'Grades/ReportCardCommentCodes.php' => _( 'Comment Codes' ),
 ] + issetVal( $menu['Grades']['teacher'], [] );
 
-$menu['Grades']['parent'] = [
-	'title' => _( 'Grades' ),
-	'default' => 'Grades/StudentGrades.php',
-	'Grades/StudentGrades.php' => _( 'Gradebook Grades' ),
-	'Grades/StudentAssignments.php' => _( 'Assignments' ),
-	'Grades/FinalGrades.php' => _( 'Final Grades' ),
-	'Grades/ReportCards.php' => _( 'Report Cards' ),
-	'Grades/ProgressReports.php' => _( 'Progress Reports' ),
-	'Grades/Transcripts.php' => _( 'Transcripts' ),
-] + issetVal( $menu['Grades']['parent'], [] );
+// Student Portal provides the student-facing grade view.
+if ( User( 'PROFILE' ) === 'student' )
+{
+	$menu['Grades']['parent'] = [];
+}
+else
+{
+	$menu['Grades']['parent'] = [
+		'title' => _( 'Grades' ),
+		'default' => 'Grades/StudentGrades.php',
+		'Grades/StudentGrades.php' => _( 'Gradebook Grades' ),
+		'Grades/StudentAssignments.php' => _( 'Assignments' ),
+		'Grades/FinalGrades.php' => _( 'Final Grades' ),
+		'Grades/ReportCards.php' => _( 'Report Cards' ),
+		'Grades/ProgressReports.php' => _( 'Progress Reports' ),
+		'Grades/Transcripts.php' => _( 'Transcripts' ),
+	] + issetVal( $menu['Grades']['parent'], [] );
+}
 
 if ( $RosarioModules['Users'] )
 {
