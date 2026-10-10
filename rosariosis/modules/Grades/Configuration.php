@@ -199,7 +199,7 @@ if ( ProgramConfig( 'grades', 'GRADES_DOES_LETTER_PERCENT' ) <= 0 )
 echo '<tr><td>' . CheckboxInput(
 	( array_key_exists( 'HIDE_PREVIOUS_ASSIGNMENT_TYPES', $gradebook_config ) ? $gradebook_config['HIDE_PREVIOUS_ASSIGNMENT_TYPES'] : '' ),
 	'values[HIDE_PREVIOUS_ASSIGNMENT_TYPES]',
-	_( 'Hide previous quarters assignment types' ),
+	_( 'Hide previous semesters assignment types' ),
 	'',
 	( ! array_key_exists( 'HIDE_PREVIOUS_ASSIGNMENT_TYPES', $gradebook_config ) )
 ) . '</td></tr>';
