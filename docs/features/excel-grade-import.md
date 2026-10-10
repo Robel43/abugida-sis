@@ -121,7 +121,10 @@ Migrations:
 ```text
 database/migrations/007_excel_grade_import.sql
 database/migrations/008_semester_class_rank.sql
+database/migrations/009_grade_program_permissions.sql
 ```
+
+Migration 009 grants existing administrator-type profiles access to **Grade Import** and **Class Rank**, so the new programs appear in the menu after deployment.
 
 ## XLSX processing
 
@@ -173,3 +176,13 @@ The next student-facing phase will expose the official SIS information already s
 - important school notices or account information where appropriate.
 
 The student-facing dashboard will be read-only for official academic and finance information unless a specific workflow explicitly allows student action.
+
+
+## Browser navigation compatibility
+
+Grade selection and automatic Subject / Section loading work through both:
+
+- normal full-page navigation;
+- RosarioSIS sidebar / AJAX navigation.
+
+The Grade Import JavaScript initializes immediately when the module is injected through sidebar navigation rather than relying only on the original page `DOMContentLoaded` event.
