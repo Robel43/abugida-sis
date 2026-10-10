@@ -244,6 +244,12 @@ if ( $_REQUEST['report_action'] === 'student_pdf'
 
 	$student_ids = array_values( array_intersect( $student_ids, $allowed_student_ids ) );
 
+	if ( ! $student_ids )
+	{
+		echo ErrorMessage( [ _( 'No authorized students were selected for this class.' ) ] );
+		exit;
+	}
+
 	if ( $student_ids )
 	{
 		$reports = [];
