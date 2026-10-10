@@ -74,6 +74,31 @@ function AbugidaReRegistrationSemesters( $syear = null )
 		ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
 }
 
+
+function AbugidaReRegistrationCurrentSemesterId()
+{
+	return (int) DBGetOne( "SELECT MARKING_PERIOD_ID
+		FROM school_marking_periods
+		WHERE SCHOOL_ID='" . UserSchool() . "'
+		AND SYEAR='" . UserSyear() . "'
+		AND MP='SEM'
+		AND START_DATE<='" . DBDate() . "'
+		AND (END_DATE IS NULL OR END_DATE>='" . DBDate() . "')
+		ORDER BY START_DATE DESC,MARKING_PERIOD_ID DESC
+		LIMIT 1" );
+}
+
+function AbugidaReRegistrationFutureSemesters()
+{
+	return DBGet( "SELECT MARKING_PERIOD_ID,TITLE,SHORT_NAME,START_DATE,END_DATE,SORT_ORDER
+		FROM school_marking_periods
+		WHERE SCHOOL_ID='" . UserSchool() . "'
+		AND SYEAR='" . UserSyear() . "'
+		AND MP='SEM'
+		AND START_DATE>'" . DBDate() . "'
+		ORDER BY START_DATE,SORT_ORDER IS NULL,SORT_ORDER" );
+}
+
 function AbugidaReRegistrationFutureYears()
 {
 	return DBGet( "SELECT DISTINCT SYEAR,MARKING_PERIOD_ID,TITLE,START_DATE,END_DATE
