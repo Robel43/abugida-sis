@@ -9,6 +9,7 @@
 require_once 'modules/Grades/includes/Grades.fnc.php';
 require_once 'ProgramFunctions/_makeLetterGrade.fnc.php';
 require_once 'ProgramFunctions/AbugidaXlsx.fnc.php';
+require_once 'ProgramFunctions/AbugidaClassRank.fnc.php';
 
 echo '<script src="assets/js/csp/modules/grades/GradeImport.js?v=1"></script>';
 
@@ -492,6 +493,7 @@ if ( isset( $_POST['grade_import_action'] )
 				);
 
 				DBQuery( 'COMMIT' );
+				AbugidaRankRecalculateSemester( (int) $session_import['mp_id'] );
 				unset( $_SESSION['AbugidaGradeImportPreview'] );
 				$note[] = sprintf( _( '%d grades imported successfully. %d rows skipped.' ), $imported, $skipped );
 			}
