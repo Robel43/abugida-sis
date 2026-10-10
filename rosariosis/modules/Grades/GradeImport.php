@@ -486,18 +486,26 @@ echo ErrorMessage( $note, 'note' );
 $preview_data = issetVal( $_SESSION['AbugidaGradeImportPreview'], [] );
 
 echo '<style>
-	.abg-import-wrap{max-width:1100px}
-	.abg-import-card{background:#fff;border:1px solid #d9e1ea;border-radius:10px;padding:18px;margin:14px 0}
-	.abg-import-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-	.abg-import-field label{display:block;font-weight:700;margin-bottom:5px}
-	.abg-import-field select,.abg-import-field input[type=file]{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px}
-	.abg-import-btn{display:inline-block;padding:10px 16px;border:0;border-radius:7px;background:#1677c8;color:#fff;font-weight:700;cursor:pointer}
+	.abg-import-wrap{max-width:1180px}
+	.abg-import-card{background:#fff;border:1px solid #d9e1ea;border-radius:12px;padding:24px;margin:16px 0;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+	.abg-import-card h3{margin:0 0 14px;font-size:24px;line-height:1.25;color:#101828}
+	.abg-import-help{margin:0 0 22px;color:#667085;line-height:1.55;font-size:15px}
+	.abg-import-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px;align-items:end}
+	.abg-import-field{min-width:0}
+	.abg-import-field label{display:block;font-weight:700;margin:0 0 7px;color:#101828;font-size:15px;line-height:1.35}
+	.abg-import-field select{display:block;width:100%;height:46px;min-height:46px;padding:0 42px 0 13px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#101828;font:inherit;font-size:15px;line-height:46px;box-sizing:border-box;vertical-align:middle}
+	.abg-import-field select:focus,.abg-file-control:focus-within{outline:0;border-color:#1677c8;box-shadow:0 0 0 3px rgba(22,119,200,.12)}
+	.abg-file-control{display:flex;align-items:center;width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;overflow:hidden;box-sizing:border-box}
+	.abg-file-control input[type=file]{display:block;width:100%;margin:0;padding:0;color:#344054;font:inherit;font-size:14px;line-height:1.3;border:0;background:#fff;box-sizing:border-box}
+	.abg-file-control input[type=file]::file-selector-button{height:44px;margin:0 12px 0 0;padding:0 16px;border:0;border-right:1px solid #d0d5dd;background:#f8fafc;color:#344054;font-weight:700;cursor:pointer}
+	.abg-import-actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 0}
+	.abg-import-btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 17px;border:0;border-radius:8px;background:#1677c8;color:#fff;font-weight:700;line-height:1.2;cursor:pointer;text-decoration:none}
+	.abg-import-btn:hover{background:#1269b1}
 	.abg-import-table{width:100%;border-collapse:collapse;margin-top:12px}
-	.abg-import-table th,.abg-import-table td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}
+	.abg-import-table th,.abg-import-table td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
 	.abg-import-table th{background:#f8fafc}
 	.abg-status-valid{color:#067647;font-weight:700}.abg-status-existing{color:#b54708;font-weight:700}.abg-status-error{color:#b42318;font-weight:700}
-	.abg-import-help{color:#667085;line-height:1.5}
-	@media(max-width:760px){.abg-import-grid{grid-template-columns:1fr}}
+	@media(max-width:760px){.abg-import-card{padding:18px}.abg-import-grid{grid-template-columns:1fr}.abg-import-actions{flex-direction:column}.abg-import-btn{width:100%}}
 </style>';
 
 echo '<div class="abg-import-wrap">';
@@ -538,12 +546,12 @@ foreach ( (array) $marking_periods as $mp )
 echo '</select></div>';
 
 echo '<div class="abg-import-field"><label>' . _( 'Excel File (.xlsx)' ) . '</label>';
-echo '<input type="file" name="grade_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div>';
+echo '<div class="abg-file-control"><input type="file" name="grade_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div></div>';
 echo '</div>';
-echo '<p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">';
+echo '<div class="abg-import-actions">';
 echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="load_context">' . _( 'Load Subjects / Sections' ) . '</button>';
 echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="preview">' . _( 'Validate & Preview' ) . '</button>';
-echo '</p>';
+echo '</div>';
 echo '</form>';
 echo '</div>';
 
