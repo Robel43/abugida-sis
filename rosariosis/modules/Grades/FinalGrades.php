@@ -162,13 +162,7 @@ if ( $_REQUEST['modfunc'] === 'save' )
 
 			foreach ( (array) $_REQUEST['mp_arr'] as $mp )
 			{
-				if ( isset( $_REQUEST['elements']['percents'] )
-					&& $_REQUEST['elements']['percents'] == 'Y' )
-				{
-					$columns[$mp . '%'] = '%';
-				}
-
-				$columns[$mp] = GetMP( $mp );
+				$columns[$mp] = GetMP( $mp ) . ' (%)';
 			}
 
 			if ( isset( $_REQUEST['elements']['comments'] )
@@ -259,14 +253,9 @@ if ( $_REQUEST['modfunc'] === 'save' )
 					{
 						if ( ! empty( $mps[$mp] ) )
 						{
-							$grades_RET[$i][$mp] = $mps[$mp][1]['GRADE_TITLE'];
-
-							if ( isset( $_REQUEST['elements']['percents'] )
-								&& $_REQUEST['elements']['percents'] == 'Y'
-								&& $mps[$mp][1]['GRADE_PERCENT'] > 0 )
-							{
-								$grades_RET[$i][$mp . '%'] = $mps[$mp][1]['GRADE_PERCENT'] . '%';
-							}
+							$grades_RET[$i][$mp] = $mps[$mp][1]['GRADE_PERCENT'] !== null
+								&& $mps[$mp][1]['GRADE_PERCENT'] !== '' ?
+								$mps[$mp][1]['GRADE_PERCENT'] . '%' : '';
 
 							$last_mp = $mp;
 						}
