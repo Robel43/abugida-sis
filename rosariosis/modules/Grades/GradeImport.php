@@ -444,7 +444,7 @@ if ( isset( $_POST['grade_import_action'] )
 					'abugida_grade_import_rows',
 					[
 						'BATCH_ID' => (int) $batch_id,
-						'ROW_NUMBER' => (int) $row['row_number'],
+						'EXCEL_ROW_NUMBER' => (int) $row['row_number'],
 						'STUDENT_ID' => $row['student_id'] ? (int) $row['student_id'] : null,
 						'STUDENT_NAME' => DBEscapeString( $row['sis_name'] ? $row['sis_name'] : $row['excel_name'] ),
 						'OLD_PERCENT' => is_numeric( $row['existing'] ) ? $row['existing'] : null,
