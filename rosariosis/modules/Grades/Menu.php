@@ -49,7 +49,6 @@ $menu['Grades']['teacher'] = [
 	2 => _( 'Reports' ),
 	'Grades/StudentGrades.php' => _( 'Student Grades' ),
 	'Grades/FinalGrades.php' => _( 'Final Grades' ),
-	'Grades/GPARankList.php' => _( 'GPA / Class Rank List' ),
 	3 => _( 'Setup' ),
 	'Grades/Configuration.php' => _( 'Configuration' ),
 	'Grades/ReportCardGrades.php' => _( 'Grading Scales' ),
