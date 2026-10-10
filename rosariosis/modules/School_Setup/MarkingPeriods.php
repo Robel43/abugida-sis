@@ -4,6 +4,34 @@ require_once 'modules/School_Setup/includes/MarkingPeriods.fnc.php';
 
 DrawHeader( ProgramTitle() );
 
+// Abugida semester-only compatibility redirect.
+// Legacy Quarter / Progress links resolve to the containing Semester.
+if ( isset( $_REQUEST['mp_term'] )
+	&& in_array( $_REQUEST['mp_term'], [ 'QTR', 'PRO' ], true ) )
+{
+	$legacy_id = (int) issetVal( $_REQUEST['marking_period_id'], 0 );
+	$semester_id = 0;
+
+	if ( $_REQUEST['mp_term'] === 'QTR' && $legacy_id )
+	{
+		$semester_id = GetParentMP( 'SEM', $legacy_id );
+	}
+	elseif ( $_REQUEST['mp_term'] === 'PRO' && $legacy_id )
+	{
+		$quarter_id = GetParentMP( 'QTR', $legacy_id );
+		$semester_id = $quarter_id ? GetParentMP( 'SEM', $quarter_id ) : 0;
+	}
+
+	$_REQUEST['mp_term'] = 'SEM';
+
+	if ( $semester_id )
+	{
+		$_REQUEST['marking_period_id'] = $semester_id;
+		$_REQUEST['semester_id'] = $semester_id;
+	}
+}
+
+
 // Default MP ID to Full Year.
 
 if ( empty( $_REQUEST['marking_period_id'] ) )
@@ -661,105 +689,7 @@ if ( ! $_REQUEST['modfunc'] )
 
 		echo '</div>';
 
-		// Abugida uses Semesters only. Legacy Quarter / Progress setup is hidden.
-		if ( false && ( $_REQUEST['mp_term'] === 'SEM'
-				&& $_REQUEST['marking_period_id'] !== 'new' )
-			|| $_REQUEST['mp_term'] === 'QTR'
-			|| $_REQUEST['mp_term'] === 'PRO' ) )
-		{
-			$qtr_RET = DBGet( "SELECT MARKING_PERIOD_ID,TITLE
-				FROM school_marking_periods
-				WHERE MP='QTR'
-				AND SCHOOL_ID='" . UserSchool() . "'
-				AND SYEAR='" . UserSyear() . "'
-				AND PARENT_ID='" . (int) $_REQUEST['semester_id'] . "'
-				ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
+		// Semester is the lowest grading period in Abugida.
 
-			if ( ! empty( $qtr_RET ) )
-			{
-				if ( ( $_REQUEST['mp_term'] === 'QTR'
-						&& $_REQUEST['marking_period_id'] !== 'new' )
-					|| $_REQUEST['mp_term'] === 'PRO' )
-				{
-					if ( $_REQUEST['mp_term'] == 'QTR' )
-					{
-						$_REQUEST['quarter_id'] = issetVal( $_REQUEST['marking_period_id'] );
-					}
-
-					foreach ( (array) $qtr_RET as $key => $value )
-					{
-						if ( $value['MARKING_PERIOD_ID'] === $_REQUEST['quarter_id'] )
-						{
-							$qtr_RET[$key]['row_color'] = Preferences( 'HIGHLIGHT' );
-						}
-					}
-				}
-			}
-
-			echo '<div class="st">';
-
-			$columns = [ 'TITLE' => _( 'Quarter' ) ];
-
-			$link = [];
-
-			$link['TITLE']['link'] = 'Modules.php?modname=' . $_REQUEST['modname'] . '&mp_term=QTR&year_id=' . $_REQUEST['year_id'] . '&semester_id=' . $_REQUEST['semester_id'];
-
-			$link['TITLE']['variables'] = [ 'marking_period_id' => 'MARKING_PERIOD_ID' ];
-
-			$link['add']['link'] = 'Modules.php?modname=' . $_REQUEST['modname'] . '&mp_term=QTR&marking_period_id=new&year_id=' . $_REQUEST['year_id'] . '&semester_id=' . $_REQUEST['semester_id'];
-
-			ListOutput( $qtr_RET, $columns, 'Quarter', 'Quarters', $link, [], $LO_options );
-
-			echo '</div>';
-
-			// PROGRESS PERIODS
-
-			if ( ( $_REQUEST['mp_term'] === 'QTR'
-					&& $_REQUEST['marking_period_id'] !== 'new' )
-				|| $_REQUEST['mp_term'] === 'PRO' )
-			{
-				$pro_RET = DBGet( "SELECT MARKING_PERIOD_ID,TITLE
-					FROM school_marking_periods
-					WHERE MP='PRO'
-					AND SCHOOL_ID='" . UserSchool() . "'
-					AND SYEAR='" . UserSyear() . "'
-					AND PARENT_ID='" . (int) $_REQUEST['quarter_id'] . "'
-					ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
-
-				if ( ! empty( $pro_RET ) )
-				{
-					if ( $_REQUEST['mp_term'] === 'PRO'
-						&& $_REQUEST['marking_period_id'] !== 'new' )
-					{
-						$_REQUEST['progress_period_id'] = issetVal( $_REQUEST['marking_period_id'] );
-
-						foreach ( (array) $pro_RET as $key => $value )
-						{
-							if ( $value['MARKING_PERIOD_ID'] === $_REQUEST['marking_period_id'] )
-							{
-								$pro_RET[$key]['row_color'] = Preferences( 'HIGHLIGHT' );
-							}
-						}
-					}
-				}
-
-				echo '<div class="st">';
-
-				$columns = [ 'TITLE' => _( 'Progress Period' ) ];
-
-				$link = [];
-
-				$link['TITLE']['link'] = 'Modules.php?modname=' . $_REQUEST['modname'] . '&mp_term=PRO&year_id=' . $_REQUEST['year_id'] .
-					'&semester_id=' . $_REQUEST['semester_id'] . '&quarter_id=' . $_REQUEST['quarter_id'];
-
-				$link['TITLE']['variables'] = [ 'marking_period_id' => 'MARKING_PERIOD_ID' ];
-
-				$link['add']['link'] = 'Modules.php?modname=' . $_REQUEST['modname'] . '&mp_term=PRO&marking_period_id=new&year_id=' . $_REQUEST['year_id'] . '&semester_id=' . $_REQUEST['semester_id'] . '&quarter_id=' . $_REQUEST['quarter_id'];
-
-				ListOutput( $pro_RET, $columns, 'Progress Period', 'Progress Periods', $link, [], $LO_options );
-
-				echo '</div>';
-			}
-		}
 	}
 }
