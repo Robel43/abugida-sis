@@ -130,10 +130,7 @@ function FinalGradesAllMPSave( $cp_id, $semester_id )
 		);
 	}
 
-	if ( GetMP( $mp_id, 'MP' ) === 'SEM' )
-	{
-		AbugidaRankRecalculateSemester( $mp_id );
-	}
+	AbugidaRankRecalculateSemester( $semester_id );
 
 	return true;
 }
