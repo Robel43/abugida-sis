@@ -492,7 +492,7 @@ if ( ! $_REQUEST['modfunc'] )
 		$hide_previous_assignment_types_sql = " AND (CREATED_MP='" . UserMP() . "' OR CREATED_MP IS NULL)";
 	}
 
-	// Check assignment type ID is valid for current school & syear & quarter!
+	// Check assignment type ID is valid for current school & syear & semester!
 
 	if ( ! empty( $_REQUEST['assignment_type_id'] )
 		&& $_REQUEST['assignment_type_id'] !== 'new' )
