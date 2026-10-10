@@ -188,9 +188,11 @@ if ( $request_id )
 
 					if ( $existing_enrollment )
 					{
+						// Preserve dates and other enrollment details if a future-year
+						// enrollment row was already prepared by the Registrar.
 						DBUpdate(
 							'student_enrollment',
-							$enrollment_values,
+							[ 'GRADE_ID' => $target_grade_id ],
 							[ 'ID' => (int) $existing_enrollment ]
 						);
 					}
