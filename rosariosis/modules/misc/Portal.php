@@ -3,6 +3,13 @@ require_once 'ProgramFunctions/PortalPollsNotes.fnc.php';
 require_once 'ProgramFunctions/Dashboard.fnc.php';
 require_once 'modules/School_Setup/includes/Rollover.fnc.php';
 
+if ( User( 'PROFILE' ) === 'student'
+	&& AllowUse( 'Students/StudentDashboard.php' ) )
+{
+	header( 'Location: Modules.php?modname=Students/StudentDashboard.php' );
+	exit;
+}
+
 if ( $RosarioModules['Discipline'] )
 {
 	// Discipline alerts.
