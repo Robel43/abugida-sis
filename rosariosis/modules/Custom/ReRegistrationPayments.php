@@ -32,30 +32,12 @@ if ( $request_id )
 	$request = ! empty( $ret[1] ) ? $ret[1] : [];
 
 	if ( $request
-		&& $_REQUEST['modfunc'] === 'download_receipt'
-		&& $request['RECEIPT_STORED_NAME'] )
-	{
-		$file = 'assets/FileUploads/ReRegistrationReceipts/' . basename( $request['RECEIPT_STORED_NAME'] );
-
-		if ( is_file( $file ) )
-		{
-			header( 'Content-Type: application/octet-stream' );
-			header( 'Content-Disposition: attachment; filename="' .
-				str_replace( '"', '', basename( $request['RECEIPT_ORIGINAL_NAME'] ) ) . '"' );
-			header( 'Content-Length: ' . filesize( $file ) );
-			readfile( $file );
-		}
-
-		exit;
-	}
-
-	if ( $request
 		&& $_SERVER['REQUEST_METHOD'] === 'POST'
-		&& $_REQUEST['modfunc'] === 'decision'
 		&& AllowEdit()
-		&& $request['STATUS'] === 'PAYMENT_SUBMITTED' )
+		&& $request['STATUS'] === 'PAYMENT_SUBMITTED'
+		&& in_array( issetVal( $_POST['finance_action'], '' ), [ 'approve', 'reject' ], true ) )
 	{
-		$decision = issetVal( $_POST['decision'], '' );
+		$decision = issetVal( $_POST['finance_action'], '' );
 		$reason = trim( (string) issetVal( $_POST['reason'], '' ) );
 		$from = $request['STATUS'];
 
@@ -167,18 +149,27 @@ if ( $request_id )
 		if ( $request['RECEIPT_STORED_NAME'] )
 		{
 			echo '<div class="abg-fin-actions"><a class="abg-fin-btn abg-fin-primary" href="' .
-				URLEscape( 'Modules.php?modname=Custom/ReRegistrationPayments.php&request_id=' . $request_id . '&modfunc=download_receipt' ) .
+				URLEscape( 'reregistration-receipt.php?request_id=' . $request_id . '&mode=download' ) .
 				'">' . _( 'Download Payment Receipt' ) . '</a></div>';
 		}
 
 		if ( $request['STATUS'] === 'PAYMENT_SUBMITTED' && AllowEdit() )
 		{
-			echo '<hr><form method="POST" action="' .
-				URLEscape( 'Modules.php?modname=Custom/ReRegistrationPayments.php&request_id=' . $request_id . '&modfunc=decision' ) . '">';
-			echo '<p><label><b>' . _( 'Reason (required when rejecting)' ) . '</b><br><textarea name="reason" rows="4"></textarea></label></p>';
+			echo '<hr><h4>' . _( 'Finance Decision' ) . '</h4>';
+
+			echo '<form method="POST" action="' .
+				URLEscape( 'Modules.php?modname=Custom/ReRegistrationPayments.php&request_id=' . $request_id ) . '">';
+			echo '<input type="hidden" name="finance_action" value="approve">';
 			echo '<div class="abg-fin-actions">';
-			echo '<button class="abg-fin-btn abg-fin-success" type="submit" name="decision" value="approve">' . _( 'Verify Payment' ) . '</button>';
-			echo '<button class="abg-fin-btn abg-fin-danger" type="submit" name="decision" value="reject">' . _( 'Reject Payment' ) . '</button>';
+			echo '<button class="abg-fin-btn abg-fin-success" type="submit">' . _( 'Verify Payment' ) . '</button>';
+			echo '</div></form>';
+
+			echo '<form method="POST" action="' .
+				URLEscape( 'Modules.php?modname=Custom/ReRegistrationPayments.php&request_id=' . $request_id ) . '">';
+			echo '<input type="hidden" name="finance_action" value="reject">';
+			echo '<p><label><b>' . _( 'Rejection Reason' ) . '</b><br><textarea name="reason" rows="4" required></textarea></label></p>';
+			echo '<div class="abg-fin-actions">';
+			echo '<button class="abg-fin-btn abg-fin-danger" type="submit">' . _( 'Reject Payment' ) . '</button>';
 			echo '</div></form>';
 		}
 		elseif ( $request['STATUS'] === 'PAYMENT_DECLINED' )
