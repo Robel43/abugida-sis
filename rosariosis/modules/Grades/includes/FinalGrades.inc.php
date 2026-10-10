@@ -1,4 +1,6 @@
 <?php
+
+require_once 'ProgramFunctions/AbugidaClassRank.fnc.php';
 /**
  * Final Grades functions & AJAX modfunc.
  *
@@ -126,6 +128,11 @@ function FinalGradesAllMPSave( $cp_id, $semester_id )
 				'COURSE_PERIOD_ID' => (int) $cp_id,
 			]
 		);
+	}
+
+	if ( GetMP( $mp_id, 'MP' ) === 'SEM' )
+	{
+		AbugidaRankRecalculateSemester( $mp_id );
 	}
 
 	return true;
