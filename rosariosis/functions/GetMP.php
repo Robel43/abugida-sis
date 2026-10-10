@@ -68,155 +68,91 @@ endif;
 
 if ( ! function_exists( 'GetAllMP' ) ) :
 /**
- * Get All Marking Periods
+ * Get all academic periods relevant to the requested context.
  *
- * Returns FY,[SEM,...],[QTR,...],[PRO,...] IDs.
+ * Abugida uses a semester-only high-school calendar. Legacy QTR / PRO calls
+ * are treated as requests for the containing semester so older RosarioSIS
+ * gradebook code continues to work without Quarter records.
  *
- * @example GetAllMP( 'QTR', UserMP() );
- *
- * @param  string $mp                PRO|QTR|SEM|FY Marking Period.
- * @param  string $marking_period_id Marking Period ID (optional). Defaults to '0' (FY).
- *
- * @return string Marking Period IDs list (separated by commas)
+ * @param string $mp                SEM|FY (legacy QTR|PRO accepted).
+ * @param string $marking_period_id Marking Period ID. Defaults to Full Year.
+ * @return string SQL-ready comma-separated quoted IDs.
  */
 function GetAllMP( $mp, $marking_period_id = '0' )
 {
-	static $all_mp = null;
+	static $all_mp = [];
+
+	$fy = GetFullYearMP();
 
 	if ( $marking_period_id < 1 )
 	{
-		$marking_period_id = GetFullYearMP();
-
+		$marking_period_id = $fy;
 		$mp = 'FY';
 	}
-	elseif ( ! $mp )
+
+	$current_type = GetMP( $marking_period_id, 'MP' );
+
+	// Legacy Quarter / Progress calls resolve to their containing Semester.
+	if ( in_array( $current_type, [ 'QTR', 'PRO' ], true ) )
 	{
-		$mp = GetMP( $marking_period_id, 'MP' );
-	}
+		$semester_id = $current_type === 'QTR' ?
+			GetParentMP( 'SEM', $marking_period_id ) :
+			GetParentMP( 'SEM', GetParentMP( 'QTR', $marking_period_id ) );
 
-	if ( GetMP( $marking_period_id, 'MP' ) === 'PRO' )
-	{
-		// @since 12.7.5 Fix SQL error when Marking Period ID is Progress Period
-		$marking_period_id = GetParentMP( 'QTR', $marking_period_id );
-	}
-
-	if ( is_null( $all_mp )
-		|| ! isset( $all_mp[ $mp ] ) )
-	{
-		$fy = GetFullYearMP();
-
-		$sem_SQL = "SELECT MARKING_PERIOD_ID
-			FROM school_marking_periods s
-			WHERE MP='SEM'
-			AND NOT EXISTS (SELECT ''
-				FROM school_marking_periods q
-				WHERE q.MP='QTR'
-				AND q.PARENT_ID=s.MARKING_PERIOD_ID)
-			AND SYEAR='" . UserSyear() . "'
-			AND SCHOOL_ID='" . UserSchool() . "'";
-
-		$qtr_SQL = "SELECT MARKING_PERIOD_ID,PARENT_ID
-			FROM school_marking_periods
-			WHERE MP='QTR'
-			AND SYEAR='" . UserSyear() . "'
-			AND SCHOOL_ID='" . UserSchool() . "'";
-
-		if ( $mp === 'PRO'
-			|| $mp === 'QTR' )
+		if ( $semester_id )
 		{
-			$qtr_RET = DBGet( $qtr_SQL );
-		}
-		else
-			$qtr_RET = DBGet( $qtr_SQL, [], [ 'PARENT_ID' ] );
-
-		// FJ Fatal error if no quarters.
-		if ( ! $qtr_RET )
-		{
-			return ErrorMessage( [ _( 'No quarters found' ) ], 'fatal' );
-		}
-
-		switch ( $mp )
-		{
-			case 'PRO':
-
-				foreach ( $qtr_RET as $qtr )
-				{
-					$qtr_id = $qtr['MARKING_PERIOD_ID'];
-
-					$all_mp[ $mp ][ $qtr_id ] = "'" . $fy . "','" . $qtr['PARENT_ID'] . "','" . $qtr_id . "'";
-
-					if ( GetChildrenMP( $mp, $qtr_id ) )
-					{
-						$all_mp[ $mp ][ $qtr_id ] .= ',' . GetChildrenMP( $mp, $qtr_id );
-					}
-
-					/*if ( mb_substr( $all_mp[ $mp ][$value['MARKING_PERIOD_ID']], -1 ) === ',' )
-						$all_mp[ $mp ][$value['MARKING_PERIOD_ID']] = mb_substr( $all_mp[ $mp ][ $qtr_id ], 0, -1 );*/
-				}
-
-			break;
-
-			case 'QTR':
-
-				foreach ( $qtr_RET as $qtr )
-				{
-					$qtr_id = $qtr['MARKING_PERIOD_ID'];
-
-					$all_mp[ $mp ][ $qtr_id ] = "'" . $fy . "','" . $qtr['PARENT_ID'] . "','" . $qtr_id . "'";
-				}
-
-			break;
-
-			case 'SEM':
-
-				foreach ( $qtr_RET as $sem => $qtrs )
-				{
-					$all_mp[ $mp ][ $sem ] = "'" . $fy . "','" . $sem . "'";
-
-					foreach ( (array) $qtrs as $qtr )
-					{
-						$all_mp[ $mp ][ $sem ] .= ",'" . $qtr['MARKING_PERIOD_ID'] . "'";
-					}
-				}
-
-				$sem_RET = DBGet( $sem_SQL );
-
-				foreach ( $sem_RET as $sem )
-				{
-					$sem_id = $sem['MARKING_PERIOD_ID'];
-
-					$all_mp[ $mp ][ $sem_id ] = "'" . $fy . "','" . $sem_id . "'";
-				}
-
-			break;
-
-			case 'FY':
-
-				// There should be exactly one FY marking period which better be $marking_period_id.
-				$all_mp[ $mp ][ $marking_period_id ] = "'" . $marking_period_id . "'";
-
-				foreach ( $qtr_RET as $sem => $qtrs )
-				{
-					$all_mp[ $mp ][ $marking_period_id ] .= ",'" . $sem . "'";
-
-					foreach ( (array) $qtrs as $qtr )
-					{
-						$all_mp[ $mp ][ $marking_period_id ] .= ",'" . $qtr['MARKING_PERIOD_ID'] . "'";
-					}
-				}
-
-				$sem_RET = DBGet( $sem_SQL );
-
-				foreach ( $sem_RET as $sem )
-				{
-					$all_mp[ $mp ][ $marking_period_id ] .= ",'" . $sem['MARKING_PERIOD_ID'] . "'";
-				}
-
-			break;
+			$marking_period_id = $semester_id;
+			$current_type = 'SEM';
 		}
 	}
 
-	return issetVal( $all_mp[ $mp ][ $marking_period_id ] );
+	if ( in_array( $mp, [ 'QTR', 'PRO' ], true ) )
+	{
+		$mp = 'SEM';
+	}
+
+	$key = $mp . '-' . $marking_period_id;
+
+	if ( isset( $all_mp[ $key ] ) )
+	{
+		return $all_mp[ $key ];
+	}
+
+	if ( $mp === 'SEM' || $current_type === 'SEM' )
+	{
+		$semester_id = $current_type === 'SEM' ? $marking_period_id :
+			DBGetOne( "SELECT MARKING_PERIOD_ID
+				FROM school_marking_periods
+				WHERE MP='SEM'
+				AND PARENT_ID='" . (int) $fy . "'
+				AND SCHOOL_ID='" . UserSchool() . "'
+				AND SYEAR='" . UserSyear() . "'
+				ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE
+				LIMIT 1" );
+
+		$all_mp[ $key ] = "'" . (int) $fy . "','" . (int) $semester_id . "'";
+
+		return $all_mp[ $key ];
+	}
+
+	$semester_rows = DBGet( "SELECT MARKING_PERIOD_ID
+		FROM school_marking_periods
+		WHERE MP='SEM'
+		AND PARENT_ID='" . (int) $fy . "'
+		AND SCHOOL_ID='" . UserSchool() . "'
+		AND SYEAR='" . UserSyear() . "'
+		ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
+
+	$ids = [ "'" . (int) $fy . "'" ];
+
+	foreach ( (array) $semester_rows as $semester )
+	{
+		$ids[] = "'" . (int) $semester['MARKING_PERIOD_ID'] . "'";
+	}
+
+	$all_mp[ $key ] = implode( ',', $ids );
+
+	return $all_mp[ $key ];
 }
 endif;
 
@@ -286,112 +222,62 @@ endif;
 
 if ( ! function_exists( 'GetChildrenMP' ) ) :
 /**
- * Get Children Marking Period IDs
+ * Get child periods for the semester-only Abugida calendar.
  *
- * @example GetChildrenMP( 'PRO', UserMP() );
- *
- * @param string $mp                PRO|QTR|SEM|FY Child Marking Period.
- * @param string $marking_period_id Parent Marking Period ID (optional). Defaults to '0' (FY).
- *
- * @return string Children Marking Period IDs list (separated by commas)
+ * FY -> Semesters.
+ * SEM -> the Semester itself (legacy code previously expected Quarter children).
+ * QTR / PRO are compatibility aliases only and never require Quarter records.
  */
 function GetChildrenMP( $mp, $marking_period_id = '0' )
 {
-	static $children_mp = null;
+	$fy = GetFullYearMP();
 
 	if ( $mp === 'FY' )
 	{
-		$marking_period_id = '0';
-	}
-
-	elseif ( $mp === 'SEM'
-		&& GetMP( $marking_period_id, 'MP' ) === 'QTR' )
-	{
-		$marking_period_id = GetParentMP( 'SEM', $marking_period_id );
-	}
-
-	if ( is_null( $children_mp )
-		|| ! isset( $children_mp[ $mp ] ) )
-	{
-		$qtr_SQL = "SELECT MARKING_PERIOD_ID,PARENT_ID
+		$rows = DBGet( "SELECT MARKING_PERIOD_ID
 			FROM school_marking_periods
-			WHERE MP='QTR'
-			AND SYEAR='" . UserSyear() . "'
+			WHERE MP='SEM'
+			AND PARENT_ID='" . (int) $fy . "'
 			AND SCHOOL_ID='" . UserSchool() . "'
-			ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE";
+			AND SYEAR='" . UserSyear() . "'
+			ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
 
-		switch ( $mp )
+		$ids = [];
+
+		foreach ( (array) $rows as $row )
 		{
-			case 'FY':
+			$ids[] = "'" . (int) $row['MARKING_PERIOD_ID'] . "'";
+		}
 
-				$qtr_RET = DBGet( $qtr_SQL, [], [ 'PARENT_ID' ] );
+		return implode( ',', $ids );
+	}
 
-				$children_mp[ $mp ]['0'] = '';
+	if ( in_array( $mp, [ 'SEM', 'QTR', 'PRO' ], true ) )
+	{
+		$type = GetMP( $marking_period_id, 'MP' );
 
-				foreach ( $qtr_RET as $sem => $qtrs )
-				{
-					$children_mp[ $mp ]['0'] .= ",'" . $sem . "'";
+		if ( $type === 'SEM' )
+		{
+			return "'" . (int) $marking_period_id . "'";
+		}
 
-					foreach ( (array) $qtrs as $qtr )
-					{
-						$children_mp[ $mp ]['0'] .= ",'" . $qtr['MARKING_PERIOD_ID'] . "'";
-					}
-				}
+		if ( $type === 'QTR' )
+		{
+			$semester_id = GetParentMP( 'SEM', $marking_period_id );
 
-				$children_mp[ $mp ]['0'] = mb_substr( $children_mp[ $mp ][0], 1 );
+			return $semester_id ? "'" . (int) $semester_id . "'" : '';
+		}
 
-				return $children_mp[ $mp ]['0'];
+		if ( $type === 'PRO' )
+		{
+			$quarter_id = GetParentMP( 'QTR', $marking_period_id );
+			$semester_id = $quarter_id ? GetParentMP( 'SEM', $quarter_id ) : 0;
 
-			case 'SEM':
-
-				$qtr_RET = DBGet( $qtr_SQL, [], [ 'PARENT_ID' ] );
-
-				foreach ( $qtr_RET as $sem => $qtrs )
-				{
-					$children_mp[ $mp ][ $sem ] = '';
-
-					foreach ( (array) $qtrs as $qtr )
-					{
-						$children_mp[ $mp ][ $sem ] .= ",'" . $qtr['MARKING_PERIOD_ID'] . "'";
-					}
-
-					$children_mp[ $mp ][ $sem ] = mb_substr( $children_mp[ $mp ][ $sem ], 1 );
-				}
-
-			break;
-
-			case 'QTR':
-
-				$children_mp[ $mp ][ $marking_period_id ] = "'" . $marking_period_id . "'";
-
-			break;
-
-			case 'PRO':
-
-				$pro_RET = DBGet( "SELECT MARKING_PERIOD_ID,PARENT_ID
-					FROM school_marking_periods
-					WHERE MP='PRO'
-					AND SYEAR='" . UserSyear() . "'
-					AND SCHOOL_ID='" . UserSchool() . "'
-					ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE", [], [ 'PARENT_ID' ] );
-
-				foreach ( $pro_RET as $qtr => $pros )
-				{
-					$children_mp[ $mp ][ $qtr ] = '';
-
-					foreach ( (array) $pros as $pro )
-					{
-						$children_mp[ $mp ][ $qtr ] .= ",'" . $pro['MARKING_PERIOD_ID'] . "'";
-					}
-
-					$children_mp[ $mp ][ $qtr ] = mb_substr( $children_mp[ $mp ][ $qtr ], 1 );
-				}
-
-			break;
+			return $semester_id ? "'" . (int) $semester_id . "'" : '';
 		}
 	}
 
-	return issetVal( $children_mp[ $mp ][ $marking_period_id ], '' );
+	return '';
 }
 endif;
 
