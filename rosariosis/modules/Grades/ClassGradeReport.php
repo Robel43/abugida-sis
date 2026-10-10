@@ -97,6 +97,30 @@ function AbugidaReportGradeTitle( $student_id )
 		LIMIT 1" );
 }
 
+
+function AbugidaReportClassStudents( $grade_id, $course_period_id, $semester_id )
+{
+	return DBGet( "SELECT DISTINCT s.STUDENT_ID,
+		CONCAT(s.FIRST_NAME,' ',s.LAST_NAME) AS STUDENT_NAME,
+		g.GRADE_PERCENT
+		FROM schedule sch
+		JOIN students s ON s.STUDENT_ID=sch.STUDENT_ID
+		LEFT JOIN student_report_card_grades g ON g.STUDENT_ID=s.STUDENT_ID
+			AND g.SCHOOL_ID=sch.SCHOOL_ID
+			AND g.SYEAR=sch.SYEAR
+			AND g.COURSE_PERIOD_ID=sch.COURSE_PERIOD_ID
+			AND g.MARKING_PERIOD_ID='" . (int) $semester_id . "'
+		JOIN student_enrollment se ON se.STUDENT_ID=s.STUDENT_ID
+			AND se.SCHOOL_ID=sch.SCHOOL_ID
+			AND se.SYEAR=sch.SYEAR
+		WHERE sch.SCHOOL_ID='" . UserSchool() . "'
+		AND sch.SYEAR='" . UserSyear() . "'
+		AND sch.COURSE_PERIOD_ID='" . (int) $course_period_id . "'
+		AND sch.MARKING_PERIOD_ID='" . (int) $semester_id . "'
+		AND se.GRADE_ID='" . (int) $grade_id . "'
+		ORDER BY s.LAST_NAME,s.FIRST_NAME,s.STUDENT_ID" );
+}
+
 function AbugidaReportStudentHTML( $student_id, $semester_id )
 {
 	$name = AbugidaReportStudentName( $student_id );
@@ -175,6 +199,8 @@ if ( $_REQUEST['report_action'] === 'student_pdf'
 			$reports[] = AbugidaReportStudentHTML( $student_id, $_REQUEST['semester_id'] );
 		}
 
+		$handle = PDFStart();
+
 		echo '<style>
 			.abg-student-report{font-family:Arial,sans-serif;font-size:12px}
 			.abg-student-report h2,.abg-student-report h3{text-align:center;margin:5px 0}
@@ -185,8 +211,83 @@ if ( $_REQUEST['report_action'] === 'student_pdf'
 			.abg-summary{margin-top:14px;border:1px solid #999;padding:10px}
 		</style>';
 
-		$handle = PDFStart();
 		echo implode( '<div style="page-break-after:always"></div>', $reports );
+		PDFStop( $handle );
+		exit;
+	}
+}
+
+if ( $_REQUEST['report_action'] === 'class_pdf'
+	&& $_REQUEST['grade_id']
+	&& $_REQUEST['course_period_id']
+	&& $_REQUEST['semester_id'] )
+{
+	$allowed = true;
+
+	if ( User( 'PROFILE' ) === 'teacher' )
+	{
+		$allowed = (bool) DBGetOne( "SELECT COURSE_PERIOD_ID
+			FROM course_periods
+			WHERE COURSE_PERIOD_ID='" . (int) $_REQUEST['course_period_id'] . "'
+			AND (TEACHER_ID='" . User( 'STAFF_ID' ) . "'
+				OR SECONDARY_TEACHER_ID='" . User( 'STAFF_ID' ) . "')
+			LIMIT 1" );
+	}
+
+	if ( $allowed )
+	{
+		$cp = DBGet( "SELECT cp.TITLE AS CP_TITLE,c.TITLE AS COURSE_TITLE
+			FROM course_periods cp
+			JOIN courses c ON c.COURSE_ID=cp.COURSE_ID
+			WHERE cp.COURSE_PERIOD_ID='" . (int) $_REQUEST['course_period_id'] . "'
+			LIMIT 1" );
+
+		$students = AbugidaReportClassStudents(
+			$_REQUEST['grade_id'],
+			$_REQUEST['course_period_id'],
+			$_REQUEST['semester_id']
+		);
+
+		$handle = PDFStart();
+
+		echo '<style>
+			body{font-family:Arial,sans-serif;font-size:11px}
+			h2,h3{text-align:center;margin:5px 0}
+			table{width:100%;border-collapse:collapse;margin-top:12px}
+			th,td{border:1px solid #777;padding:6px;text-align:left}
+			th{background:#eee}
+		</style>';
+
+		echo '<h2>' . AttrEscape( SchoolInfo( 'TITLE' ) ) . '</h2>';
+		echo '<h3>' . _( 'Class Grade Report' ) . '</h3>';
+
+		if ( ! empty( $cp[1] ) )
+		{
+			echo '<p><b>' . _( 'Class / Subject' ) . ':</b> ' .
+				AttrEscape( $cp[1]['COURSE_TITLE'] . ' - ' . $cp[1]['CP_TITLE'] ) . '<br>';
+		}
+
+		echo '<b>' . _( 'Semester' ) . ':</b> ' . AttrEscape( GetMP( $_REQUEST['semester_id'] ) ) . '</p>';
+
+		echo '<table><thead><tr><th>' . _( 'Rank' ) . '</th><th>' . _( 'Student ID' ) . '</th><th>' .
+			_( 'Student' ) . '</th><th>' . _( 'Subject Grade' ) . '</th><th>' .
+			_( 'Semester Average' ) . '</th></tr></thead><tbody>';
+
+		foreach ( (array) $students as $student )
+		{
+			$rank_RET = AbugidaRankGetStudent( $student['STUDENT_ID'], 'SEM', $_REQUEST['semester_id'] );
+			$rank = ! empty( $rank_RET[1] ) ? $rank_RET[1] : [];
+
+			echo '<tr><td>' . ( $rank ? (int) $rank['RANK_POSITION'] : '-' ) . '</td>';
+			echo '<td>' . (int) $student['STUDENT_ID'] . '</td>';
+			echo '<td>' . AttrEscape( $student['STUDENT_NAME'] ) . '</td>';
+			echo '<td>' . ( $student['GRADE_PERCENT'] === null || $student['GRADE_PERCENT'] === '' ? '-' :
+				number_format( (float) $student['GRADE_PERCENT'], 2 ) . '%' ) . '</td>';
+			echo '<td>' . ( $rank ? number_format( (float) $rank['AVERAGE_PERCENT'], 2 ) . '%' : '-' ) . '</td></tr>';
+		}
+
+		echo '</tbody></table>';
+
 		PDFStop( $handle );
 		exit;
 	}
@@ -292,29 +393,24 @@ if ( $_REQUEST['grade_id'] && $_REQUEST['course_period_id'] && $_REQUEST['semest
 
 	if ( ! empty( $selected_cp[1] ) )
 	{
-		$students = DBGet( "SELECT DISTINCT s.STUDENT_ID,
-			CONCAT(s.FIRST_NAME,' ',s.LAST_NAME) AS STUDENT_NAME,
-			g.GRADE_PERCENT
-			FROM schedule sch
-			JOIN students s ON s.STUDENT_ID=sch.STUDENT_ID
-			LEFT JOIN student_report_card_grades g ON g.STUDENT_ID=s.STUDENT_ID
-				AND g.SCHOOL_ID=sch.SCHOOL_ID
-				AND g.SYEAR=sch.SYEAR
-				AND g.COURSE_PERIOD_ID=sch.COURSE_PERIOD_ID
-				AND g.MARKING_PERIOD_ID='" . (int) $_REQUEST['semester_id'] . "'
-			JOIN student_enrollment se ON se.STUDENT_ID=s.STUDENT_ID
-				AND se.SCHOOL_ID=sch.SCHOOL_ID
-				AND se.SYEAR=sch.SYEAR
-			WHERE sch.SCHOOL_ID='" . UserSchool() . "'
-			AND sch.SYEAR='" . UserSyear() . "'
-			AND sch.COURSE_PERIOD_ID='" . (int) $_REQUEST['course_period_id'] . "'
-			AND sch.MARKING_PERIOD_ID='" . (int) $_REQUEST['semester_id'] . "'
-			AND se.GRADE_ID='" . (int) $_REQUEST['grade_id'] . "'
-			ORDER BY s.LAST_NAME,s.FIRST_NAME,s.STUDENT_ID" );
+		$students = AbugidaReportClassStudents(
+			$_REQUEST['grade_id'],
+			$_REQUEST['course_period_id'],
+			$_REQUEST['semester_id']
+		);
 
 		echo '<div class="abg-card">';
 		echo '<h3>' . AttrEscape( $selected_cp[1]['COURSE_TITLE'] . ' - ' . $selected_cp[1]['CP_TITLE'] ) . '</h3>';
 		echo '<p class="abg-muted">' . AttrEscape( GetMP( $_REQUEST['semester_id'] ) ) . '</p>';
+
+		echo '<div class="abg-actions">';
+		echo '<a class="abg-btn" target="_blank" href="' . URLEscape(
+			'Modules.php?modname=Grades/ClassGradeReport.php&report_action=class_pdf&_ROSARIO_PDF=true' .
+			'&grade_id=' . (int) $_REQUEST['grade_id'] .
+			'&course_period_id=' . (int) $_REQUEST['course_period_id'] .
+			'&semester_id=' . (int) $_REQUEST['semester_id']
+		) . '">' . _( 'Download / Print Class Report' ) . '</a>';
+		echo '</div>';
 
 		echo '<form method="POST" action="Modules.php?modname=Grades/ClassGradeReport.php&_ROSARIO_PDF=true" target="_blank">';
 		echo '<input type="hidden" name="report_action" value="student_pdf">';
