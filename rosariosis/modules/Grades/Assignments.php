@@ -445,7 +445,7 @@ if ( $_REQUEST['modfunc'] === 'delete' )
 			// Filename match = [course_title]_[assignment_ID]_*.
 			$student_assignments_file_name = no_accents( $assignment_course_title . '_' . $_REQUEST['assignment_id'] . '_' ) . '*';
 
-			// Files uploaded to AssignmentsFiles/[School_Year]/Teacher[teacher_ID]/Quarter[1,2,3,4...]/.
+			// Files uploaded to AssignmentsFiles/[School_Year]/Teacher[teacher_ID]/Semester[1,2]/.
 			$student_assignments_path = GetAssignmentsFilesPath( User( 'STAFF_ID' ) );
 
 			$student_assignments_files = glob( $student_assignments_path . $student_assignments_file_name );
@@ -488,7 +488,7 @@ if ( ! $_REQUEST['modfunc'] )
 
 	if ( ! empty( $gradebook_config['HIDE_PREVIOUS_ASSIGNMENT_TYPES'] ) )
 	{
-		// @since 4.5 Hide previous quarters assignment types.
+		// @since 4.5 Hide previous semesters assignment types.
 		$hide_previous_assignment_types_sql = " AND (CREATED_MP='" . UserMP() . "' OR CREATED_MP IS NULL)";
 	}
 
@@ -656,10 +656,10 @@ if ( ! $_REQUEST['modfunc'] )
 	}
 	elseif ( $_REQUEST['assignment_id'] === 'new' )
 	{
-		if ( GetCurrentMP( 'QTR', DBDate(), false ) !== UserMP() )
+		if ( GetCurrentMP( 'SEM', DBDate(), false ) !== UserMP() )
 		{
-			// Add Warning if not in current Quarter.
-			$warning[] = _( 'You are not in the current Quarter.' );
+			// Add Warning if not in current Semester.
+			$warning[] = _( 'You are not in the current Semester.' );
 		}
 
 		$title = _( 'New Assignment' );
@@ -874,13 +874,13 @@ if ( ! $_REQUEST['modfunc'] )
 		if ( ! empty( $RET['ASSIGNED_ERROR'] )
 			&& $RET['ASSIGNED_ERROR'] == 'Y' )
 		{
-			$error[] = _( 'Assigned date is after end of quarter!' );
+			$error[] = _( 'Assigned date is after end of semester!' );
 		}
 
 		if ( ! empty( $RET['DUE_ERROR'] )
 			&& $RET['DUE_ERROR'] == 'Y' )
 		{
-			$error[] = _( 'Due date is after end of quarter!' );
+			$error[] = _( 'Due date is after end of semester!' );
 		}
 
 		$header .= '<tr><td class="valign-top" colspan="2">' . ErrorMessage( $error ) . '</td></tr>';
