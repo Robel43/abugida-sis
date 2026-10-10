@@ -172,19 +172,30 @@ $course_periods = [];
 
 if ( $_REQUEST['grade_id'] )
 {
-	$subject_ids = AbugidaGradeImportSubjectIdsForGrade( $_REQUEST['grade_id'] );
+	$grade_number = AbugidaGradeImportGradeNumber( $_REQUEST['grade_id'] );
 
-	if ( $subject_ids )
+	if ( $grade_number )
 	{
-		$subject_id_list = implode( ',', array_map( 'intval', $subject_ids ) );
-
 		$course_periods = DBGet( "SELECT DISTINCT cp.COURSE_PERIOD_ID,
-			CONCAT(c.TITLE,' - ',cp.TITLE) AS TITLE
-			FROM course_periods cp
-			JOIN courses c ON c.COURSE_ID=cp.COURSE_ID
-			WHERE cp.SCHOOL_ID='" . UserSchool() . "'
-			AND cp.SYEAR='" . UserSyear() . "'
-			AND c.SUBJECT_ID IN(" . $subject_id_list . ")
+			CONCAT(c.TITLE,' - ',cp.TITLE) AS TITLE,
+			cs.TITLE AS SUBJECT_TITLE,
+			c.TITLE AS COURSE_TITLE,
+			cp.TITLE AS COURSE_PERIOD_TITLE
+			FROM course_subjects cs
+			JOIN courses c ON c.SUBJECT_ID=cs.SUBJECT_ID
+				AND c.SCHOOL_ID=cs.SCHOOL_ID
+				AND c.SYEAR=cs.SYEAR
+			JOIN course_periods cp ON cp.COURSE_ID=c.COURSE_ID
+				AND cp.SCHOOL_ID=c.SCHOOL_ID
+				AND cp.SYEAR=c.SYEAR
+			WHERE cs.SCHOOL_ID='" . UserSchool() . "'
+			AND cs.SYEAR='" . UserSyear() . "'
+			AND (
+				cs.TITLE='" . $grade_number . "'
+				OR cs.TITLE='" . $grade_number . "th'
+				OR cs.TITLE='Grade " . $grade_number . "'
+				OR cs.TITLE LIKE '%Grade " . $grade_number . "%'
+			)
 			ORDER BY c.TITLE,cp.TITLE" );
 	}
 }
@@ -596,7 +607,10 @@ foreach ( (array) $course_periods as $cp )
 echo '</select>';
 if ( $_REQUEST['grade_id'] && empty( $course_periods ) )
 {
-	echo '<div class="abg-field-help">' . _( 'No course periods were found under the course subject for the selected grade.' ) . '</div>';
+	echo '<div class="abg-field-help">' . sprintf(
+	_( 'No course periods were found for the selected grade (%s). Make sure the course is created under the matching grade subject in Scheduling > Courses.' ),
+	AttrEscape( DBGetOne( "SELECT TITLE FROM school_gradelevels WHERE ID='" . (int) $_REQUEST['grade_id'] . "' LIMIT 1" ) )
+) . '</div>';
 }
 echo '</div>';
 
