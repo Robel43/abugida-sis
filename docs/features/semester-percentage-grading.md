@@ -28,7 +28,7 @@ Official grades are percentage values:
 
 The percentage is the primary grade shown to staff and students.
 
-Abugida does not use GPA or class-rank presentation as part of the high-school grading workflow.
+Abugida does not use GPA. Class rank is required, but it is calculated at the Semester and Full Year level rather than separately for each subject.
 
 ## Course setup
 
@@ -74,8 +74,69 @@ The important Abugida dimensions are:
 - Semester;
 - percentage.
 
+## Semester average and class rank
+
+For each student and Semester:
+
+1. take all official subject percentages recorded for that Semester;
+2. calculate the arithmetic mean;
+3. compare that Semester average with the averages of students in the same grade level;
+4. assign the student's Semester class rank.
+
+Example:
+
+```text
+Amharic        80%
+Mathematics    90%
+English        70%
+Biology        85%
+
+Semester Average = (80 + 90 + 70 + 85) / 4 = 81.25%
+```
+
+Class rank is based on the Semester Average, not on any individual subject.
+
+Students with equal averages share the same competition rank.
+
+## Full Year cumulative average and rank
+
+The Full Year cumulative average is calculated only when both Semester averages are available.
+
+```text
+Semester 1 Average = 81.25%
+Semester 2 Average = 84.75%
+
+Full Year Cumulative Average = (81.25 + 84.75) / 2 = 83.00%
+```
+
+The Full Year class rank is then calculated among students in the same grade level using the Full Year Cumulative Average.
+
+There is no GPA conversion.
+
+## Rank storage
+
+Calculated Semester and Full Year averages / ranks are stored in:
+
+```text
+abugida_student_academic_rank
+```
+
+Migration:
+
+```text
+database/migrations/008_semester_class_rank.sql
+```
+
+The table stores the student, grade level, period, average percentage, rank position, cohort size, and calculation time.
+
 ## Student-facing use
 
-The planned student dashboard will read these official semester percentages and show them alongside enrolled courses and other student information.
+The planned student dashboard will show:
 
-The dashboard must not calculate a separate GPA or ranking layer.
+- subject percentages for Semester 1 and Semester 2;
+- Semester Average;
+- Semester Class Rank;
+- Full Year Cumulative Average;
+- Full Year Class Rank.
+
+The dashboard must not calculate GPA.
