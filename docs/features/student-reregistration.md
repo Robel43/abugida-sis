@@ -278,3 +278,34 @@ Custom Registrar and Finance profiles can be restricted through **Users > User P
 8. Registrar final-confirms.
 9. Verify `student_enrollment` contains the future-year enrollment with the selected grade.
 10. Sign in again with the same student account.
+
+
+## Browser test fixes
+
+The following issues found during the first browser test were corrected:
+
+### Semester eligibility is independent of the sidebar
+
+A Semester request is now valid only when the Semester start date is later than the current date.
+
+The currently active Semester is determined from the configured Semester date range, not from `UserMP()` or the Semester selected in the sidebar.
+
+Changing the sidebar Semester therefore cannot make the currently active Semester eligible for re-registration.
+
+### Finance decisions
+
+Finance verification no longer depends on the `modfunc` query value or a clicked submit-button name.
+
+Verify and Reject use separate POST forms with an explicit hidden `finance_action` value.
+
+### Secure receipt download
+
+Re-registration receipts are served through:
+
+```text
+reregistration-receipt.php
+```
+
+The endpoint requires an authenticated admin-type staff account with permission to use the Re-Registration Payments program, restricts the request to the current school, validates the stored MIME type, and returns the file directly with the correct download headers.
+
+This avoids binary receipt content being rendered inside the normal RosarioSIS Modules page.
