@@ -387,9 +387,13 @@ if ( ! $open )
 	echo '<select name="target_semester_id"><option value="">' . _( 'Select Semester' ) . '</option>';
 	foreach ( (array) $future_semesters as $semester )
 	{
+		$semester_start_label = $semester['START_DATE'] ?
+			date( 'M j, Y', strtotime( $semester['START_DATE'] ) ) :
+			'';
+
 		echo '<option value="' . (int) $semester['MARKING_PERIOD_ID'] . '">' .
-			AttrEscape( $semester['TITLE'] ) . ' (' .
-			AttrEscape( ProperDate( $semester['START_DATE'] ) ) . ')' .
+			AttrEscape( $semester['TITLE'] ) .
+			( $semester_start_label ? ' (' . AttrEscape( $semester_start_label ) . ')' : '' ) .
 			'</option>';
 	}
 	echo '</select><div class="abg-student-subvalue">' .
