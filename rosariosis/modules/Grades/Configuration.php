@@ -347,7 +347,7 @@ if ( ! empty( $grades ) )
 
 // Abugida high-school grading uses Semester percentages directly.
 echo '<fieldset><legend>' . _( 'Final Grades' ) . '</legend>';
-echo '<p>' . _( 'Abugida uses Semester 1 and Semester 2 as the grading periods. Final grades are recorded as percentages, so Quarter weighting and GPA configuration are not used.' ) . '</p>';
+echo '<p>' . _( 'Abugida uses Semester 1 and Semester 2 as the grading periods. Final grades are recorded directly as percentages.' ) . '</p>';
 echo '</fieldset><br />';
 
 
