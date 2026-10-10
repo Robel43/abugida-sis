@@ -23,7 +23,6 @@ $menu['Grades']['admin'] = [
 	'Grades/FinalGrades.php' => _( 'Final Grades' ),
 	2 => _( 'Setup' ),
 	'Grades/Configuration.php' => _( 'Configuration' ),
-	'Grades/ReportCardGrades.php' => _( 'Grading Scales' ),
 	'Grades/ReportCardComments.php' => _( 'Report Card Comments' ),
 	'Grades/ReportCardCommentCodes.php' => _( 'Comment Codes' ),
 	'Grades/EditHistoryMarkingPeriods.php' => _( 'History Marking Periods' ),
