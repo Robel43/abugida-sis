@@ -495,9 +495,12 @@ echo '<style>
 	.abg-import-field label{display:block;font-weight:700;margin:0 0 7px;color:#101828;font-size:15px;line-height:1.35}
 	.abg-import-field select{display:block;width:100%;height:46px;min-height:46px;padding:0 42px 0 13px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#101828;font:inherit;font-size:15px;line-height:46px;box-sizing:border-box;vertical-align:middle}
 	.abg-import-field select:focus,.abg-file-control:focus-within{outline:0;border-color:#1677c8;box-shadow:0 0 0 3px rgba(22,119,200,.12)}
-	.abg-file-control{display:flex;align-items:center;width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;overflow:hidden;box-sizing:border-box}
-	.abg-file-control input[type=file]{display:block;width:100%;margin:0;padding:0;color:#344054;font:inherit;font-size:14px;line-height:1.3;border:0;background:#fff;box-sizing:border-box}
-	.abg-file-control input[type=file]::file-selector-button{height:44px;margin:0 12px 0 0;padding:0 16px;border:0;border-right:1px solid #d0d5dd;background:#f8fafc;color:#344054;font-weight:700;cursor:pointer}
+	.abg-file-input{display:block;width:100%;min-height:46px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#344054;font:inherit;font-size:14px;line-height:normal;box-sizing:border-box;overflow:visible;white-space:nowrap}
+	.abg-file-input:focus{outline:0;border-color:#1677c8;box-shadow:0 0 0 3px rgba(22,119,200,.12)}
+	.abg-file-input::file-selector-button{min-width:160px;height:30px;margin:0 12px 0 0;padding:0 14px;border:1px solid #d0d5dd;border-radius:6px;background:#f8fafc;color:#344054;font-weight:700;cursor:pointer;line-height:28px}
+	.abg-template-box{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;margin:0 0 20px;border:1px solid #dbe7f3;border-radius:10px;background:#f8fbff}
+	.abg-template-copy{min-width:0}.abg-template-copy b{display:block;margin-bottom:3px;color:#101828}.abg-template-copy span{color:#667085;font-size:14px;line-height:1.4}
+	.abg-template-link{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:9px 14px;border-radius:7px;background:#eef6ff;color:#1269b1;font-weight:700;text-decoration:none;border:1px solid #cfe3f8}
 	.abg-import-actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 0}
 	.abg-import-btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 17px;border:0;border-radius:8px;background:#1677c8;color:#fff;font-weight:700;line-height:1.2;cursor:pointer;text-decoration:none}
 	.abg-import-btn:hover{background:#1269b1}
@@ -505,7 +508,7 @@ echo '<style>
 	.abg-import-table th,.abg-import-table td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
 	.abg-import-table th{background:#f8fafc}
 	.abg-status-valid{color:#067647;font-weight:700}.abg-status-existing{color:#b54708;font-weight:700}.abg-status-error{color:#b42318;font-weight:700}
-	@media(max-width:760px){.abg-import-card{padding:18px}.abg-import-grid{grid-template-columns:1fr}.abg-import-actions{flex-direction:column}.abg-import-btn{width:100%}}
+	@media(max-width:760px){.abg-import-card{padding:18px}.abg-import-grid{grid-template-columns:1fr}.abg-import-actions{flex-direction:column}.abg-import-btn{width:100%}.abg-template-box{align-items:flex-start;flex-direction:column}.abg-template-link{width:100%;box-sizing:border-box}}
 </style>';
 
 echo '<div class="abg-import-wrap">';
@@ -514,6 +517,13 @@ echo '<h3>' . _( 'Excel Grade Import' ) . '</h3>';
 echo '<p class="abg-import-help">' .
 	_( 'Select the grade, subject / section and marking period, then upload an Excel .xlsx file. The first worksheet must contain Student ID, Student Name and Final Score columns. Grades are validated before anything is saved.' ) .
 	'</p>';
+
+echo '<div class="abg-template-box">';
+echo '<div class="abg-template-copy"><b>' . _( 'Need the correct Excel format?' ) . '</b><span>' .
+	_( 'Download the official template, enter the students and final scores, then upload the completed file below.' ) .
+	'</span></div>';
+echo '<a class="abg-template-link" href="' . URLEscape( 'grade-import-template.php' ) . '">' . _( 'Download Excel Template' ) . '</a>';
+echo '</div>';
 
 echo '<form method="POST" enctype="multipart/form-data">';
 echo '<div class="abg-import-grid">';
@@ -546,7 +556,7 @@ foreach ( (array) $marking_periods as $mp )
 echo '</select></div>';
 
 echo '<div class="abg-import-field"><label>' . _( 'Excel File (.xlsx)' ) . '</label>';
-echo '<div class="abg-file-control"><input type="file" name="grade_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div></div>';
+echo '<input class="abg-file-input" type="file" name="grade_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div>';
 echo '</div>';
 echo '<div class="abg-import-actions">';
 echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="load_context">' . _( 'Load Subjects / Sections' ) . '</button>';
