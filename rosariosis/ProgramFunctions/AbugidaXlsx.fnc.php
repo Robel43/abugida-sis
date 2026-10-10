@@ -26,6 +26,18 @@ function AbugidaXlsxColumnIndex( $cell_reference )
 	return $index - 1;
 }
 
+function AbugidaXlsxTextFromSharedString( $node )
+{
+	$text = '';
+
+	foreach ( $node->xpath( './/*[local-name()="t"]' ) as $text_node )
+	{
+		$text .= (string) $text_node;
+	}
+
+	return $text;
+}
+
 function AbugidaReadXlsx( $file_path, &$error_message = '' )
 {
 	$error_message = '';
@@ -33,6 +45,13 @@ function AbugidaReadXlsx( $file_path, &$error_message = '' )
 	if ( ! class_exists( 'ZipArchive' ) )
 	{
 		$error_message = 'PHP ZipArchive is not available. Enable the PHP zip extension to import .xlsx files.';
+
+		return false;
+	}
+
+	if ( ! function_exists( 'simplexml_load_string' ) )
+	{
+		$error_message = 'PHP SimpleXML is not available. Enable the PHP XML extension to import .xlsx files.';
 
 		return false;
 	}
@@ -55,54 +74,51 @@ function AbugidaReadXlsx( $file_path, &$error_message = '' )
 
 		if ( $shared )
 		{
-			foreach ( $shared->si as $si )
+			$items = $shared->xpath( '/*[local-name()="sst"]/*[local-name()="si"]' );
+
+			foreach ( (array) $items as $item )
 			{
-				$text = '';
-
-				if ( isset( $si->t ) )
-				{
-					$text = (string) $si->t;
-				}
-				elseif ( isset( $si->r ) )
-				{
-					foreach ( $si->r as $run )
-					{
-						$text .= (string) $run->t;
-					}
-				}
-
-				$shared_strings[] = $text;
+				$shared_strings[] = AbugidaXlsxTextFromSharedString( $item );
 			}
 		}
 	}
 
 	$sheet_xml = $zip->getFromName( 'xl/worksheets/sheet1.xml' );
+	$zip->close();
 
 	if ( $sheet_xml === false )
 	{
-		$zip->close();
 		$error_message = 'The workbook does not contain a readable first worksheet.';
 
 		return false;
 	}
 
 	$sheet = @simplexml_load_string( $sheet_xml );
-	$zip->close();
 
-	if ( ! $sheet || ! isset( $sheet->sheetData ) )
+	if ( ! $sheet )
 	{
 		$error_message = 'The first worksheet is not readable.';
 
 		return false;
 	}
 
+	$row_nodes = $sheet->xpath( '/*[local-name()="worksheet"]/*[local-name()="sheetData"]/*[local-name()="row"]' );
+
+	if ( ! $row_nodes )
+	{
+		$error_message = 'The first worksheet does not contain readable rows.';
+
+		return false;
+	}
+
 	$rows = [];
 
-	foreach ( $sheet->sheetData->row as $row )
+	foreach ( $row_nodes as $row )
 	{
 		$cells = [];
+		$cell_nodes = $row->xpath( './*[local-name()="c"]' );
 
-		foreach ( $row->c as $cell )
+		foreach ( (array) $cell_nodes as $cell )
 		{
 			$attributes = $cell->attributes();
 			$reference = (string) $attributes['r'];
@@ -110,13 +126,19 @@ function AbugidaReadXlsx( $file_path, &$error_message = '' )
 			$index = AbugidaXlsxColumnIndex( $reference );
 			$value = '';
 
-			if ( $type === 'inlineStr' && isset( $cell->is->t ) )
+			if ( $type === 'inlineStr' )
 			{
-				$value = (string) $cell->is->t;
+				$text_nodes = $cell->xpath( './*[local-name()="is"]//*[local-name()="t"]' );
+
+				foreach ( (array) $text_nodes as $text_node )
+				{
+					$value .= (string) $text_node;
+				}
 			}
-			elseif ( isset( $cell->v ) )
+			else
 			{
-				$raw = (string) $cell->v;
+				$value_nodes = $cell->xpath( './*[local-name()="v"]' );
+				$raw = ! empty( $value_nodes[0] ) ? (string) $value_nodes[0] : '';
 
 				if ( $type === 's' )
 				{
