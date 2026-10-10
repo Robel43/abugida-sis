@@ -19,6 +19,7 @@ if ( $RosarioModules['Students'] )
 		'Custom/CreateParents.php' => _( 'Create Parent Users' ),
 		// @since 6.6 Add Registration program for Administrators.
 		'Custom/Registration.php' => _( 'Registration' ),
+		'Custom/ApplicationReview.php' => _( 'Online Applications' ),
 		'Custom/RemoveAccess.php' => _( 'Remove Access' ),
 	];
 
@@ -27,11 +28,23 @@ if ( $RosarioModules['Students'] )
 	$menu['Students']['parent']['Custom/Registration.php'] = _( 'Registration' );
 }
 
+// Abugida Student Billing workflow.
+if ( $RosarioModules['Student_Billing'] )
+{
+	$menu['Student_Billing']['admin'] = issetVal( $menu['Student_Billing']['admin'], [] );
+
+	$menu['Student_Billing']['admin'] += [
+		'Custom/FinanceApplications.php' => _( 'Application Payments' ),
+		'Custom/RegistrationFees.php' => _( 'Registration Fees' ),
+	];
+}
+
 // Custom Users programs
 if ( $RosarioModules['Users'] )
 {
 	$menu['Users']['admin'][] = _( 'Utilities' );
 	$menu['Users']['admin']['Custom/NotifyParents.php'] = _( 'Notify Parents' );
+	$menu['Users']['admin']['Custom/EmailTest.php'] = _( 'Email Test' );
 
 	$exceptions['Users']['Custom/NotifyParents.php'] = true;
 }

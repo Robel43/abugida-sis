@@ -77,6 +77,20 @@ $RosarioNotifyAddress = '';
  */
 $RosarioErrorsAddress = '';
 
+/**
+ * Abugida SIS SMTP email settings.
+ *
+ * Gmail requires an App Password when 2-Step Verification is enabled.
+ * Never commit a real App Password to Git.
+ */
+$AbugidaMailHost = 'smtp.gmail.com';
+$AbugidaMailPort = 587;
+$AbugidaMailUsername = 'robelalemu2111@gmail.com';
+$AbugidaMailPassword = '';
+$AbugidaMailFrom = 'robelalemu2111@gmail.com';
+$AbugidaMailFromName = 'Abugida SIS';
+$AbugidaMailEncryption = 'tls';
+
 
 /**
  * Locales
