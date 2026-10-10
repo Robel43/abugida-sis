@@ -11,6 +11,8 @@ require_once 'modules/Grades/includes/ClassRank.inc.php';
 require_once 'ProgramFunctions/_makeLetterGrade.fnc.php';
 require_once 'ProgramFunctions/AbugidaXlsx.fnc.php';
 
+echo '<script src="assets/js/csp/modules/grades/GradeImport.js?v=1"></script>';
+
 DrawHeader( ProgramTitle() );
 
 if ( User( 'PROFILE' ) !== 'admin' )
@@ -583,17 +585,18 @@ echo '<div class="abg-template-copy"><b>' . _( 'Need the correct Excel format?' 
 echo '<a class="abg-template-link" href="' . URLEscape( 'grade-import-template.php' ) . '">' . _( 'Download Excel Template' ) . '</a>';
 echo '</div>';
 
-echo '<form method="POST" enctype="multipart/form-data">';
+echo '<form id="abugida-grade-import-form" method="POST" enctype="multipart/form-data">';
+echo '<input type="hidden" id="abugida-grade-import-action" name="grade_import_action" value="preview">';
 echo '<div class="abg-import-grid">';
 
 echo '<div class="abg-import-field"><label>' . _( 'Grade' ) . '</label>';
-echo '<select name="grade_id"><option value="">' . _( 'Select Grade' ) . '</option>';
+echo '<select id="abugida-grade-id" name="grade_id"><option value="">' . _( 'Select Grade' ) . '</option>';
 foreach ( (array) $grades as $grade )
 {
 	$selected = $_REQUEST['grade_id'] == $grade['ID'] ? ' selected' : '';
 	echo '<option value="' . (int) $grade['ID'] . '"' . $selected . '>' . AttrEscape( $grade['TITLE'] ) . '</option>';
 }
-echo '</select></div>';
+echo '</select><div class="abg-field-help">' . _( 'Subjects and sections load automatically when the grade changes.' ) . '</div></div>';
 
 echo '<div class="abg-import-field"><label>' . _( 'Subject / Section' ) . '</label>';
 echo '<select name="course_period_id"><option value="">' .
@@ -627,8 +630,7 @@ echo '<div class="abg-import-field"><label>' . _( 'Excel File (.xlsx)' ) . '</la
 echo '<input class="abg-file-input" type="file" name="grade_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div>';
 echo '</div>';
 echo '<div class="abg-import-actions">';
-echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="load_context">' . _( 'Load Subjects / Sections' ) . '</button>';
-echo '<button class="abg-import-btn" type="submit" name="grade_import_action" value="preview">' . _( 'Validate & Preview' ) . '</button>';
+echo '<button class="abg-import-btn" type="submit" data-grade-import-action="preview">' . _( 'Validate & Preview' ) . '</button>';
 echo '</div>';
 echo '</form>';
 echo '</div>';
