@@ -90,14 +90,21 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 
 		if ( $applicant['STATUS'] === 'PAYMENT_SUBMITTED' && AllowEdit() )
 		{
-			echo '<br /><br /><form method="POST" action="' .
+			echo '<br /><br /><fieldset><legend>' . _( 'Finance Decision' ) . '</legend>';
+			// RosarioSIS AJAX serialization omits submit button values. Keep each
+			// decision in a hidden field so both AJAX and native submissions agree.
+			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/FinanceApplications.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
 			echo AbugidaCsrfField();
-			echo '<fieldset><legend>' . _( 'Finance Decision' ) . '</legend>';
+			echo '<input type="hidden" name="decision" value="approve">';
+			echo '<button type="submit">' . _( 'Verify Payment' ) . '</button></form>';
+			echo '<form method="POST" action="' .
+				URLEscape( 'Modules.php?modname=Custom/FinanceApplications.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo AbugidaCsrfField();
+			echo '<input type="hidden" name="decision" value="reject">';
 			echo '<p><label>' . _( 'Reason (required when rejecting)' ) . '<br><textarea name="reason" rows="3" class="width-100p"></textarea></label></p>';
-			echo '<button type="submit" name="decision" value="approve">' . _( 'Verify Payment' ) . '</button> ';
-			echo '<button type="submit" name="decision" value="reject">' . _( 'Reject Payment' ) . '</button>';
-			echo '</fieldset></form>';
+			echo '<button type="submit">' . _( 'Reject Payment' ) . '</button></form>';
+			echo '</fieldset>';
 		}
 		elseif ( $applicant['STATUS'] === 'PAYMENT_DECLINED' )
 		{
@@ -114,7 +121,13 @@ $rows = DBGet( "SELECT ID,APPLICATION_REFERENCE,FIRST_NAME,LAST_NAME,PHONE,PAYME
 	WHERE STATUS IN ('APPROVED_FOR_PAYMENT','PAYMENT_SUBMITTED','PAYMENT_DECLINED','PAYMENT_VERIFIED')
 	ORDER BY ID DESC" );
 
+foreach ( $rows as $key => $row )
+{
+	$rows[$key]['VIEW_PAYMENT'] = _( 'View Payment' );
+}
+
 $columns = [
+	'VIEW_PAYMENT' => _( 'Actions' ),
 	'APPLICATION_REFERENCE' => _( 'Reference' ),
 	'FIRST_NAME' => _( 'First Name' ),
 	'LAST_NAME' => _( 'Last Name' ),
@@ -126,9 +139,11 @@ $columns = [
 ];
 
 $link = [
-	'FULL_NAME' => false,
-	'link' => 'Modules.php?modname=Custom/FinanceApplications.php',
-	'variables' => [ 'applicant_id' => 'ID' ],
+	'VIEW_PAYMENT' => [
+		'link' => 'Modules.php?modname=Custom/FinanceApplications.php',
+		'variables' => [ 'applicant_id' => 'ID' ],
+		'extra' => 'class="button"',
+	],
 ];
 
 ListOutput( $rows, $columns, 'Application Payment', 'Application Payments', $link );
