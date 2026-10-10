@@ -278,7 +278,7 @@ if ( UserStudentID()
 						'UNGRADED' => $ungraded,
 					]
 					 	+ ( $do_stats && $_REQUEST['do_stats'] ?
-						[ 'BAR1' => $bargraph1, 'BAR2' => $bargraph2 ] :
+						[ 'BAR1' => $bargraph1 ] :
 						[]
 					);
 				}
@@ -448,7 +448,7 @@ if ( UserStudentID()
 
 				if ( $do_stats && $_REQUEST['do_stats'] )
 				{
-					$LO_columns += [ 'BAR1' => _( 'Grade Range' ), 'BAR2' => _( 'Class Rank' ) ];
+					$LO_columns += [ 'BAR1' => _( 'Grade Range' ) ];
 				}
 
 				$LO_ret = [ 0 => [] ];
