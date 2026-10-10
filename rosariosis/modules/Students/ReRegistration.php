@@ -111,6 +111,31 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 
 			if ( empty( $error ) )
 			{
+				$duplicate_where = "STUDENT_ID='" . UserStudentID() . "'
+					AND SCHOOL_ID='" . UserSchool() . "'
+					AND REQUEST_TYPE='" . DBEscapeString( $type ) . "'
+					AND TARGET_SYEAR='" . (int) $target_syear . "'
+					AND TARGET_GRADE_ID='" . (int) $target_grade_id . "'
+					AND STATUS='COMPLETED'";
+
+				if ( $type === 'SEMESTER' )
+				{
+					$duplicate_where .= " AND TARGET_SEMESTER_ID='" . (int) $target_semester_id . "'";
+				}
+
+				$already_completed = DBGetOne( "SELECT ID
+					FROM abugida_reregistration_requests
+					WHERE " . $duplicate_where . "
+					LIMIT 1" );
+
+				if ( $already_completed )
+				{
+					$error[] = _( 'You are already registered for the selected target period.' );
+				}
+			}
+
+			if ( empty( $error ) )
+			{
 				$reference = AbugidaReRegistrationReference();
 
 				$request_id = DBInsert(
