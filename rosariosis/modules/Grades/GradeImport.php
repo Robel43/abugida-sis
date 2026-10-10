@@ -7,7 +7,6 @@
  */
 
 require_once 'modules/Grades/includes/Grades.fnc.php';
-require_once 'modules/Grades/includes/ClassRank.inc.php';
 require_once 'ProgramFunctions/_makeLetterGrade.fnc.php';
 require_once 'ProgramFunctions/AbugidaXlsx.fnc.php';
 
@@ -168,6 +167,7 @@ $marking_periods = DBGet( "SELECT MARKING_PERIOD_ID,TITLE,MP,START_DATE,END_DATE
 	WHERE SCHOOL_ID='" . UserSchool() . "'
 	AND SYEAR='" . UserSyear() . "'
 	AND MP='SEM'
+	AND DOES_GRADES='Y'
 	ORDER BY SORT_ORDER,START_DATE,MARKING_PERIOD_ID" );
 
 $course_periods = [];
@@ -531,7 +531,6 @@ if ( isset( $_POST['grade_import_action'] )
 				);
 
 				DBQuery( 'COMMIT' );
-				ClassRankCalculateAddMP( (int) $session_import['mp_id'] );
 				unset( $_SESSION['AbugidaGradeImportPreview'] );
 				$note[] = sprintf( _( '%d grades imported successfully. %d rows skipped.' ), $imported, $skipped );
 			}
