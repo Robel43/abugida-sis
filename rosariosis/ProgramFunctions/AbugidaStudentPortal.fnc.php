@@ -10,9 +10,41 @@ require_once 'ProgramFunctions/AbugidaClassRank.fnc.php';
 
 function AbugidaStudentPortalGuard()
 {
-	if ( User( 'PROFILE' ) !== 'student' || ! UserStudentID() )
+	if ( User( 'PROFILE' ) !== 'student' )
 	{
 		echo ErrorMessage( [ _( 'This page is available only to the authenticated student.' ) ] );
+		exit;
+	}
+
+	if ( ! UserStudentID() && ! empty( $_SESSION['STUDENT_ID'] ) )
+	{
+		SetUserStudentID( $_SESSION['STUDENT_ID'] );
+	}
+
+	if ( ! UserStudentID() )
+	{
+		echo ErrorMessage( [ _( 'Student session could not be resolved.' ) ] );
+		exit;
+	}
+
+	if ( ! UserSchool() )
+	{
+		$school_id = DBGetOne( "SELECT SCHOOL_ID
+			FROM student_enrollment
+			WHERE STUDENT_ID='" . UserStudentID() . "'
+			AND SYEAR='" . UserSyear() . "'
+			ORDER BY ID DESC
+			LIMIT 1" );
+
+		if ( $school_id )
+		{
+			$_SESSION['UserSchool'] = $school_id;
+		}
+	}
+
+	if ( ! UserSchool() )
+	{
+		echo ErrorMessage( [ _( 'No school enrollment is available for the current academic year.' ) ] );
 		exit;
 	}
 }
