@@ -32,6 +32,7 @@ $menu['Grades']['admin'] = [
 	3 => _( 'Utilities' ),
 	'Grades/EditReportCardGrades.php' => _( 'Historical Grades' ),
 	'Grades/MassCreateAssignments.php' => _( 'Mass Create Assignments' ),
+	'Grades/GradeImport.php' => _( 'Grade Import' ),
 ] + issetVal( $menu['Grades']['admin'], [] );
 
 $menu['Grades']['teacher'] = [
