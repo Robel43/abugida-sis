@@ -13,11 +13,13 @@ if ( $_REQUEST['modfunc'] === 'final_grades_all_mp_save_ajax' )
 
 	// Note: no need to call RedirectURL() & unset $_REQUEST params here as we die just after.
 	$cp_ids = empty( $_REQUEST['cp_id'] ) ? '0' : $_REQUEST['cp_id'];
-	$qtr_id = empty( $_REQUEST['qtr_id'] ) ? '0' : $_REQUEST['qtr_id'];
+	$semester_id = ! empty( $_REQUEST['semester_id'] ) ?
+		$_REQUEST['semester_id'] :
+		( ! empty( $_REQUEST['qtr_id'] ) ? $_REQUEST['qtr_id'] : '0' );
 
 	foreach ( (array) $cp_ids as $cp_id )
 	{
-		FinalGradesAllMPSave( $cp_id, $qtr_id );
+		FinalGradesAllMPSave( $cp_id, $semester_id );
 	}
 
 	die( 1 );
@@ -47,18 +49,15 @@ if ( $_REQUEST['modfunc'] === 'final_grades_all_mp_save_ajax' )
  *
  * @return boolean True.
  */
-function FinalGradesAllMPSaveAJAX( $cp_id, $qtr_id )
+function FinalGradesAllMPSaveAJAX( $cp_id, $semester_id )
 {
-	// Call FinalGradesAllMPSave() using 'final_grades_all_mp_save_ajax' modfunc.
 	$url = PreparePHP_SELF( [
 		'modname' => $_REQUEST['modname'],
 		'modfunc' => 'final_grades_all_mp_save_ajax',
 		'cp_id' => $cp_id,
-		'qtr_id' => $qtr_id,
-		// 'include_inactive' => 'Y',
+		'semester_id' => $semester_id,
 	] );
 
-	// @since 12.5 CSP remove unsafe-inline Javascript
 	?>
 	<input type="hidden" disabled id="ajax_url" value="<?php echo $url; ?>" />
 	<script src="assets/js/csp/modules/AjaxUrl.js?v=12.5"></script>
@@ -68,123 +67,65 @@ function FinalGradesAllMPSaveAJAX( $cp_id, $qtr_id )
 }
 
 /**
- * Automatically calculate & save Course Period's Final Grades using Gradebook Grades
- * (all graded Marking Periods, Semester and Full Year only if percentages are set)
+ * Automatically calculate and save the selected Semester final percentages.
  *
- * @uses FinalGradesQtrOrProCalculate()
- * @uses FinalGradesSemOrFYCalculate()
- * @uses FinalGradesSave()
- *
- * @since 11.8
- * @since 11.8.6 Automatic Class Rank calculation.
- * @since 11.8.6 SQL INSERT INTO grades_completed so "These grades are complete." is displayed on the Input Final Grades program
- *
- * @param int $cp_id  Course Period ID.
- * @param int $qtr_id Quarter ID.
- *
- * @return bool True if Final Grades saved, else false.
+ * Abugida uses Semesters as the atomic grading period. Quarter and Progress
+ * Period records are not required. Legacy Quarter IDs are resolved to their
+ * containing Semester when encountered.
  */
-function FinalGradesAllMPSave( $cp_id, $qtr_id )
+function FinalGradesAllMPSave( $cp_id, $semester_id )
 {
-	if ( ! $cp_id
-		|| GetMP( $qtr_id, 'MP' ) !== 'QTR' )
+	if ( ! $cp_id || ! $semester_id )
 	{
 		return false;
 	}
 
-	// First, calculate Final Grades for Quarter.
-	$final_grades = FinalGradesQtrOrProCalculate( $cp_id, $qtr_id );
+	$type = GetMP( $semester_id, 'MP' );
+
+	if ( $type === 'QTR' )
+	{
+		$semester_id = GetParentMP( 'SEM', $semester_id );
+	}
+	elseif ( $type === 'PRO' )
+	{
+		$quarter_id = GetParentMP( 'QTR', $semester_id );
+		$semester_id = $quarter_id ? GetParentMP( 'SEM', $quarter_id ) : 0;
+	}
+
+	if ( ! $semester_id || GetMP( $semester_id, 'MP' ) !== 'SEM' )
+	{
+		return false;
+	}
+
+	$final_grades = FinalGradesSemesterCalculate( $cp_id, $semester_id );
 
 	if ( ! $final_grades )
 	{
 		return false;
 	}
 
-	FinalGradesSave( $cp_id, $qtr_id, $final_grades );
-
-	$final_grade_mps[] = $qtr_id;
-
-	$pro = GetChildrenMP( 'PRO', $qtr_id );
-
-	$pro = explode( ',', $pro );
-
-	foreach ( $pro as $pro_id )
-	{
-		$pro_id = trim( $pro_id, "'" ); // Remove single quotes around ID.
-
-		if ( ! GetMP( $pro_id, 'DOES_GRADES' ) )
-		{
-			continue;
-		}
-
-		// Then, calculate Final Grades for Progress Periods (only if graded).
-		$final_grades = FinalGradesQtrOrProCalculate( $cp_id, $pro_id );
-
-		if ( $final_grades )
-		{
-			FinalGradesSave( $cp_id, $pro_id, $final_grades );
-
-			$final_grade_mps[] = $pro_id;
-		}
-	}
-
-	$sem_id = GetParentMP( 'SEM', $qtr_id );
-
-	if ( GetMP( $sem_id, 'DOES_GRADES' ) )
-	{
-		// Then, calculate Final Grades for Semester (only if graded & Final Grading Percentages set).
-		$final_grades = FinalGradesSemOrFYCalculate( $cp_id, $sem_id, 'fail' );
-
-		if ( $final_grades )
-		{
-			FinalGradesSave( $cp_id, $sem_id, $final_grades );
-
-			$final_grade_mps[] = $sem_id;
-		}
-	}
-
-	$fy_id = GetParentMP( 'FY', $sem_id );
-
-	if ( GetMP( $fy_id, 'DOES_GRADES' ) )
-	{
-		// Then, calculate Final Grades for Full Year (only if graded & Final Grading Percentages set).
-		$final_grades = FinalGradesSemOrFYCalculate( $cp_id, $fy_id, 'fail' );
-
-		if ( $final_grades )
-		{
-			FinalGradesSave( $cp_id, $fy_id, $final_grades );
-
-			$final_grade_mps[] = $fy_id;
-		}
-	}
-
-	require_once 'modules/Grades/includes/ClassRank.inc.php';
+	FinalGradesSave( $cp_id, $semester_id, $final_grades );
 
 	$teacher_id = DBGetOne( "SELECT TEACHER_ID
 		FROM course_periods
 		WHERE COURSE_PERIOD_ID='" . (int) $cp_id . "'" );
 
-	foreach ( $final_grade_mps as $mp_id )
+	$current_completed = (bool) DBGetOne( "SELECT 1
+		FROM grades_completed
+		WHERE STAFF_ID='" . (int) $teacher_id . "'
+		AND MARKING_PERIOD_ID='" . (int) $semester_id . "'
+		AND COURSE_PERIOD_ID='" . (int) $cp_id . "'" );
+
+	if ( ! $current_completed )
 	{
-		$current_completed = (bool) DBGetOne( "SELECT 1
-			FROM grades_completed
-			WHERE STAFF_ID='" . (int) $teacher_id . "'
-			AND MARKING_PERIOD_ID='" . (int) $mp_id . "'
-			AND COURSE_PERIOD_ID='" . (int) $cp_id . "'" );
-
-		if ( ! $current_completed )
-		{
-			DBInsert(
-				'grades_completed',
-				[
-					'STAFF_ID' => (int) $teacher_id,
-					'MARKING_PERIOD_ID' => (int) $mp_id,
-					'COURSE_PERIOD_ID' => (int) $cp_id,
-				]
-			);
-		}
-
-		ClassRankCalculateAddMP( $mp_id );
+		DBInsert(
+			'grades_completed',
+			[
+				'STAFF_ID' => (int) $teacher_id,
+				'MARKING_PERIOD_ID' => (int) $semester_id,
+				'COURSE_PERIOD_ID' => (int) $cp_id,
+			]
+		);
 	}
 
 	return true;
@@ -211,12 +152,23 @@ function FinalGradesAllMPSave( $cp_id, $qtr_id )
  *
  * @return array Final Grades, else empty.
  */
-function FinalGradesQtrOrProCalculate( $cp_id, $mp_id, $assignment_type_id = 0 )
+function FinalGradesSemesterCalculate( $cp_id, $mp_id, $assignment_type_id = 0 )
 {
 	$mp = GetMP( $mp_id, 'MP' );
 
-	if ( ! $cp_id
-		|| ! in_array( $mp, [ 'QTR', 'PRO' ] ) )
+	if ( $mp === 'QTR' )
+	{
+		$mp_id = GetParentMP( 'SEM', $mp_id );
+		$mp = 'SEM';
+	}
+	elseif ( $mp === 'PRO' )
+	{
+		$quarter_id = GetParentMP( 'QTR', $mp_id );
+		$mp_id = $quarter_id ? GetParentMP( 'SEM', $quarter_id ) : 0;
+		$mp = $mp_id ? 'SEM' : '';
+	}
+
+	if ( ! $cp_id || $mp !== 'SEM' )
 	{
 		return [];
 	}
@@ -342,6 +294,16 @@ function FinalGradesQtrOrProCalculate( $cp_id, $mp_id, $assignment_type_id = 0 )
 
 
 /**
+ * Legacy RosarioSIS compatibility wrapper.
+ * Quarter / Progress requests are resolved to their containing Semester.
+ */
+function FinalGradesQtrOrProCalculate( $cp_id, $mp_id, $assignment_type_id = 0 )
+{
+	return FinalGradesSemesterCalculate( $cp_id, $mp_id, $assignment_type_id );
+}
+
+
+/**
  * Automatically calculate Course Period's Final Grades using Gradebook Grades
  * (Semester or Full Year)
  *
@@ -361,146 +323,79 @@ function FinalGradesQtrOrProCalculate( $cp_id, $mp_id, $assignment_type_id = 0 )
  */
 function FinalGradesSemOrFYCalculate( $cp_id, $mp_id, $mode = 'continue' )
 {
-	global $warning;
-
 	$mp = GetMP( $mp_id, 'MP' );
 
-	if ( ! $cp_id
-		|| ! in_array( $mp, [ 'SEM', 'FY' ] ) )
+	if ( ! $cp_id || ! in_array( $mp, [ 'SEM', 'FY' ], true ) )
 	{
 		return false;
 	}
 
-	if ( GetMP( $mp_id, 'MP' ) == 'SEM' )
+	if ( $mp === 'SEM' )
 	{
-		$mp_RET = DBGet( "SELECT MARKING_PERIOD_ID,'Y' AS DOES_GRADES
-		FROM school_marking_periods
-		WHERE MP='QTR'
-		AND PARENT_ID='" . (int) $mp_id . "'
-		UNION
-		SELECT MARKING_PERIOD_ID,NULL AS DOES_GRADES
-		FROM school_marking_periods
-		WHERE MP='SEM'
-		AND MARKING_PERIOD_ID='" . (int) $mp_id . "'" );
-		$prefix = 'SEM-';
+		return FinalGradesSemesterCalculate( $cp_id, $mp_id );
 	}
-	else
-	{
-		$mp_RET = DBGet( "SELECT q.MARKING_PERIOD_ID,'Y' AS DOES_GRADES
-		FROM school_marking_periods q,school_marking_periods s
-		WHERE q.MP='QTR'
-		AND s.MP='SEM'
-		AND q.PARENT_ID=s.MARKING_PERIOD_ID
-		AND s.PARENT_ID='" . (int) $mp_id . "'
-		UNION
-		SELECT MARKING_PERIOD_ID,DOES_GRADES
+
+	$semester_rows = DBGet( "SELECT MARKING_PERIOD_ID
 		FROM school_marking_periods
 		WHERE MP='SEM'
 		AND PARENT_ID='" . (int) $mp_id . "'
-		UNION
-		SELECT MARKING_PERIOD_ID,NULL AS DOES_GRADES
-		FROM school_marking_periods
-		WHERE MP='FY'
-		AND MARKING_PERIOD_ID='" . (int) $mp_id . "'" );
-		$prefix = 'FY-';
-	}
+		AND DOES_GRADES='Y'
+		AND SCHOOL_ID='" . UserSchool() . "'
+		AND SYEAR='" . UserSyear() . "'
+		ORDER BY SORT_ORDER IS NULL,SORT_ORDER,START_DATE" );
 
-	$mps = '';
-
-	foreach ( (array) $mp_RET as $mp )
+	if ( ! $semester_rows )
 	{
-		if ( $mp['DOES_GRADES'] === 'Y' )
-		{
-			$mps .= "'" . $mp['MARKING_PERIOD_ID'] . "',";
-		}
+		return [];
 	}
 
-	$mps = mb_substr( $mps, 0, -1 );
+	$semester_ids = array_map(
+		function ( $row ) { return (int) $row['MARKING_PERIOD_ID']; },
+		(array) $semester_rows
+	);
 
-	$percents_RET = DBGet( "SELECT STUDENT_ID,GRADE_PERCENT,MARKING_PERIOD_ID
+	$percent_rows = DBGet( "SELECT STUDENT_ID,GRADE_PERCENT
 		FROM student_report_card_grades
 		WHERE COURSE_PERIOD_ID='" . (int) $cp_id . "'
-		AND MARKING_PERIOD_ID IN (" . $mps . ")", [], [ 'STUDENT_ID' ] );
+		AND MARKING_PERIOD_ID IN(" . implode( ',', $semester_ids ) . ")
+		AND GRADE_PERCENT IS NOT NULL", [], [ 'STUDENT_ID' ] );
 
-	$teacher_id = DBGetOne( "SELECT TEACHER_ID
-		FROM course_periods
-		WHERE COURSE_PERIOD_ID='" . (int) $cp_id . "'" );
+	$results = [];
 
-	$gradebook_config = ProgramUserConfig( 'Gradebook', $teacher_id );
-
-	require_once 'ProgramFunctions/_makeLetterGrade.fnc.php';
-
-	$import_RET = [];
-
-	foreach ( (array) $percents_RET as $student_id => $percents )
+	foreach ( (array) $percent_rows as $student_id => $grades )
 	{
-		$total_percent = 0;
+		$total = 0;
+		$count = 0;
 
-		/**
-		 * N/A for all children Marking Periods case
-		 *
-		 * @since 12.3 Save null percent: N/A final grade
-		 */
-		$total = null;
-
-		foreach ( (array) $percents as $percent )
+		foreach ( (array) $grades as $grade )
 		{
-			if ( ! isset( $gradebook_config[$prefix . $percent['MARKING_PERIOD_ID']] ) )
+			if ( $grade['GRADE_PERCENT'] === null || $grade['GRADE_PERCENT'] === '' )
 			{
-				// @since 11.5 Add "Final Grading Percentages are not configured." warning
-				$warning['config_percent'] = _( 'Final Grading Percentages are not configured.' );
-
-				if ( AllowUse( 'Grades/Configuration.php' ) )
-				{
-					$warning['config_percent'] .= ' <a href="Modules.php?modname=Grades/Configuration.php">' .
-						_( 'Configuration' ) . '</a>';
-				}
-
-				if ( $mode === 'fail' )
-				{
-					return [];
-				}
-			}
-
-			if ( is_null( $percent['GRADE_PERCENT'] ) )
-			{
-				// N/A final grade
 				continue;
 			}
 
-			$total += $percent['GRADE_PERCENT'] *
-				issetVal( $gradebook_config[$prefix . $percent['MARKING_PERIOD_ID']] );
-
-			$total_percent += $gradebook_config[$prefix . $percent['MARKING_PERIOD_ID']];
+			$total += (float) $grade['GRADE_PERCENT'];
+			$count++;
 		}
 
-		if ( $total_percent != 0 )
+		if ( ! $count )
 		{
-			$total /= $total_percent;
-
-			$total /= 100;
+			continue;
 		}
 
-		if ( $total > 9.999 )
-		{
-			// Fix SQL error when percent grade > 999.9
-			$total = '9.999';
-		}
-		elseif ( $total < 0 )
-		{
-			$total = '0';
-		}
+		$percent = round( $total / $count, 1 );
+		$ratio = $percent / 100;
 
-		$import_RET[$student_id] = [
+		$results[$student_id] = [
 			1 => [
-				'REPORT_CARD_GRADE_ID' => _makeLetterGrade( $total, $cp_id, 0, 'ID' ),
-				'GRADE_LETTER' => _makeLetterGrade( $total, $cp_id, 0, 'TITLE' ),
-				'GRADE_PERCENT' => is_null( $total ) ? null : round( $total * 100, 1 ),
+				'REPORT_CARD_GRADE_ID' => _makeLetterGrade( $ratio, $cp_id, 0, 'ID' ),
+				'GRADE_LETTER' => _makeLetterGrade( $ratio, $cp_id, 0, 'TITLE' ),
+				'GRADE_PERCENT' => $percent,
 			],
 		];
 	}
 
-	return $import_RET;
+	return $results;
 }
 
 
@@ -526,8 +421,19 @@ function FinalGradesGetAssignmentsPoints( $cp_id, $mp_id, $assignment_type_id = 
 
 	$mp = GetMP( $mp_id, 'MP' );
 
-	if ( ! $cp_id
-		|| ! in_array( $mp, [ 'QTR', 'PRO' ] ) )
+	if ( $mp === 'QTR' )
+	{
+		$mp_id = GetParentMP( 'SEM', $mp_id );
+		$mp = 'SEM';
+	}
+	elseif ( $mp === 'PRO' )
+	{
+		$quarter_id = GetParentMP( 'QTR', $mp_id );
+		$mp_id = $quarter_id ? GetParentMP( 'SEM', $quarter_id ) : 0;
+		$mp = $mp_id ? 'SEM' : '';
+	}
+
+	if ( ! $cp_id || $mp !== 'SEM' )
 	{
 		return [];
 	}
@@ -552,13 +458,13 @@ function FinalGradesGetAssignmentsPoints( $cp_id, $mp_id, $assignment_type_id = 
 			sum(CASE WHEN gg.POINTS<0 THEN '0' ELSE (gg.POINTS/ga.POINTS)*ga.WEIGHT END) AS PARTIAL_WEIGHTED_GRADE";
 	}
 
-	$qtr_id = $mp === 'QTR' ? $mp_id : GetParentMP( 'QTR', $mp_id );
+	$semester_id = $mp_id;
 
 	$extra['FROM'] = " JOIN gradebook_assignments ga ON
 		(((ga.COURSE_PERIOD_ID=cp.COURSE_PERIOD_ID
 				OR ga.COURSE_ID=cp.COURSE_ID)
 				AND ga.STAFF_ID=cp.TEACHER_ID)
-			AND ga.MARKING_PERIOD_ID='" . (int) $qtr_id . "')
+			AND ga.MARKING_PERIOD_ID='" . (int) $semester_id . "')
 		LEFT OUTER JOIN gradebook_grades gg ON
 		(gg.STUDENT_ID=s.STUDENT_ID
 			AND gg.ASSIGNMENT_ID=ga.ASSIGNMENT_ID
@@ -594,20 +500,6 @@ function FinalGradesGetAssignmentsPoints( $cp_id, $mp_id, $assignment_type_id = 
 		$extra['WHERE'] .= " AND ga.POINTS>0";
 	}
 
-	if ( $mp === 'PRO' )
-	{
-		// FJ: limit Assignments to the ones due during the Progress Period.
-		$extra['WHERE'] .= " AND ((ga.ASSIGNED_DATE IS NULL OR (SELECT END_DATE
-			FROM school_marking_periods
-			WHERE MARKING_PERIOD_ID='" . (int) $mp_id . "')>=ga.ASSIGNED_DATE)
-			AND (ga.DUE_DATE IS NULL
-				OR (SELECT END_DATE
-					FROM school_marking_periods
-					WHERE MARKING_PERIOD_ID='" . (int) $mp_id . "')>=ga.DUE_DATE
-				AND (SELECT START_DATE
-					FROM school_marking_periods
-					WHERE MARKING_PERIOD_ID='" . (int) $mp_id . "')<=ga.DUE_DATE))";
-	}
 
 	$extra['GROUP'] = "gt.ASSIGNMENT_TYPE_ID,gt.FINAL_GRADE_PERCENT,s.STUDENT_ID";
 
@@ -684,15 +576,6 @@ function FinalGradesSave( $cp_id, $mp_id, $final_grades )
 
 	$grade_scale_id = $course_RET[1]['GRADE_SCALE_ID'];
 
-	$grades_RET = DBGet( "SELECT rcg.ID,rcg.TITLE,rcg.GPA_VALUE AS WEIGHTED_GP,
-		rcg.UNWEIGHTED_GP,gs.GP_SCALE,gs.GP_PASSING_VALUE,rcg.COMMENT
-		FROM report_card_grades rcg, report_card_grade_scales gs
-		WHERE rcg.GRADE_SCALE_ID=gs.ID
-		AND rcg.SYEAR='" . $cp['SYEAR'] . "'
-		AND rcg.SCHOOL_ID='" . (int) $cp['SCHOOL_ID'] . "'
-		AND rcg.GRADE_SCALE_ID='" . (int) $grade_scale_id . "'
-		ORDER BY rcg.BREAK_OFF IS NULL,rcg.BREAK_OFF DESC,rcg.SORT_ORDER IS NULL,rcg.SORT_ORDER", [], [ 'ID' ] );
-
 	if ( ! $grade_scale_id )
 	{
 		return false;
@@ -707,32 +590,13 @@ function FinalGradesSave( $cp_id, $mp_id, $final_grades )
 		}
 
 		$grade = $final_grade[1]['REPORT_CARD_GRADE_ID'];
-		$letter = $final_grade[1]['GRADE_LETTER'];
-		$weighted = $grades_RET[$grade][1]['WEIGHTED_GP'];
-		$unweighted = $grades_RET[$grade][1]['UNWEIGHTED_GP'];
-		$scale = $grades_RET[$grade][1]['GP_SCALE'];
-		$gp_passing = $grades_RET[$grade][1]['GP_PASSING_VALUE'];
-
-		if ( GetMP( $mp_id, 'MP' ) === 'FY'
-			&& $cp['MP'] !== 'FY'
-			&& ! is_null( $weighted ) )
-		{
-			// Add precision to year weighted GPA if not year course period.
-			$weighted = $final_grade[1]['GRADE_PERCENT'] / 100 * $scale;
-		}
+		$letter = issetVal( $final_grade[1]['GRADE_LETTER'], '' );
 
 		$columns = [
 			'REPORT_CARD_GRADE_ID' => $grade,
 			'GRADE_PERCENT' => $final_grade[1]['GRADE_PERCENT'],
 			'GRADE_LETTER' => DBEscapeString( $letter ),
-			'WEIGHTED_GP' => $weighted,
-			'UNWEIGHTED_GP' => $unweighted,
-			'GP_SCALE' => $scale,
 			'COURSE_TITLE' => DBEscapeString( $course_RET[1]['COURSE_NAME'] ),
-			'CLASS_RANK' => $course_RET[1]['CLASS_RANK'],
-			'CREDIT_HOURS' => $course_RET[1]['CREDIT_HOURS'],
-			'CREDIT_ATTEMPTED' => $course_RET[1]['CREDITS'],
-			'CREDIT_EARNED' => ( (float) $weighted && $weighted >= $gp_passing ? $course_RET[1]['CREDITS'] : '0' ),
 		];
 
 		if ( isset( $final_grade[1]['COMMENT'] ) )
