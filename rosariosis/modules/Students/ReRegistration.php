@@ -17,6 +17,8 @@ $current_RET = AbugidaReRegistrationCurrentEnrollment();
 $current = ! empty( $current_RET[1] ) ? $current_RET[1] : [];
 $grades = AbugidaReRegistrationGrades();
 $semesters = AbugidaReRegistrationSemesters();
+$future_semesters = AbugidaReRegistrationFutureSemesters();
+$current_semester_id = AbugidaReRegistrationCurrentSemesterId();
 $future_years = AbugidaReRegistrationFutureYears();
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
@@ -53,20 +55,19 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 
 				$valid_semester = false;
 
-				foreach ( (array) $semesters as $semester )
+				foreach ( (array) $future_semesters as $semester )
 				{
-					if ( (int) $semester['MARKING_PERIOD_ID'] === $target_semester_id
-						&& $target_semester_id !== (int) UserMP()
-						&& ( empty( $semester['END_DATE'] ) || $semester['END_DATE'] >= DBDate() ) )
+					if ( (int) $semester['MARKING_PERIOD_ID'] === $target_semester_id )
 					{
 						$valid_semester = true;
 						break;
 					}
 				}
 
-				if ( ! $valid_semester )
+				if ( ! $valid_semester
+					|| ( $current_semester_id && $target_semester_id === $current_semester_id ) )
 				{
-					$error[] = _( 'Select an available future Semester.' );
+					$error[] = _( 'Select a future Semester that has not started yet.' );
 				}
 			}
 			elseif ( $type === 'YEAR' )
@@ -384,18 +385,15 @@ if ( ! $open )
 
 	echo '<div class="abg-rereg-row"><label><b>' . _( 'Target Semester' ) . '</b></label><br><br>';
 	echo '<select name="target_semester_id"><option value="">' . _( 'Select Semester' ) . '</option>';
-	foreach ( (array) $semesters as $semester )
+	foreach ( (array) $future_semesters as $semester )
 	{
-		if ( (int) $semester['MARKING_PERIOD_ID'] === (int) UserMP()
-			|| ( ! empty( $semester['END_DATE'] ) && $semester['END_DATE'] < DBDate() ) )
-		{
-			continue;
-		}
-
-		echo '<option value="' . (int) $semester['MARKING_PERIOD_ID'] . '">' . AttrEscape( $semester['TITLE'] ) . '</option>';
+		echo '<option value="' . (int) $semester['MARKING_PERIOD_ID'] . '">' .
+			AttrEscape( $semester['TITLE'] ) . ' (' .
+			AttrEscape( ProperDate( $semester['START_DATE'] ) ) . ')' .
+			'</option>';
 	}
 	echo '</select><div class="abg-student-subvalue">' .
-		_( 'Used only for Next Semester requests.' ) . '</div></div>';
+		_( 'Only Semesters that have not started yet are available. Sidebar Semester selection does not affect eligibility.' ) . '</div></div>';
 
 	echo '<div class="abg-rereg-row"><label><b>' . _( 'Target Academic Year' ) . '</b></label><br><br>';
 	echo '<select name="target_syear"><option value="">' . _( 'Select Academic Year' ) . '</option>';
