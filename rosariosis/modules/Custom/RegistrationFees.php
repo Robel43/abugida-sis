@@ -5,7 +5,9 @@
 
 DrawHeader( ProgramTitle() );
 
-if ( User( 'PROFILE' ) !== 'admin' )
+require_once 'ProgramFunctions/AbugidaWorkflow.fnc.php';
+
+if ( ! AbugidaStaffAllowed( 'Custom/RegistrationFees.php' ) )
 {
 	exit;
 }
@@ -19,7 +21,8 @@ $grades = DBGet( "SELECT ID,TITLE,SHORT_NAME,SORT_ORDER
 	ORDER BY SORT_ORDER,ID" );
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST'
-	&& AllowEdit() )
+	&& AllowEdit()
+	&& AbugidaValidStaffPost() )
 {
 	foreach ( (array) $grades as $grade )
 	{
@@ -111,7 +114,7 @@ echo '<p class="abg-fees-help">' .
 	_( 'Set the online registration payment amount once for each grade. When the Registrar approves an application, the system automatically uses the amount configured here.' ) .
 	'</p>';
 
-echo '<form method="POST">';
+echo '<form method="POST">' . AbugidaCsrfField();
 echo '<table class="abg-fees-table">';
 echo '<thead><tr><th>' . _( 'Grade' ) . '</th><th>' . _( 'Registration Fee (ETB)' ) . '</th></tr></thead><tbody>';
 

@@ -23,6 +23,10 @@ services:
       context: .
       dockerfile: Dockerfile
 
+    env_file:
+      - path: .env.smtp
+        required: false
+
     container_name: abugida-web
     restart: unless-stopped
 
@@ -35,6 +39,18 @@ services:
     volumes:
       - ./rosariosis:/var/www/html
 
+
+  registration-migrations:
+    profiles: ["maintenance"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: ["php", "/opt/abugida/database/migrate-registration.php"]
+    depends_on:
+      - db
+    volumes:
+      - ./database:/opt/abugida/database:ro
+      - ./rosariosis/config.inc.php:/opt/abugida/rosariosis/config.inc.php:ro
 
 volumes:
   abugida_db_data:

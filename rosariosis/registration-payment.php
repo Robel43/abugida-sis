@@ -4,6 +4,11 @@
  */
 
 require_once __DIR__ . '/Warehouse.php';
+require_once __DIR__ . '/registration-schema.inc.php';
+abugida_registration_require_schema();
+require_once __DIR__ . '/ProgramFunctions/AbugidaWorkflow.fnc.php';
+header( 'Referrer-Policy: no-referrer' );
+header( 'Cache-Control: no-store' );
 
 const ABUGIDA_PAYMENT_MAX_UPLOAD_BYTES = 5242880;
 
@@ -14,9 +19,10 @@ function abugida_payment_h( $value )
 
 if ( ! empty( $_GET['token'] ) )
 {
-	$token = preg_replace( '/[^a-f0-9]/i', '', (string) $_GET['token'] );
+	unset( $_SESSION['abugida_applicant_id'], $_SESSION['abugida_applicant_phone'] );
+	$token = (string) $_GET['token'];
 
-	if ( strlen( $token ) === 64 )
+	if ( preg_match( '/^[a-f0-9]{64}$/', $token ) )
 	{
 		$token_RET = DBGet( "SELECT ID,PHONE
 			FROM abugida_applicants
@@ -101,58 +107,30 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST'
 
 				if ( ! is_dir( $dir ) )
 				{
-					mkdir( $dir, 0750, true );
+					if ( ! mkdir( $dir, 0750, true ) && ! is_dir( $dir ) ) { $errors[] = 'Unable to prepare receipt storage.'; }
 				}
+
+				if ( ! file_exists( $dir . '/.htaccess' ) && file_put_contents( $dir . '/.htaccess', "Require all denied\n" ) === false ) { $errors[] = 'Unable to protect receipt storage.'; }
 
 				$stored = 'receipt-' . $applicant_id . '-' . bin2hex( random_bytes( 12 ) ) . '.' . $allowed[ $mime ];
 
-				if ( ! move_uploaded_file( $file['tmp_name'], $dir . '/' . $stored ) )
+				if ( $errors || ! move_uploaded_file( $file['tmp_name'], $dir . '/' . $stored ) )
 				{
 					$errors[] = 'Unable to save the receipt.';
 				}
 				else
 				{
-					if ( $applicant['RECEIPT_STORED_NAME'] )
+					try
 					{
-						$old = $dir . '/' . basename( $applicant['RECEIPT_STORED_NAME'] );
-
-						if ( is_file( $old ) )
-						{
-							@unlink( $old );
-						}
+						AbugidaSubmitReceipt( $applicant_id, $phone, [ 'stored' => $stored,
+							'original' => basename( $file['name'] ), 'mime' => $mime, 'size' => (int) $file['size'] ] );
+						header( 'Location: registration-payment.php?submitted=1' );
+						exit;
 					}
-
-					$from = $applicant['STATUS'];
-
-					DBUpdate(
-						'abugida_applicants',
-						[
-							'STATUS' => 'PAYMENT_SUBMITTED',
-							'PAYMENT_STATUS' => 'SUBMITTED',
-							'RECEIPT_STORED_NAME' => $stored,
-							'RECEIPT_ORIGINAL_NAME' => basename( $file['name'] ),
-							'RECEIPT_MIME_TYPE' => $mime,
-							'RECEIPT_SIZE' => (int) $file['size'],
-							'RECEIPT_SUBMITTED_AT' => DBDate() . ' ' . date( 'H:i:s' ),
-							'FINANCE_DECISION_REASON' => null,
-						],
-						[ 'ID' => $applicant_id ]
-					);
-
-					DBInsert(
-						'abugida_application_history',
-						[
-							'APPLICANT_ID' => $applicant_id,
-							'FROM_STATUS' => $from,
-							'TO_STATUS' => 'PAYMENT_SUBMITTED',
-							'ACTION' => 'Payment receipt submitted',
-							'ACTOR_TYPE' => 'APPLICANT',
-							'ACTOR_NAME' => $applicant['FIRST_NAME'] . ' ' . $applicant['LAST_NAME'],
-						]
-					);
-
-					header( 'Location: registration-payment.php?submitted=1' );
-					exit;
+					catch ( RuntimeException $exception )
+					{
+						$errors[] = $exception instanceof PDOException ? 'Unable to save the receipt. Please try again.' : $exception->getMessage();
+					}
 				}
 			}
 		}

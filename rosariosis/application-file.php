@@ -5,16 +5,16 @@
 
 require_once __DIR__ . '/Warehouse.php';
 
-if ( User( 'PROFILE' ) !== 'admin'
-	|| empty( User( 'STAFF_ID' ) ) )
-{
-	http_response_code( 403 );
-	exit( 'Access denied.' );
-}
+require_once __DIR__ . '/ProgramFunctions/AbugidaWorkflow.fnc.php';
 
 $applicant_id = (int) ( $_GET['applicant_id'] ?? 0 );
 $type = (string) ( $_GET['type'] ?? '' );
 $mode = (string) ( $_GET['mode'] ?? 'inline' );
+$module = $type === 'receipt' ? 'Custom/FinanceApplications.php' : 'Custom/ApplicationReview.php';
+if (!AbugidaStaffAllowed($module)) {
+    http_response_code(403);
+    exit('Access denied.');
+}
 
 $map = [
 	'document' => [ 'DOCUMENT_STORED_NAME', 'DOCUMENT_ORIGINAL_NAME', 'DOCUMENT_MIME_TYPE' ],
@@ -52,7 +52,9 @@ if ( ! $stored )
 
 $file = __DIR__ . '/assets/FileUploads/ApplicantDocuments/' . basename( $stored );
 
-if ( ! is_file( $file ) )
+$resolved = realpath( $file );
+$upload_root = realpath( __DIR__ . '/assets/FileUploads/ApplicantDocuments' );
+if ( ! $resolved || ! $upload_root || ! str_starts_with( $resolved, $upload_root . DIRECTORY_SEPARATOR ) || ! is_file( $resolved ) )
 {
 	http_response_code( 404 );
 	exit( 'Document file not found.' );
@@ -76,7 +78,9 @@ header( 'Content-Type: ' . $mime );
 header( 'Content-Disposition: ' . $disposition . '; filename="' . $filename . '"' );
 header( 'Content-Length: ' . filesize( $file ) );
 header( 'X-Content-Type-Options: nosniff' );
-header( 'Cache-Control: private, max-age=0, must-revalidate' );
+header( 'Cache-Control: private, no-store' );
+header( "Content-Security-Policy: sandbox; default-src 'none'; frame-ancestors 'self'" );
+header( 'Referrer-Policy: no-referrer' );
 
 readfile( $file );
 exit;

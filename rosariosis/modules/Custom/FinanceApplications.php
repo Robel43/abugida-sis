@@ -5,7 +5,9 @@
 
 DrawHeader( ProgramTitle() );
 
-if ( User( 'PROFILE' ) !== 'admin' )
+require_once 'ProgramFunctions/AbugidaWorkflow.fnc.php';
+
+if ( ! AbugidaStaffAllowed( 'Custom/FinanceApplications.php' ) )
 {
 	exit;
 }
@@ -35,77 +37,29 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 	$ret = DBGet( "SELECT * FROM abugida_applicants WHERE ID='" . $applicant_id . "' LIMIT 1" );
 	$applicant = ! empty( $ret[1] ) ? $ret[1] : null;
 
-	if ( $applicant && $_REQUEST['modfunc'] === 'download_receipt' )
+	if ( $applicant && ( $_REQUEST['modfunc'] ?? '' ) === 'download_receipt' )
 	{
-		$file = 'assets/FileUploads/ApplicantDocuments/' . basename( $applicant['RECEIPT_STORED_NAME'] );
-
-		if ( is_file( $file ) )
-		{
-			header( 'Content-Type: application/octet-stream' );
-			header( 'Content-Disposition: attachment; filename="' . str_replace( '"', '', basename( $applicant['RECEIPT_ORIGINAL_NAME'] ) ) . '"' );
-			header( 'Content-Length: ' . filesize( $file ) );
-			readfile( $file );
-		}
+		header( 'Location: application-file.php?applicant_id=' . $applicant_id . '&type=receipt&mode=download' );
 		exit;
 	}
-
-	if ( $applicant
-		&& $_REQUEST['modfunc'] === 'decision'
-		&& AllowEdit() )
+	if ( $applicant && in_array( $_REQUEST['modfunc'] ?? '', [ 'decision', 'retry_email' ], true ) )
 	{
-		$decision = issetVal( $_POST['decision'] );
-		$reason = trim( issetVal( $_POST['reason'] ) );
-		$from = $applicant['STATUS'];
-
-		if ( $decision === 'approve'
-			&& $applicant['STATUS'] === 'PAYMENT_SUBMITTED' )
+		try
 		{
-			DBUpdate(
-				'abugida_applicants',
-				[
-					'STATUS' => 'PAYMENT_VERIFIED',
-					'PAYMENT_STATUS' => 'VERIFIED',
-					'FINANCE_DECISION_REASON' => null,
-					'FINANCE_REVIEWED_AT' => DBDate() . ' ' . date( 'H:i:s' ),
-					'FINANCE_REVIEWED_BY' => (int) User( 'STAFF_ID' ),
-				],
-				[ 'ID' => $applicant_id ]
-			);
-
-			AbugidaFinanceHistory( $applicant_id, $from, 'PAYMENT_VERIFIED', 'Payment verified' );
-			AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS payment verified', "Your payment has been verified. The Registrar will now complete your enrollment and create your student account." );
-			$note[] = button( 'check' ) . '&nbsp;' . _( 'Payment verified.' );
+			if ( $_REQUEST['modfunc'] === 'decision' )
+			{
+				$notification_id = AbugidaReviewDecision( $applicant_id, 'FINANCE', (string) ( $_POST['decision'] ?? '' ), (string) ( $_POST['reason'] ?? '' ) );
+				$note[] = 'Finance decision saved.';
+			}
+			else { $notification_id = (int) ( $_POST['notification_id'] ?? 0 ); }
+			$delivery = AbugidaDeliverNotification( $notification_id, $applicant_id, 'FINANCE' );
+			$note[] = $delivery === 'SENT' ? 'Notification accepted by the SMTP server.' : 'Notification status: ' . $delivery . '. The saved decision is preserved; see Email notifications below.';
 		}
-		elseif ( $decision === 'reject'
-			&& $applicant['STATUS'] === 'PAYMENT_SUBMITTED' )
+		catch ( RuntimeException $exception )
 		{
-			if ( $reason === '' )
-			{
-				$error[] = _( 'A rejection reason is required.' );
-			}
-			else
-			{
-				DBUpdate(
-					'abugida_applicants',
-					[
-						'STATUS' => 'PAYMENT_DECLINED',
-						'PAYMENT_STATUS' => 'DECLINED',
-						'FINANCE_DECISION_REASON' => $reason,
-						'FINANCE_REVIEWED_AT' => DBDate() . ' ' . date( 'H:i:s' ),
-						'FINANCE_REVIEWED_BY' => (int) User( 'STAFF_ID' ),
-					],
-					[ 'ID' => $applicant_id ]
-				);
-
-				AbugidaFinanceHistory( $applicant_id, $from, 'PAYMENT_DECLINED', 'Payment rejected', $reason );
-				AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS payment update', "Your payment proof was not approved.\n\nReason: " . $reason . "\n\nReturn to the registration portal using your phone number and upload a corrected receipt." );
-				$note[] = button( 'check' ) . '&nbsp;' . _( 'Payment rejected.' );
-			}
+			$error[] = htmlspecialchars( $exception instanceof PDOException ? 'Unable to save the request. Check that Stage 2 migration 007 is installed.' : $exception->getMessage(), ENT_QUOTES, 'UTF-8' );
 		}
-
-		RedirectURL( [ 'modfunc', 'decision' ] );
 	}
-
 	if ( $applicant )
 	{
 		$ret = DBGet( "SELECT * FROM abugida_applicants WHERE ID='" . $applicant_id . "' LIMIT 1" );
@@ -130,7 +84,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		if ( $applicant['RECEIPT_STORED_NAME'] )
 		{
 			echo '<br /><a class="button" href="' .
-				URLEscape( 'Modules.php?modname=Custom/FinanceApplications.php&applicant_id=' . $applicant_id . '&modfunc=download_receipt' ) .
+				URLEscape( 'application-file.php?applicant_id=' . $applicant_id . '&type=receipt&mode=download' ) .
 				'">' . _( 'Download Payment Receipt' ) . '</a>';
 		}
 
@@ -138,6 +92,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		{
 			echo '<br /><br /><form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/FinanceApplications.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo AbugidaCsrfField();
 			echo '<fieldset><legend>' . _( 'Finance Decision' ) . '</legend>';
 			echo '<p><label>' . _( 'Reason (required when rejecting)' ) . '<br><textarea name="reason" rows="3" class="width-100p"></textarea></label></p>';
 			echo '<button type="submit" name="decision" value="approve">' . _( 'Verify Payment' ) . '</button> ';
@@ -146,9 +101,10 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		}
 		elseif ( $applicant['STATUS'] === 'PAYMENT_DECLINED' )
 		{
-			echo '<br />' . ErrorMessage( [ _( 'Payment rejected: ' ) . $applicant['FINANCE_DECISION_REASON'] ], 'warning' );
+			echo '<br />' . ErrorMessage( [ _( 'Payment rejected: ' ) . AttrEscape( $applicant['FINANCE_DECISION_REASON'] ) ], 'warning' );
 		}
 
+		AbugidaNotificationPanel( $applicant_id, 'FINANCE' );
 		return;
 	}
 }

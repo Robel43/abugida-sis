@@ -92,3 +92,4 @@ __pycache__/
 
 phpdoc/
 phpdoc-cache*
+!.env.smtp.example

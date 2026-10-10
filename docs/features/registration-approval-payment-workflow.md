@@ -234,3 +234,8 @@ Get-Content .\database\migrations\004_registration_approval_payment_workflow.sql
 8. Registrar returns to the application and selects **Final Confirm & Create Student Account**.
 9. Applicant sees ACTIVE status and generated username.
 10. Student signs in through the normal SIS login.
+
+
+## Stage 2 verification and SMTP setup
+
+See [Stage 2 tests, permissions, SMTP configuration, and safe email retries](stage2-testing-smtp.md) for the verified workflow and local configuration steps. Migration 007 adds the notification outbox; migrations 001–006 remain unchanged.

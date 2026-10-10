@@ -7,6 +7,9 @@
  */
 
 require_once __DIR__ . '/Warehouse.php';
+require_once __DIR__ . '/registration-schema.inc.php';
+abugida_registration_require_schema();
+require_once __DIR__ . '/ProgramFunctions/AbugidaWorkflow.fnc.php';
 
 const ABUGIDA_REG_MAX_UPLOAD_BYTES = 5242880;
 
@@ -119,7 +122,7 @@ function abugida_reg_store_upload( $input_name, $applicant_id, $prefix, $current
 
 	if ( ! file_exists( $deny_file ) )
 	{
-		@file_put_contents( $deny_file, "Require all denied\n" );
+		if ( file_put_contents( $deny_file, "Require all denied\n" ) === false ) { throw new RuntimeException( 'Unable to protect applicant document storage.' ); }
 	}
 
 	$stored_name = $prefix . '-' . (int) $applicant_id . '-' . bin2hex( random_bytes( 12 ) ) . '.' . $allowed[ $mime ];
@@ -130,15 +133,8 @@ function abugida_reg_store_upload( $input_name, $applicant_id, $prefix, $current
 		throw new RuntimeException( 'Unable to save the uploaded file.' );
 	}
 
-	if ( $current_stored_name !== '' )
-	{
-		$old = $upload_dir . '/' . basename( $current_stored_name );
-
-		if ( is_file( $old ) )
-		{
-			@unlink( $old );
-		}
-	}
+	// Keep saved uploads intact until the replacement is validated and persisted.
+	// Retain historical files rather than deleting applicant data here.
 
 	return [
 		'stored_name' => $stored_name,
@@ -291,53 +287,31 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' )
 
 				if ( ! $errors )
 				{
-					$set = [
-						"FIRST_NAME='" . DBEscapeString( $first_name ) . "'",
-						"LAST_NAME='" . DBEscapeString( $last_name ) . "'",
-						"EMAIL='" . DBEscapeString( $email ) . "'",
-						'GRADE_LEVEL=' . ( $grade ? (int) $grade : 'NULL' ),
-						"STUDY_APPROACH='" . DBEscapeString( $study_approach ) . "'",
-						'UPDATED_AT=NOW()',
-					];
-
-					if ( $document_upload )
+					$fields = [ 'first_name' => $first_name, 'last_name' => $last_name,
+						'email' => $email, 'grade_level' => $grade ?: null, 'study_approach' => $study_approach ?: null ];
+					foreach ( [ 'document' => $document_upload, 'fayda' => $fayda_upload ] as $prefix => $upload )
 					{
-						$set[] = "DOCUMENT_STORED_NAME='" . DBEscapeString( $document_upload['stored_name'] ) . "'";
-						$set[] = "DOCUMENT_ORIGINAL_NAME='" . DBEscapeString( $document_upload['original_name'] ) . "'";
-						$set[] = "DOCUMENT_MIME_TYPE='" . DBEscapeString( $document_upload['mime_type'] ) . "'";
-						$set[] = 'DOCUMENT_SIZE=' . (int) $document_upload['file_size'];
+						if ( ! $upload ) { continue; }
+						$fields[ $prefix . '_stored_name' ] = $upload['stored_name'];
+						$fields[ $prefix . '_original_name' ] = $upload['original_name'];
+						$fields[ $prefix . '_mime_type' ] = $upload['mime_type'];
+						$fields[ $prefix . '_size' ] = $upload['file_size'];
 					}
-
-					if ( $fayda_upload )
-					{
-						$set[] = "FAYDA_STORED_NAME='" . DBEscapeString( $fayda_upload['stored_name'] ) . "'";
-						$set[] = "FAYDA_ORIGINAL_NAME='" . DBEscapeString( $fayda_upload['original_name'] ) . "'";
-						$set[] = "FAYDA_MIME_TYPE='" . DBEscapeString( $fayda_upload['mime_type'] ) . "'";
-						$set[] = 'FAYDA_SIZE=' . (int) $fayda_upload['file_size'];
-					}
-
 					$current_step = 1;
 					if ( $first_name !== '' && $last_name !== '' && $email !== '' ) $current_step = 2;
 					if ( $current_step >= 2 && $grade >= 7 && $grade <= 12 && $study_approach !== '' ) $current_step = 3;
 					if ( $has_document && $has_fayda ) $current_step = 4;
-
-					$set[] = 'CURRENT_STEP=' . $current_step;
-
-					if ( $action === 'submit' )
+					$fields['current_step'] = $action === 'submit' ? 5 : $current_step;
+					try
 					{
-						$set[] = "STATUS='SUBMITTED'";
-						$set[] = 'REGISTRAR_DECISION_REASON=NULL';
-						$set[] = 'SUBMITTED_AT=NOW()';
-						$set[] = 'CURRENT_STEP=5';
+						AbugidaSaveRegistration( $applicant_id, $phone, $fields, $action === 'submit' );
+						header( 'Location: registration.php?' . ( $action === 'submit' ? 'submitted=1' : 'saved=1' ) );
+						exit;
 					}
-
-					DBQuery( "UPDATE abugida_applicants
-						SET " . implode( ', ', $set ) . "
-						WHERE ID='" . $applicant_id . "'
-						AND PHONE='" . DBEscapeString( $phone ) . "'" );
-
-					header( 'Location: registration.php?' . ( $action === 'submit' ? 'submitted=1' : 'saved=1' ) );
-					exit;
+					catch ( RuntimeException $exception )
+					{
+						$errors[] = $exception instanceof PDOException ? 'Unable to save your application. Please try again.' : $exception->getMessage();
+					}
 				}
 			}
 		}
