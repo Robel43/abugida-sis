@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS abugida_grade_import_batches (
 CREATE TABLE IF NOT EXISTS abugida_grade_import_rows (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     batch_id BIGINT UNSIGNED NOT NULL,
-    row_number INT NOT NULL,
+    excel_row_number INT NOT NULL,
     student_id INT NULL,
     student_name VARCHAR(255) NULL,
     old_percent DECIMAL(6,2) NULL,
