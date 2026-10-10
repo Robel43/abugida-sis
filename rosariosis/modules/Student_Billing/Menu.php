@@ -25,15 +25,23 @@ $menu['Student_Billing']['admin'] = [
 
 $menu['Student_Billing']['teacher'] = issetVal( $menu['Student_Billing']['teacher'], [] );
 
-$menu['Student_Billing']['parent'] = [
-	'title' => _( 'Student Billing' ),
-	'default' => 'Student_Billing/StudentFees.php',
-	'Student_Billing/StudentFees.php' => _( 'Fees' ),
-	'Student_Billing/StudentPayments.php' => _( 'Payments' ),
-	1 => _( 'Reports' ),
-	'Student_Billing/DailyTransactions.php' => _( 'Daily Transactions' ),
-	// FJ fix bug PDF.
-	'Student_Billing/Statements.php&_ROSARIO_PDF' => _( 'Print Statements' ),
-] + issetVal( $menu['Student_Billing']['parent'], [] );
+// Student Portal provides the student-facing billing view.
+if ( User( 'PROFILE' ) === 'student' )
+{
+	$menu['Student_Billing']['parent'] = [];
+}
+else
+{
+	$menu['Student_Billing']['parent'] = [
+		'title' => _( 'Student Billing' ),
+		'default' => 'Student_Billing/StudentFees.php',
+		'Student_Billing/StudentFees.php' => _( 'Fees' ),
+		'Student_Billing/StudentPayments.php' => _( 'Payments' ),
+		1 => _( 'Reports' ),
+		'Student_Billing/DailyTransactions.php' => _( 'Daily Transactions' ),
+		// FJ fix bug PDF.
+		'Student_Billing/Statements.php&_ROSARIO_PDF' => _( 'Print Statements' ),
+	] + issetVal( $menu['Student_Billing']['parent'], [] );
+}
 
 $exceptions['Student_Billing'] = [];
