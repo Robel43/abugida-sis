@@ -140,3 +140,21 @@ The planned student dashboard will show:
 - Full Year Class Rank.
 
 The dashboard must not calculate GPA.
+
+
+## Sidebar semester context
+
+The RosarioSIS side-panel marking-period selector has been adapted from Quarter context to Semester context.
+
+The selector now lists the configured Semesters and stores the selected Semester in the user session. Changing school or academic year resets the current period to the Semester containing the current date.
+
+This Semester context is used by gradebook and Student Grades workflows that depend on the current marking period.
+
+## Program permissions
+
+The new staff-facing programs require RosarioSIS profile permissions:
+
+- `Grades/GradeImport.php`
+- `Grades/ClassRank.php`
+
+Migration `009_grade_program_permissions.sql` grants these programs to existing administrator-type profiles. More restrictive custom roles can still be configured through **Users > Profiles**.
