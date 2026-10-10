@@ -41,11 +41,28 @@ The first version should show:
 | Amharic | 82% | 88% |
 | Mathematics | 76% | 81% |
 
+Below the subject table, show summary results such as:
+
+```text
+Semester 1 Average: 79.00%
+Semester 1 Class Rank: 4 / 32
+
+Semester 2 Average: 84.50%
+Semester 2 Class Rank: 2 / 32
+
+Full Year Cumulative Average: 81.75%
+Full Year Class Rank: 3 / 32
+```
+
 Rules:
 
-- percentage only;
+- subject grades are percentage values;
 - no GPA;
-- no class rank;
+- show Semester Average across all published subject percentages;
+- show Semester Class Rank based on that Semester Average;
+- show Full Year Cumulative Average after both Semester averages are available;
+- show Full Year Class Rank based on the cumulative average;
+- do not show a separate rank for each subject;
 - no unofficial gradebook values unless explicitly added later;
 - if a Semester grade is not yet available, show a clear pending / not published state rather than zero.
 
