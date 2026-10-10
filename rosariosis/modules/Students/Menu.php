@@ -52,6 +52,7 @@ if ( User( 'PROFILE' ) === 'student' )
 		'Students/MyGrades.php' => _( 'My Grades' ),
 		'Students/MyPayments.php' => _( 'Payments' ),
 		'Students/MyProfile.php' => _( 'My Profile' ),
+		'Students/ReRegistration.php' => _( 'Re-Registration' ),
 	] + issetVal( $menu['Students']['parent'], [] );
 }
 else
