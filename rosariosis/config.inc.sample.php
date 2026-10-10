@@ -85,9 +85,9 @@ $RosarioErrorsAddress = '';
  */
 $AbugidaMailHost = 'smtp.gmail.com';
 $AbugidaMailPort = 587;
-$AbugidaMailUsername = 'robelalemu2111@gmail.com';
+$AbugidaMailUsername = '';
 $AbugidaMailPassword = '';
-$AbugidaMailFrom = 'robelalemu2111@gmail.com';
+$AbugidaMailFrom = '';
 $AbugidaMailFromName = 'Abugida SIS';
 $AbugidaMailEncryption = 'tls';
 

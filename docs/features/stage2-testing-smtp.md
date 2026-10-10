@@ -23,8 +23,10 @@ resubmit the same record. Finance reviews only PAYMENT_SUBMITTED receipts;
 rejection returns them to PAYMENT_DECLINED for another upload. Verification moves
 them to PAYMENT_VERIFIED. No payment gateway is used. Final Registrar confirmation
 is an existing, separate explicit POST action that creates permanent records;
-it was protected against GET/CSRF and concurrent duplicates, but tests do not
-execute enrollment or change permanent student records.
+it is protected against GET/CSRF and duplicate confirmation. The initial Stage 2
+suite leaves permanent student records untouched. The separate `enrollment-http.php`
+regression now verifies final confirmation, the credentials email and standard
+student portal login using one synthetic permanent student in an isolated database.
 
 Transactions lock the applicant and commit each decision with its audit event and
 notification. Receipt submission and application resubmission also preserve audit
@@ -136,6 +138,13 @@ docker compose -f database/tests/docker-compose.stage2.yaml -p abugida-stage2 do
 ```
 
 ## Changed files
+
+Final handoff verification additionally passed fresh baseline installation and all
+001–007 migrations, 46 Stage 2 HTTP checks, 17 enrollment/login checks, the Finance
+form regression, six Grade 7–12 registration scenarios, ten direct SMTP checks,
+untrusted TLS rejection, and targeted PHP lint. SMTP delivery was accepted only by
+the local TLS/authenticated fixture, not an external mailbox. The default student
+portal remains unchanged. See [the Windows setup guide](../deployment/windows-registration-setup.md).
 
 Stage 2 code: ProgramFunctions/AbugidaEmail.fnc.php,
 ProgramFunctions/AbugidaWorkflow.fnc.php, modules/Custom/ApplicationReview.php,

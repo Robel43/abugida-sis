@@ -1,5 +1,10 @@
 # Abugida SIS
 
+For the completed registration feature, use
+[the Windows Docker installation and testing guide](docs/deployment/windows-registration-setup.md)
+on branch `feature/online-registration-updated`. It covers MariaDB initialization,
+migrations 001–007, SMTP, and registration through the default RosarioSIS student portal.
+
 Abugida SIS is a student information and school administration platform designed for secondary-school operations. It is being developed to support student registration, finance, academic records, staff roles, reporting, and integration with Moodle 4.5 for teaching, assessment, enrolment, and grade synchronization.
 
 ## Project Goals

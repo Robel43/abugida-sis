@@ -1,9 +1,13 @@
 # Online registration database setup (MariaDB 10.11)
 
-The registration pages require migrations 001–006. Docker starting a database does
+The complete registration workflow requires migrations 001–007. Docker starting a database does
 not install these tables, especially when a database volume already exists. Core
 RosarioSIS must be installed separately through its established installation flow.
 Never reset a volume or drop tables to resolve a registration schema error.
+
+For fresh Windows/Docker installations, baseline setup, permissions, SMTP and the
+registration-to-enrollment checklist, see
+[the collaborator guide](../docs/deployment/windows-registration-setup.md).
 
 The maintenance service is explicit and disabled during ordinary `compose up`.
 It uses the same `rosariosis/config.inc.php` as the website. Inspect status first:
