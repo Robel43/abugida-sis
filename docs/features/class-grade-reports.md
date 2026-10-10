@@ -38,6 +38,8 @@ Staff select:
 
 The report lists the students scheduled in the selected course period for the selected Semester.
 
+The full class report can be opened as a printable / downloadable PDF using **Download / Print Class Report**.
+
 For each student it shows:
 
 - Student ID;
@@ -55,6 +57,8 @@ Administrator-type roles with permission can access all configured classes.
 From the class report, staff can select one or more students and choose:
 
 **Download / Print Selected Student Reports**
+
+Each selected student is rendered on a separate PDF page.
 
 The system generates a PDF with one student per page.
 
