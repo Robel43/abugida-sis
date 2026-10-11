@@ -12,6 +12,7 @@
 require_once 'ProgramFunctions/AbugidaClassRank.fnc.php';
 
 DrawHeader( ProgramTitle() );
+echo '<script src="assets/js/csp/modules/grades/ClassRank.js?v=1"></script>';
 
 if ( User( 'PROFILE' ) !== 'admin' )
 {
@@ -50,6 +51,7 @@ if ( $full_year_id )
 
 if ( isset( $_POST['rank_action'] )
 	&& $_POST['rank_action'] === 'recalculate'
+	&& isset( $periods[$_REQUEST['period_key']] )
 	&& AllowEdit() )
 {
 	list( $period_type, $period_id ) = array_pad( explode( ':', $_REQUEST['period_key'], 2 ), 2, 0 );
@@ -63,6 +65,7 @@ if ( isset( $_POST['rank_action'] )
 	{
 		AbugidaRankRecalculateFullYear( $period_id );
 	}
+	DrawHeader( _( 'Class ranks recalculated successfully.' ) );
 }
 
 echo '<style>
@@ -86,7 +89,8 @@ echo '<p class="abg-rank-help">' .
 	_( 'Semester rank is based on the average of all official subject percentages. Full Year rank is based on the average of Semester 1 and Semester 2 averages. Students are ranked only against students in the same grade level.' ) .
 	'</p>';
 
-echo '<form method="POST">';
+echo '<form method="POST" id="abugida-class-rank-form">';
+echo '<input type="hidden" name="rank_action" id="abugida-class-rank-action" value="view">';
 echo '<div class="abg-rank-grid">';
 
 echo '<div class="abg-rank-field"><label>' . _( 'Grade' ) . '</label>';
@@ -109,10 +113,10 @@ echo '</select></div>';
 
 echo '</div>';
 echo '<div class="abg-rank-actions">';
-echo '<button class="abg-rank-btn" type="submit" name="rank_action" value="view">' . _( 'View Rank' ) . '</button>';
+echo '<button class="abg-rank-btn" type="submit" data-rank-action="view">' . _( 'View Rank' ) . '</button>';
 if ( AllowEdit() )
 {
-	echo '<button class="abg-rank-btn" type="submit" name="rank_action" value="recalculate">' . _( 'Recalculate' ) . '</button>';
+	echo '<button class="abg-rank-btn" type="submit" data-rank-action="recalculate">' . _( 'Recalculate' ) . '</button>';
 }
 echo '</div></form>';
 echo '</div>';
@@ -174,3 +178,4 @@ if ( $_REQUEST['grade_id'] && $_REQUEST['period_key'] )
 }
 
 echo '</div>';
+
