@@ -771,3 +771,81 @@ body.abg-modal-open { overflow: hidden; }
 	from { opacity: 0; transform: translateY(-8px); }
 	to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* Phase 1 browser-test fixes: override legacy FlatSIS responsive shell behavior. */
+.abg-page-hero h1,
+.abg-page-hero h2,
+.abg-page-hero h3,
+#body .abg-page-hero h1,
+#body .abg-page-hero h2,
+#body .abg-page-hero h3 {
+	color: #fff !important;
+}
+
+@media (max-width: 874px) {
+	:root { --abg-topbar-height: 62px; }
+
+	/* FlatSIS zresponsive.css sets #menu height:0 and expects .slide.
+	   The Abugida drawer uses transform/body state, so explicitly restore geometry. */
+	#menu,
+	#menu.fixedmenu-fixed {
+		position: fixed !important;
+		top: var(--abg-topbar-height) !important;
+		right: auto !important;
+		bottom: 0 !important;
+		left: 0 !important;
+		width: min(310px, 88vw) !important;
+		height: calc(100dvh - var(--abg-topbar-height)) !important;
+		min-height: 0 !important;
+		margin: 0 !important;
+		padding-bottom: 0 !important;
+		overflow-y: auto !important;
+		overflow-x: hidden !important;
+		float: none !important;
+		clear: none !important;
+		transform: translateX(-105%);
+		transition: transform .22s ease !important;
+	}
+
+	body.abg-menu-open #menu,
+	#menu.slide {
+		height: calc(100dvh - var(--abg-topbar-height)) !important;
+		transform: translateX(0);
+	}
+
+	/* Legacy fixedmenu inserts a spacer immediately after #menu.
+	   It must not reserve desktop sidebar width after a live resize. */
+	#menu.fixedmenu-fixed + div {
+		display: none !important;
+		width: 0 !important;
+		height: 0 !important;
+		min-width: 0 !important;
+		min-height: 0 !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	#footer {
+		left: 0 !important;
+		right: 0 !important;
+		top: 0 !important;
+		bottom: auto !important;
+		width: 100% !important;
+		height: var(--abg-topbar-height) !important;
+	}
+
+	#body,
+	#body.mod {
+		width: auto !important;
+		min-width: 0 !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+		padding: 82px 14px 32px !important;
+		float: none !important;
+		clear: none !important;
+	}
+
+	#BottomButtonMenu { display: inline-flex !important; }
+	body.abg-menu-open .abg-menu-backdrop { display: block; }
+}
