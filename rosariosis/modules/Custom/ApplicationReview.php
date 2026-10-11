@@ -7,7 +7,9 @@ DrawHeader( ProgramTitle() );
 
 $abugida_decision_feedback = null;
 
-if ( User( 'PROFILE' ) !== 'admin' )
+require_once 'ProgramFunctions/AbugidaWorkflow.fnc.php';
+
+if ( ! AbugidaStaffAllowed( 'Custom/ApplicationReview.php' ) )
 {
 	exit;
 }
@@ -87,148 +89,45 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 	$applicant = ! empty( $applicant_RET[1] ) ? $applicant_RET[1] : null;
 
 
+	if ( $applicant && in_array( $_REQUEST['modfunc'] ?? '', [ 'decision', 'retry_email' ], true ) )
+	{
+		try
+		{
+			if ( $_REQUEST['modfunc'] === 'decision' )
+			{
+				$notification_id = AbugidaReviewDecision( $applicant_id, 'REGISTRAR', (string) ( $_POST['decision'] ?? '' ), (string) ( $_POST['reason'] ?? '' ) );
+				$note[] = 'Registrar decision saved.';
+			}
+			else
+			{
+				$notification_id = (int) ( $_POST['notification_id'] ?? 0 );
+			}
+			$delivery = AbugidaDeliverNotification( $notification_id, $applicant_id, 'REGISTRAR' );
+			$note[] = $delivery === 'SENT' ? 'Notification accepted by the SMTP server.' : 'Notification status: ' . $delivery . '. The saved decision is preserved; see Email notifications below.';
+		}
+		catch ( RuntimeException $exception )
+		{
+			$error[] = htmlspecialchars( $exception instanceof PDOException ? 'Unable to save the request. Check that Stage 2 migration 007 is installed.' : $exception->getMessage(), ENT_QUOTES, 'UTF-8' );
+		}
+	}
 	if ( $applicant
 		&& $_SERVER['REQUEST_METHOD'] === 'POST'
-		&& issetVal( $_REQUEST['modfunc'] ) === 'decision'
-		&& AllowEdit() )
-	{
-		$decision = issetVal( $_POST['decision'], '' );
-		$reason = trim( (string) issetVal( $_POST['reason'], '' ) );
-		$from = $applicant['STATUS'];
-
-		if ( $decision === 'reject' )
-		{
-			if ( $reason === '' )
-			{
-				$error[] = _( 'A rejection reason is required.' );
-			}
-			else
-			{
-				DBUpdate(
-					'abugida_applicants',
-					[
-						'STATUS' => 'DECLINED',
-						'REGISTRAR_DECISION_REASON' => $reason,
-						'REGISTRAR_REVIEWED_AT' => DBDate() . ' ' . date( 'H:i:s' ),
-						'REGISTRAR_REVIEWED_BY' => (int) User( 'STAFF_ID' ),
-					],
-					[ 'ID' => $applicant_id ]
-				);
-
-				AbugidaApplicationHistory( $applicant_id, $from, 'DECLINED', 'Application rejected', $reason );
-
-				$registration_url = AbugidaPublicURL( 'registration.php' );
-				$rejection_message = "Your Abugida SIS application requires correction.\n\n" .
-					"Reason: " . $reason . "\n\n" .
-					"Open the registration page and use your phone number to update and resubmit your application:\n" .
-					$registration_url;
-
-				$email_sent = AbugidaSendEmail(
-					$applicant['EMAIL'],
-					'Abugida SIS application update',
-					$rejection_message
-				);
-
-				$saved_status = DBGetOne( "SELECT STATUS FROM abugida_applicants WHERE ID='" . $applicant_id . "'" );
-
-				if ( $saved_status === 'DECLINED' )
-				{
-					$abugida_decision_feedback = [
-						'type' => 'rejected',
-						'title' => 'Application Rejected',
-						'message' => $email_sent ?
-							'The application was rejected successfully and the rejection reason was emailed to the student.' :
-							'The application was rejected successfully, but the email could not be sent. The student can still see the reason in the registration portal.',
-					];
-				}
-				else
-				{
-					$error[] = _( 'The rejection decision could not be saved.' );
-				}
-			}
-		}
-		elseif ( $decision === 'approve' )
-		{
-			$configured_grade_id = AbugidaFindConfiguredGradeId( (int) $applicant['GRADE_LEVEL'] );
-
-			$amount = $configured_grade_id ? DBGetOne( "SELECT AMOUNT
-				FROM abugida_registration_fees
-				WHERE SCHOOL_ID='" . UserSchool() . "'
-				AND SYEAR='" . UserSyear() . "'
-				AND GRADE_ID='" . (int) $configured_grade_id . "'
-				LIMIT 1" ) : null;
-
-			if ( $amount === null || $amount === false || $amount === '' )
-			{
-				$error[] = sprintf(
-					_( 'No registration fee is configured for Grade %d. Set it under Student Billing > Registration Fees.' ),
-					(int) $applicant['GRADE_LEVEL']
-				);
-			}
-			else
-			{
-				$amount = (float) $amount;
-				$payment_token = bin2hex( random_bytes( 32 ) );
-				$instructions = 'Your application has been approved. Please complete the required payment and upload your payment receipt.';
-				DBUpdate(
-					'abugida_applicants',
-					[
-						'STATUS' => 'APPROVED_FOR_PAYMENT',
-						'REGISTRAR_DECISION_REASON' => null,
-						'REGISTRAR_REVIEWED_AT' => DBDate() . ' ' . date( 'H:i:s' ),
-						'REGISTRAR_REVIEWED_BY' => (int) User( 'STAFF_ID' ),
-						'PAYMENT_AMOUNT' => $amount,
-						'PAYMENT_INSTRUCTIONS' => $instructions,
-						'PAYMENT_STATUS' => 'PENDING',
-						'PAYMENT_ACCESS_TOKEN' => $payment_token,
-					],
-					[ 'ID' => $applicant_id ]
-				);
-
-				AbugidaApplicationHistory( $applicant_id, $from, 'APPROVED_FOR_PAYMENT', 'Application approved for payment' );
-
-				$payment_url = AbugidaPublicURL( 'registration-payment.php', [ 'token' => $payment_token ] );
-				$approval_message = "Your Abugida SIS application has been approved.\n\n" .
-					"Amount to pay: ETB " . number_format( $amount, 2 ) . "\n\n" .
-					"Open the payment page using the link below:\n" . $payment_url . "\n\n" .
-					"After payment, upload your receipt from the payment page.";
-
-				$email_sent = AbugidaSendEmail(
-					$applicant['EMAIL'],
-					'Abugida SIS application approved',
-					$approval_message
-				);
-
-				$saved_status = DBGetOne( "SELECT STATUS FROM abugida_applicants WHERE ID='" . $applicant_id . "'" );
-
-				if ( $saved_status === 'APPROVED_FOR_PAYMENT' )
-				{
-					$abugida_decision_feedback = [
-						'type' => 'approved',
-						'title' => 'Application Approved',
-						'message' => $email_sent ?
-							'The application was approved successfully and the payment link was emailed to the student.' :
-							'The application was approved successfully, but the email could not be sent. Check the SMTP configuration.',
-					];
-				}
-				else
-				{
-					$error[] = _( 'The approval decision could not be saved. Make sure database migration 005 has been applied.' );
-				}
-			}
-		}
-		elseif ( $decision === '' )
-		{
-			$error[] = _( 'No Registrar decision was received. Please try again.' );
-		}
-
-	}
-
-	if ( $applicant
+		&& AbugidaValidStaffPost()
 		&& $_REQUEST['modfunc'] === 'final_confirm'
 		&& AllowEdit()
 		&& $applicant['STATUS'] === 'PAYMENT_VERIFIED' )
 	{
+
+		DBQuery( 'START TRANSACTION' );
+		$locked = DBGet( "SELECT * FROM abugida_applicants WHERE ID='" . $applicant_id . "' FOR UPDATE" );
+		if ( empty( $locked[1] ) || $locked[1]['STATUS'] !== 'PAYMENT_VERIFIED' )
+		{
+			DBQuery( 'ROLLBACK' );
+			$error[] = 'This application was already finalized or is not ready for final confirmation.';
+			echo ErrorMessage( $error );
+			return;
+		}
+		$applicant = $locked[1];
 		$grade = (int) $applicant['GRADE_LEVEL'];
 		$grade_id = AbugidaFindConfiguredGradeId( $grade );
 
@@ -307,11 +206,13 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 				"Temporary password: " . $temp_password . "\n\n" .
 				"Please sign in and change your password.";
 
+			DBQuery( 'COMMIT' );
 			AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS account created', $message );
 
 			$note[] = button( 'check' ) . '&nbsp;' . _( 'Student account created and registration completed.' );
 		}
 
+		DBQuery( 'ROLLBACK' ); // No-op after commit; releases a lock when prerequisites are missing.
 		RedirectURL( [ 'modfunc' ] );
 	}
 
@@ -416,6 +317,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			echo '<div class="abg-decision"><h3>' . _( 'Registrar Decision' ) . '</h3>';
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo AbugidaCsrfField();
 			echo '<input type="hidden" name="decision" value="approve">';
 			echo '<p>' . _( 'The payment amount will be taken automatically from the Registration Fees configured for this grade.' ) . '</p>';
 			echo '<button class="abg-btn abg-success" type="submit">' . _( 'Approve Application' ) . '</button>';
@@ -425,6 +327,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			echo '<summary>' . _( 'Reject Application' ) . '</summary>';
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=decision' ) . '">';
+			echo AbugidaCsrfField();
 			echo '<input type="hidden" name="decision" value="reject">';
 			echo '<p>' . _( 'Explain why the application is being returned. The applicant will see this reason when they return to the registration page, and it will also be emailed when outgoing email is configured.' ) . '</p>';
 			echo '<textarea name="reason" rows="4" required placeholder="' . AttrEscape( _( 'Write the rejection reason here...' ) ) . '"></textarea><br><br>';
@@ -435,7 +338,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		}
 		elseif ( $applicant['STATUS'] === 'DECLINED' )
 		{
-			echo '<br />' . ErrorMessage( [ _( 'Rejected: ' ) . $applicant['REGISTRAR_DECISION_REASON'] ], 'warning' );
+			echo '<br />' . ErrorMessage( [ _( 'Rejected: ' ) . AttrEscape( $applicant['REGISTRAR_DECISION_REASON'] ) ], 'warning' );
 		}
 		elseif ( $applicant['STATUS'] === 'PAYMENT_VERIFIED' && AllowEdit() )
 		{
@@ -443,6 +346,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			echo '<p>' . _( 'Finance has verified payment. Final confirmation will create the permanent student account.' ) . '</p>';
 			echo '<form method="POST" action="' .
 				URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . $applicant_id . '&modfunc=final_confirm' ) . '">';
+			echo AbugidaCsrfField();
 			echo '<button class="abg-btn abg-success" type="submit">' . _( 'Final Confirm & Create Student Account' ) . '</button>';
 			echo '</form></div>';
 		}
@@ -455,6 +359,7 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			);
 		}
 
+		AbugidaNotificationPanel( $applicant_id, 'REGISTRAR' );
 		return;
 	}
 }

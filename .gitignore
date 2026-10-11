@@ -43,6 +43,9 @@ meta/
 *.dump
 *.backup
 
+# Clean upstream MariaDB installer schema; never allow local database dumps.
+!/rosariosis/rosariosis_mysql.sql
+
 # ------------------------------------------------
 # Docker local persistent data
 # ------------------------------------------------
@@ -92,3 +95,4 @@ __pycache__/
 
 phpdoc/
 phpdoc-cache*
+!.env.smtp.example

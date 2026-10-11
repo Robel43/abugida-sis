@@ -1,0 +1,39 @@
+services:
+  stage2-db:
+    image: mariadb:10.11
+    container_name: abugida-stage2-db
+    environment:
+      MARIADB_ROOT_PASSWORD: stage2-test-root-only
+      MARIADB_DATABASE: abugida_sis
+      MARIADB_USER: abugida_user
+      MARIADB_PASSWORD: stage2-test-database-only
+    tmpfs:
+      - /var/lib/mysql
+    networks: [sis]
+  stage2-smtp:
+    image: abugida-sis-web
+    container_name: abugida-stage2-smtp
+    entrypoint: [php, /test/stage2-smtp.php]
+    volumes:
+      - ./:/test:ro
+      - ../../tmp/stage2:/runtime
+    networks: [sis]
+  stage2-web:
+    image: abugida-sis-web
+    container_name: abugida-stage2-web
+    ports: ["127.0.0.1:8091:80"]
+    volumes:
+      - ../../rosariosis:/var/www/html:ro
+      - ../../tmp/stage2/uploads:/var/www/html/assets/FileUploads/ApplicantDocuments
+      - ../../rosariosis/config.inc.php:/test-original-config.inc.php:ro
+      - ./stage2-config.inc.php:/var/www/html/config.inc.php:ro
+      - ../../tmp/stage2:/runtime:ro
+      - ./:/test:ro
+      - ../../database:/opt/abugida/database:ro
+      - ./stage2-config.inc.php:/opt/abugida/rosariosis/config.inc.php:ro
+      - ./stage2-php.ini:/usr/local/etc/php/conf.d/stage2-test.ini:ro
+    networks: [sis]
+networks:
+  sis:
+    external: true
+    name: abugida-sis_default

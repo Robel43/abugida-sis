@@ -25,7 +25,8 @@ The applicant can:
 - enter last name;
 - enter email;
 - select Grade 7 through Grade 12;
-- upload one PDF or PNG supporting document;
+- select Online or Distance Learning;
+- upload a PDF or PNG supporting document and a Fayda ID file;
 - save an incomplete application as a draft;
 - leave the page and later continue using the same phone number;
 - see previously saved values preloaded;
@@ -98,17 +99,9 @@ The directory is already covered by the repository's user-upload ignore rule. Th
 
 ## Database Installation
 
-Apply:
-
-```text
-database/migrations/001_online_registration.sql
-```
-
-Local PowerShell example:
-
-```powershell
-Get-Content .\database\migrations\001_online_registration.sql -Raw | docker compose exec -T db mariadb -uabugida_user -pabugida_dev_password abugida_sis
-```
+Install migrations 001–006 through the explicit maintenance runner. Follow the
+[backup, approval, and migration instructions](../../database/README-registration.md)
+for both fresh and existing MariaDB databases. Do not reset Docker volumes.
 
 ## Local Test
 
@@ -120,7 +113,7 @@ Get-Content .\database\migrations\001_online_registration.sql -Raw | docker comp
 6. Select **Use another phone number**.
 7. Enter the original phone again.
 8. Confirm all saved fields are preloaded.
-9. Upload a PDF or PNG.
+9. Select a learning approach and upload both supporting and Fayda ID files (PDF or PNG).
 10. Submit the application.
 11. Confirm the status becomes SUBMITTED and the public form becomes read-only.
 
