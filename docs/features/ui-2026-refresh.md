@@ -105,3 +105,28 @@ Recommended viewport checks:
 ```
 
 The validated `feature/online-registration-integration` branch remains the functional baseline.
+
+
+## Phase 1 browser-test fixes
+
+Browser testing identified four regressions and the following corrections were applied:
+
+- aligned the Abugida mobile shell breakpoint with FlatSIS at 874px;
+- explicitly restores mobile drawer height and geometry that legacy `zresponsive.css` collapsed to zero;
+- coordinates the Abugida drawer state with the legacy `.slide` class;
+- suppresses the legacy fixedmenu spacer on mobile and clears stale inline geometry during live resize;
+- forces student hero headings to remain white against the dark gradient;
+- Class Rank recalculation now emits semantic success feedback through `ErrorMessage(..., 'note')`, allowing the global success modal to display.
+
+Retest widths:
+
+```text
+1440
+1024
+830
+768
+480
+360
+```
+
+Also retest live resize from 1440 directly to 360 without reloading.
