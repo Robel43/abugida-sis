@@ -158,3 +158,24 @@ Targeted retest:
 4. backdrop and Escape must close the drawer;
 5. Class Rank Recalculate must display a success modal;
 6. an `ErrorMessage(..., 'warning')` path should display a warning modal rather than an error modal.
+
+
+## Mobile drawer stacking fix
+
+The targeted UI retest confirmed that drawer state and dimensions were correct, but FlatSIS retained `#menu { z-index: 1 !important; }`, placing the opened drawer underneath the Abugida backdrop.
+
+The Abugida UI layer now sets the application drawer to `z-index: 1040 !important` globally and again in the mobile shell rule. The backdrop remains at 1035, so the intended stack is:
+
+```text
+top utility bar / drawer controls
+drawer: 1040
+backdrop: 1035
+page content: below backdrop
+```
+
+Targeted verification should confirm:
+- drawer content is sharp and interactive;
+- `elementFromPoint()` inside the drawer resolves to menu content, not the backdrop;
+- a Student Portal link such as My Courses navigates normally;
+- backdrop click outside the drawer closes it;
+- Escape closes it.
