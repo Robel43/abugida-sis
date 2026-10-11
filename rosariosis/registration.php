@@ -344,6 +344,8 @@ elseif ( isset( $_GET['submitted'] ) )
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Online Registration | Abugida SIS</title>
+	<link rel="stylesheet" href="assets/css/abugida-public-2026.css">
+	<script defer src="assets/js/abugida-public-2026.js"></script>
 	<style>
 		:root{
 			--navy:#0f1f38;
