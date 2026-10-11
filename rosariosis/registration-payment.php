@@ -151,6 +151,8 @@ if ( isset( $_GET['submitted'] ) )
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Payment | Abugida SIS</title>
+	<link rel="stylesheet" href="assets/css/abugida-public-2026.css">
+	<script defer src="assets/js/abugida-public-2026.js"></script>
 <style>
 body{margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#182230}
 .wrap{max-width:760px;margin:48px auto;padding:0 18px}
