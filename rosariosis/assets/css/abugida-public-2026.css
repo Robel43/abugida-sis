@@ -46,3 +46,18 @@ button.secondary,.button.secondary,a.back{background:#fff!important;color:#33415
 .progress span{background:linear-gradient(90deg,#2563eb,#38bdf8)!important}
 @media(max-width:860px){.page,.wrap{width:min(100% - 24px,760px)!important;padding-top:16px!important}.hero{border-radius:18px!important}.card{padding:22px!important}}
 @media(max-width:640px){.page,.wrap{width:calc(100% - 20px)!important}.topbar{align-items:flex-start}.hero{border-radius:16px!important}.card{padding:18px!important}.actions{display:grid!important;grid-template-columns:1fr!important}.actions>*{width:100%!important;margin-left:0!important}.panel-head{display:block}.panel-head .badge{margin-top:10px}}
+
+body.abg-public-modal-open{overflow:hidden}
+.abg-public-modal-backdrop{position:fixed;z-index:1500;inset:0;display:grid;place-items:center;padding:18px;background:rgba(15,23,42,.52);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.abg-public-modal{width:min(520px,100%);max-height:82vh;overflow:auto;padding:22px;border:1px solid rgba(255,255,255,.5);border-radius:18px;background:#fff;box-shadow:0 28px 72px rgba(15,23,42,.22)}
+.abg-public-modal__head{display:flex;gap:12px;align-items:flex-start}
+.abg-public-modal__icon{flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;border-radius:12px;font-size:20px;font-weight:900}
+.abg-public-modal--success .abg-public-modal__icon{background:#ecfdf3;color:#15803d}
+.abg-public-modal--error .abg-public-modal__icon{background:#fef2f2;color:#b91c1c}
+.abg-public-modal h2{margin:1px 0 3px!important;font-size:19px!important;color:var(--pub-text)!important}
+.abg-public-modal__head p{margin:0!important;color:var(--pub-muted)!important;font-size:13px}
+.abg-public-modal__message{padding:16px 0 4px;color:#334155;line-height:1.6}
+.abg-public-modal__message ul{margin:8px 0 0;padding-left:20px}
+.abg-public-modal__actions{display:flex;justify-content:flex-end;margin-top:18px}
+.abg-public-modal__actions button{min-width:96px;background:var(--pub-primary)!important;color:#fff!important}
+@media(max-width:520px){.abg-public-modal-backdrop{padding:10px;align-items:end}.abg-public-modal{border-radius:18px 18px 8px 8px;padding:18px}}
