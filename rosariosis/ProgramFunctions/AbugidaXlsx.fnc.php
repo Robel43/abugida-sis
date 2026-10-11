@@ -72,7 +72,7 @@ function AbugidaReadXlsx( $file_path, &$error_message = '' )
 	{
 		$shared = @simplexml_load_string( $shared_xml );
 
-		if ( $shared )
+		if ( $shared !== false )
 		{
 			$items = $shared->xpath( '/*[local-name()="sst"]/*[local-name()="si"]' );
 
@@ -95,7 +95,7 @@ function AbugidaReadXlsx( $file_path, &$error_message = '' )
 
 	$sheet = @simplexml_load_string( $sheet_xml );
 
-	if ( ! $sheet )
+	if ( $sheet === false )
 	{
 		$error_message = 'The first worksheet is not readable.';
 
