@@ -125,14 +125,16 @@
 
 		var item = modalQueue.shift();
 		var isWarning = item.type === 'warning';
+		var isSuccess = item.type === 'success';
+		var modalType = isSuccess ? 'success' : (isWarning ? 'warning' : 'error');
 		var backdrop = document.createElement('div');
 		backdrop.className = 'abg-modal-backdrop';
 		backdrop.innerHTML =
-			'<section class="abg-modal abg-modal--' + (isWarning ? 'warning' : 'error') + '" role="dialog" aria-modal="true" aria-labelledby="abg-modal-title">' +
+			'<section class="abg-modal abg-modal--' + modalType + '" role="dialog" aria-modal="true" aria-labelledby="abg-modal-title">' +
 			'<div class="abg-modal__head">' +
-			'<div class="abg-modal__icon" aria-hidden="true">' + (isWarning ? '!' : '&times;') + '</div>' +
-			'<div><div id="abg-modal-title" class="abg-modal__title">' + (isWarning ? 'Please review' : 'Something went wrong') + '</div>' +
-			'<div class="abg-modal__subtitle">' + (isWarning ? 'Check the information below before continuing.' : 'The requested action could not be completed.') + '</div></div>' +
+			'<div class="abg-modal__icon" aria-hidden="true">' + (isSuccess ? '&#10003;' : (isWarning ? '!' : '&times;')) + '</div>' +
+			'<div><div id="abg-modal-title" class="abg-modal__title">' + (isSuccess ? 'Success' : (isWarning ? 'Please review' : 'Something went wrong')) + '</div>' +
+			'<div class="abg-modal__subtitle">' + (isSuccess ? 'The action completed successfully.' : (isWarning ? 'Check the information below before continuing.' : 'The requested action could not be completed.')) + '</div></div>' +
 			'</div>' +
 			'<div class="abg-modal__message">' + item.message + '</div>' +
 			'<div class="abg-modal__actions"><button type="button" class="abg-modal__button">OK</button></div>' +
@@ -187,9 +189,14 @@
 
 	function enhanceMessages(root) {
 		var scope = root && root.querySelectorAll ? root : document;
-		var selectors = ['#body .error', '#body .warning', '#body .note'];
+		var selector = '#body .error, #body .warning, #body .note';
+		var nodes = qa(selector, scope);
 
-		qa(selectors.join(','), scope).forEach(function (node) {
+		if (root && root.nodeType === 1 && root.matches && root.matches('.error, .warning, .note') && root.closest('#body')) {
+			nodes.unshift(root);
+		}
+
+		nodes.forEach(function (node) {
 			if (node.dataset.abgEnhanced === '1') return;
 			if (node.closest('.abg-modal, .abg-toast')) return;
 
@@ -205,14 +212,20 @@
 				queueModal(html, 'warning');
 			} else if (node.classList.contains('note')) {
 				node.hidden = true;
-				showToast(html, 'success');
+				queueModal(html, 'success');
 			}
 		});
 	}
 
 	function wrapWideTables(root) {
 		var scope = root && root.querySelectorAll ? root : document;
-		qa('#body table', scope).forEach(function (table) {
+		var tables = qa('#body table', scope);
+
+		if (root && root.nodeType === 1 && root.matches && root.matches('table') && root.closest('#body')) {
+			tables.unshift(root);
+		}
+
+		tables.forEach(function (table) {
 			if (table.dataset.abgResponsive === '1') return;
 			if (table.closest('.abg-table-scroll')) return;
 
