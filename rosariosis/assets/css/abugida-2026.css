@@ -74,7 +74,7 @@ a:hover { color: var(--abg-primary-hover); }
 
 #menu {
 	position: fixed !important;
-	z-index: 1040;
+	z-index: 1040 !important;
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -791,6 +791,7 @@ body.abg-modal-open { overflow: hidden; }
 	#menu,
 	#menu.fixedmenu-fixed {
 		position: fixed !important;
+		z-index: 1040 !important;
 		top: var(--abg-topbar-height) !important;
 		right: auto !important;
 		bottom: 0 !important;
