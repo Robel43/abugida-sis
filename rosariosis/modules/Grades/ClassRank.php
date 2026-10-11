@@ -65,7 +65,7 @@ if ( isset( $_POST['rank_action'] )
 	{
 		AbugidaRankRecalculateFullYear( $period_id );
 	}
-	DrawHeader( _( 'Class ranks recalculated successfully.' ) );
+	echo ErrorMessage( [ _( 'Class ranks recalculated successfully.' ) ], 'note' );
 }
 
 echo '<style>
