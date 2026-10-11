@@ -130,3 +130,31 @@ Retest widths:
 ```
 
 Also retest live resize from 1440 directly to 360 without reloading.
+
+
+## Phase 1 retest fixes
+
+A second browser retest found two remaining issues:
+
+- repeated `refresh()` calls were rebinding the mobile Menu click handler, causing one click to toggle the drawer multiple times and finish closed;
+- RosarioSIS `ErrorMessage(..., 'note')` renders the legacy `.updated` class, while the UI enhancer originally looked for `.note`.
+
+Corrections:
+
+- Menu and sidebar click handlers are now bound idempotently using per-element data flags;
+- success markup now recognizes legacy `.updated`;
+- `ErrorMessage()` now adds non-breaking semantic classes:
+  - `abg-feedback-success`
+  - `abg-feedback-warning`
+  - `abg-feedback-error`
+- legacy `.updated` and `.error` classes remain intact for backward compatibility;
+- warning messages can now be distinguished from ordinary errors even though RosarioSIS historically renders both with the `.error` class.
+
+Targeted retest:
+
+1. fresh reload at 360, 480, 768 and 830;
+2. one Menu click must open exactly once;
+3. Enter on the Menu button must open exactly once;
+4. backdrop and Escape must close the drawer;
+5. Class Rank Recalculate must display a success modal;
+6. an `ErrorMessage(..., 'warning')` path should display a warning modal rather than an error modal.
