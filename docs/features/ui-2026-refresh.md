@@ -179,3 +179,56 @@ Targeted verification should confirm:
 - a Student Portal link such as My Courses navigates normally;
 - backdrop click outside the drawer closes it;
 - Escape closes it.
+
+
+## Phase 2 - module and workflow modernization
+
+Phase 2 extends the design layer beyond the shell.
+
+Implemented:
+
+- modern RosarioSIS page headers and secondary headings;
+- consistent legacy ListOutput / widefat / postbox table surfaces;
+- modern search and filter containers;
+- modern tab treatment;
+- unified Abugida cards, review panels, status chips, action buttons, and workflow tables;
+- improved mobile stacking for action groups and custom forms;
+- shared public registration/payment design layer in `assets/css/abugida-public-2026.css`;
+- shared public success/error dialogs in `assets/js/abugida-public-2026.js`;
+- public Registration and Registration Payment now load the shared UI layer.
+
+Business logic and database behavior remain unchanged.
+
+### Phase 2 browser test focus
+
+Staff:
+- Online Applications list and applicant detail;
+- Application Payments list and Finance detail;
+- Registration Fees;
+- Grade Import;
+- Class Rank;
+- Class Grade Reports;
+- Re-Registration Requests;
+- Re-Registration Payments.
+
+Public:
+- registration start form;
+- saved/submitted success feedback;
+- validation error feedback;
+- returned/declined application state;
+- registration payment;
+- receipt validation error;
+- receipt submitted success feedback.
+
+Responsive widths:
+
+```text
+1440
+1024
+830
+768
+480
+360
+```
+
+Verify no page-level horizontal overflow, buttons remain reachable, tables scroll inside their own containers, and modal focus/Escape behavior remains intact.
