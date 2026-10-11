@@ -31,7 +31,7 @@
 			menuButton.setAttribute('aria-controls', 'menu');
 			menuButton.setAttribute('aria-expanded', document.body.classList.contains('abg-menu-open') ? 'true' : 'false');
 			menuButton.addEventListener('click', function (event) {
-				if (window.matchMedia('(max-width: 800px)').matches) {
+				if (window.matchMedia('(max-width: 874px)').matches) {
 					event.preventDefault();
 					event.stopPropagation();
 					toggleMenu();
@@ -43,16 +43,50 @@
 		if (menu) {
 			menu.setAttribute('aria-label', 'Primary navigation');
 			menu.addEventListener('click', function (event) {
-				if (window.matchMedia('(max-width: 800px)').matches && event.target.closest('a')) {
+				if (window.matchMedia('(max-width: 874px)').matches && event.target.closest('a')) {
 					closeMenu();
 				}
 			});
 		}
 	}
 
+	function normalizeResponsiveShell() {
+		var menu = q('#menu');
+		var mobile = window.matchMedia('(max-width: 874px)').matches;
+
+		if (!menu) return;
+
+		if (mobile) {
+			/* Legacy fixedmenu leaves desktop inline geometry behind after live resize. */
+			menu.style.removeProperty('bottom');
+			menu.style.removeProperty('height');
+			menu.style.removeProperty('width');
+			menu.style.removeProperty('margin-left');
+			menu.style.removeProperty('margin-right');
+
+			/* FlatSIS fixedmenu may insert a width/height spacer directly after #menu. */
+			if (menu.classList.contains('fixedmenu-fixed') && menu.nextElementSibling) {
+				var spacer = menu.nextElementSibling;
+				if (!spacer.id && !spacer.className) {
+					spacer.style.display = 'none';
+					spacer.setAttribute('data-abg-fixedmenu-spacer', '1');
+				}
+			}
+		} else {
+			qa('[data-abg-fixedmenu-spacer="1"]').forEach(function (spacer) {
+				spacer.style.removeProperty('display');
+				spacer.removeAttribute('data-abg-fixedmenu-spacer');
+			});
+			menu.classList.remove('slide');
+		}
+	}
+
 	function toggleMenu() {
+		normalizeResponsiveShell();
 		document.body.classList.toggle('abg-menu-open');
 		var opened = document.body.classList.contains('abg-menu-open');
+		var menu = q('#menu');
+		if (menu) menu.classList.toggle('slide', opened);
 		var button = q('#BottomButtonMenu');
 		if (button) {
 			button.setAttribute('aria-expanded', opened ? 'true' : 'false');
@@ -67,6 +101,8 @@
 
 	function closeMenu() {
 		document.body.classList.remove('abg-menu-open');
+		var menu = q('#menu');
+		if (menu) menu.classList.remove('slide');
 		var button = q('#BottomButtonMenu');
 		if (button) {
 			button.setAttribute('aria-expanded', 'false');
@@ -249,6 +285,7 @@
 	function initialize() {
 		if (initialized) return;
 		initialized = true;
+		normalizeResponsiveShell();
 		refresh(document);
 
 		var observer = new MutationObserver(function (mutations) {
@@ -262,7 +299,8 @@
 		observer.observe(document.body, { childList: true, subtree: true });
 
 		window.addEventListener('resize', function () {
-			if (!window.matchMedia('(max-width: 800px)').matches) closeMenu();
+			normalizeResponsiveShell();
+			if (!window.matchMedia('(max-width: 874px)').matches) closeMenu();
 		});
 
 		document.addEventListener('keydown', function (event) {
