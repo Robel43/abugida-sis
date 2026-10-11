@@ -730,6 +730,18 @@ function Warehouse( $mode )
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="token" content="<?php echo AttrEscape( $_SESSION['token'] ); ?>">
 	<link rel="stylesheet" href="<?php echo $stylesheet_css; ?>?<?php echo $stylesheet_css_hash; ?>">
+	<?php
+		$abugida_ui_css = 'assets/css/abugida-2026.css';
+		$abugida_ui_js = 'assets/js/abugida-2026.js';
+		$abugida_ui_css_hash = file_exists( $abugida_ui_css ) ? hash( 'adler32', filemtime( $abugida_ui_css ) ) : '';
+		$abugida_ui_js_hash = file_exists( $abugida_ui_js ) ? hash( 'adler32', filemtime( $abugida_ui_js ) ) : '';
+	?>
+	<?php if ( $abugida_ui_css_hash ): ?>
+		<link rel="stylesheet" href="<?php echo $abugida_ui_css; ?>?<?php echo $abugida_ui_css_hash; ?>">
+	<?php endif; ?>
+	<?php if ( $abugida_ui_js_hash ): ?>
+		<script defer src="<?php echo $abugida_ui_js; ?>?<?php echo $abugida_ui_js_hash; ?>"></script>
+	<?php endif; ?>
 	<style>.highlight,.highlight-hover:hover{background-color:<?php echo Preferences( 'HIGHLIGHT' ); ?> !important;}</style>
 	<?php
 
