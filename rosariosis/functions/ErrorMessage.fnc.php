@@ -44,18 +44,18 @@ function ErrorMessage( $errors, $code = 'error' )
 	}
 
 	// Note / Update.
-	$return = '<div class="updated"><p><b>' . _( 'Note' ) . '</b>';
+	$return = '<div class="updated abg-feedback-success"><p><b>' . _( 'Note' ) . '</b>';
 
 	if ( $code === 'error'
 		|| $code === 'fatal' )
 	{
 		// Error.
-		$return = '<div class="error"><p>' . button( 'x', _( 'Error' ) );
+		$return = '<div class="error abg-feedback-error"><p>' . button( 'x', _( 'Error' ) );
 	}
 	elseif ( $code === 'warning' )
 	{
 		// Warning.
-		$return = '<div class="error"><p>' . button( 'warning', _( 'Warning' ) );
+		$return = '<div class="error abg-feedback-warning"><p>' . button( 'warning', _( 'Warning' ) );
 	}
 
 	if ( count( $errors ) === 1 )
