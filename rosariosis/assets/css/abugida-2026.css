@@ -850,3 +850,365 @@ body.abg-modal-open { overflow: hidden; }
 	#BottomButtonMenu { display: inline-flex !important; }
 	body.abg-menu-open .abg-menu-backdrop { display: block; }
 }
+
+
+/* =========================================================
+   Phase 2 - legacy module and Abugida workflow modernization
+   ========================================================= */
+
+/* Core RosarioSIS page headings */
+#body .header1 {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 18px !important;
+	padding: 0 0 14px !important;
+	border-bottom: 1px solid var(--abg-border) !important;
+	background: transparent !important;
+}
+
+#body .header1 h2,
+#body .header1 h1 {
+	margin: 0 !important;
+	padding: 0 !important;
+	color: var(--abg-text) !important;
+	font-size: clamp(22px, 2vw, 30px) !important;
+	font-weight: 800 !important;
+	line-height: 1.2 !important;
+	letter-spacing: -.025em;
+	text-indent: 0 !important;
+}
+
+#body .header1 .module-icon {
+	width: 34px !important;
+	height: 34px !important;
+	flex: 0 0 34px;
+	background-size: contain !important;
+}
+
+#body .header2,
+#body .header3 {
+	margin: 18px 0 10px !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: transparent !important;
+	color: var(--abg-text);
+}
+
+/* Generic RosarioSIS list/table cards */
+#body .widefat,
+#body .postbox,
+#body table.list {
+	width: 100%;
+	border: 1px solid var(--abg-border) !important;
+	border-radius: var(--abg-radius) !important;
+	overflow: hidden;
+	background: var(--abg-surface) !important;
+	box-shadow: var(--abg-shadow-sm);
+}
+
+#body .widefat th,
+#body .postbox th,
+#body table.list th {
+	background: var(--abg-surface-muted) !important;
+	color: #475569 !important;
+	border-color: var(--abg-border) !important;
+	font-size: 12px;
+	font-weight: 800;
+	letter-spacing: .02em;
+}
+
+#body .widefat td,
+#body .postbox td,
+#body table.list td {
+	border-color: var(--abg-border) !important;
+	background: var(--abg-surface);
+}
+
+#body .widefat tr:hover td,
+#body table.list tr:hover td {
+	background: #f8fbff !important;
+}
+
+#body .tablenav,
+#body .list-header,
+#body .list-footer {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin: 10px 0;
+}
+
+/* Search / filter regions */
+#body #search,
+#body .search-form,
+#body .filter-box {
+	margin: 12px 0 18px;
+	padding: 14px;
+	border: 1px solid var(--abg-border);
+	border-radius: var(--abg-radius);
+	background: var(--abg-surface);
+	box-shadow: var(--abg-shadow-sm);
+}
+
+/* Tabs */
+#body .tabs,
+#body .tabmenu {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	border-bottom: 1px solid var(--abg-border);
+	margin-bottom: 18px;
+}
+
+#body .tabs a,
+#body .tabmenu a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 40px;
+	padding: 8px 12px;
+	border-radius: 9px 9px 0 0;
+	text-decoration: none;
+	color: var(--abg-text-muted);
+	font-weight: 700;
+}
+
+#body .tabs a:hover,
+#body .tabmenu a:hover,
+#body .tabs .selected a,
+#body .tabmenu .selected a {
+	color: var(--abg-primary);
+	background: var(--abg-primary-soft);
+}
+
+/* Generic cards used by Abugida modules */
+#body .abg-card,
+#body .abg-rank-card,
+#body .abg-fees-card,
+#body .abg-rereg-card,
+#body .abg-rereg-decision,
+#body .abg-decision,
+#body .abg-doc {
+	border: 1px solid var(--abg-border) !important;
+	border-radius: 16px !important;
+	background: var(--abg-surface) !important;
+	box-shadow: var(--abg-shadow-sm) !important;
+}
+
+#body .abg-card,
+#body .abg-rank-card,
+#body .abg-fees-card,
+#body .abg-rereg-card,
+#body .abg-rereg-decision,
+#body .abg-decision {
+	padding: 20px !important;
+}
+
+#body .abg-doc {
+	padding: 16px !important;
+	background: #fbfdff !important;
+}
+
+#body .abg-label,
+#body .abg-rereg-label,
+#body .abg-student-label {
+	color: var(--abg-text-muted) !important;
+	font-size: 11px !important;
+	font-weight: 800 !important;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+}
+
+#body .abg-value,
+#body .abg-rereg-value {
+	color: var(--abg-text) !important;
+	font-weight: 750 !important;
+}
+
+/* Shared custom workflow buttons */
+#body .abg-btn,
+#body .abg-view,
+#body .abg-rank-btn,
+#body .abg-fees-btn,
+#body .abg-rereg-btn {
+	min-height: 40px;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	padding: 9px 14px !important;
+	border-radius: 9px !important;
+	border: 1px solid transparent !important;
+	font-weight: 750 !important;
+	text-decoration: none !important;
+	box-shadow: none;
+	transition: transform var(--abg-transition), box-shadow var(--abg-transition), background var(--abg-transition);
+}
+
+#body .abg-primary,
+#body .abg-view,
+#body .abg-rank-btn,
+#body .abg-fees-btn,
+#body .abg-rereg-primary,
+#body .abg-btn:not(.abg-secondary):not(.abg-danger):not(.abg-success) {
+	color: #fff !important;
+	background: var(--abg-primary) !important;
+	border-color: var(--abg-primary) !important;
+}
+
+#body .abg-secondary {
+	color: #334155 !important;
+	background: #fff !important;
+	border-color: var(--abg-border-strong) !important;
+}
+
+#body .abg-success,
+#body .abg-rereg-success {
+	color: #fff !important;
+	background: var(--abg-success) !important;
+	border-color: var(--abg-success) !important;
+}
+
+#body .abg-danger,
+#body .abg-rereg-danger {
+	color: #fff !important;
+	background: var(--abg-danger) !important;
+	border-color: var(--abg-danger) !important;
+}
+
+#body .abg-btn:hover,
+#body .abg-view:hover,
+#body .abg-rank-btn:hover,
+#body .abg-fees-btn:hover,
+#body .abg-rereg-btn:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 8px 18px rgba(15,23,42,.10);
+}
+
+/* Status chips across workflows */
+#body .abg-status,
+#body .abg-rereg-status {
+	display: inline-flex !important;
+	align-items: center;
+	min-height: 28px;
+	padding: 5px 10px !important;
+	border-radius: 999px !important;
+	background: #eef4ff !important;
+	color: #1d4ed8 !important;
+	font-size: 11px !important;
+	font-weight: 800 !important;
+	letter-spacing: .02em;
+}
+
+/* Abugida workflow tables */
+#body .abg-app-table,
+#body .abg-fees-table,
+#body .abg-rank-table,
+#body .abg-table {
+	width: 100% !important;
+	border: 1px solid var(--abg-border) !important;
+	border-radius: 12px;
+	border-collapse: separate !important;
+	border-spacing: 0 !important;
+	overflow: hidden;
+	background: #fff !important;
+}
+
+#body .abg-app-table th,
+#body .abg-fees-table th,
+#body .abg-rank-table th,
+#body .abg-table th {
+	background: #f8fafc !important;
+	color: #475569 !important;
+	font-size: 11px !important;
+	font-weight: 800 !important;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+}
+
+#body .abg-app-table th,
+#body .abg-app-table td,
+#body .abg-fees-table th,
+#body .abg-fees-table td,
+#body .abg-rank-table th,
+#body .abg-rank-table td,
+#body .abg-table th,
+#body .abg-table td {
+	padding: 11px 12px !important;
+	border-bottom: 1px solid var(--abg-border) !important;
+}
+
+/* Decision / review forms */
+#body .abg-decision,
+#body .abg-rereg-decision {
+	margin-top: 18px !important;
+}
+
+#body .abg-decision details,
+#body .abg-rereg-decision details {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid var(--abg-border);
+}
+
+#body details > summary {
+	cursor: pointer;
+	color: var(--abg-text);
+	font-weight: 750;
+}
+
+/* Inline hints / empty states */
+#body .abg-muted,
+#body .abg-rank-help,
+#body .abg-fees-help {
+	color: var(--abg-text-muted) !important;
+	line-height: 1.6;
+}
+
+#body .abg-empty {
+	padding: 22px !important;
+	border: 1px dashed var(--abg-border-strong) !important;
+	border-radius: 12px !important;
+	background: #f8fafc !important;
+	color: var(--abg-text-muted) !important;
+}
+
+/* Finance legacy detail table */
+#body table.width-100p.cellpadding-5 {
+	border: 1px solid var(--abg-border);
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: var(--abg-shadow-sm);
+}
+#body table.width-100p.cellpadding-5 td {
+	padding: 12px !important;
+	border-bottom: 1px solid var(--abg-border);
+}
+#body table.width-100p.cellpadding-5 tr:last-child td { border-bottom: 0; }
+
+/* Mobile form and action normalization */
+@media (max-width: 640px) {
+	#body .abg-actions,
+	#body .abg-rank-actions,
+	#body .abg-rereg-actions {
+		display: grid !important;
+		grid-template-columns: 1fr;
+		gap: 8px;
+	}
+
+	#body .abg-actions > *,
+	#body .abg-rank-actions > *,
+	#body .abg-rereg-actions > * {
+		width: 100%;
+	}
+
+	#body .header1 {
+		align-items: flex-start;
+	}
+
+	#body .header1 h2,
+	#body .header1 h1 {
+		font-size: 23px !important;
+	}
+}
