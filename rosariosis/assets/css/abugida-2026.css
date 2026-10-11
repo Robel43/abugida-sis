@@ -586,6 +586,7 @@ button:not(.button-primary) {
 
 .abg-modal--error .abg-modal__icon { color: var(--abg-danger); background: var(--abg-danger-soft); }
 .abg-modal--warning .abg-modal__icon { color: var(--abg-warning); background: var(--abg-warning-soft); }
+.abg-modal--success .abg-modal__icon { color: var(--abg-success); background: var(--abg-success-soft); }
 
 .abg-modal__title {
 	margin: 1px 0 3px;
