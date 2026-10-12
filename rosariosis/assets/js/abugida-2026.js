@@ -64,6 +64,17 @@
 
 		if (!menu) return;
 
+		/* FlatSIS fixedmenu may insert a width/height spacer directly after #menu.
+		   Abugida already reserves sidebar space with #body margin, so the spacer is
+		   unnecessary at every viewport width and can cause transient desktop gaps. */
+		if (menu.classList.contains('fixedmenu-fixed') && menu.nextElementSibling) {
+			var spacer = menu.nextElementSibling;
+			if (!spacer.id && !spacer.className) {
+				spacer.style.display = 'none';
+				spacer.setAttribute('data-abg-fixedmenu-spacer', '1');
+			}
+		}
+
 		if (mobile) {
 			/* Legacy fixedmenu leaves desktop inline geometry behind after live resize. */
 			menu.style.removeProperty('bottom');
@@ -71,20 +82,7 @@
 			menu.style.removeProperty('width');
 			menu.style.removeProperty('margin-left');
 			menu.style.removeProperty('margin-right');
-
-			/* FlatSIS fixedmenu may insert a width/height spacer directly after #menu. */
-			if (menu.classList.contains('fixedmenu-fixed') && menu.nextElementSibling) {
-				var spacer = menu.nextElementSibling;
-				if (!spacer.id && !spacer.className) {
-					spacer.style.display = 'none';
-					spacer.setAttribute('data-abg-fixedmenu-spacer', '1');
-				}
-			}
 		} else {
-			qa('[data-abg-fixedmenu-spacer="1"]').forEach(function (spacer) {
-				spacer.style.removeProperty('display');
-				spacer.removeAttribute('data-abg-fixedmenu-spacer');
-			});
 			menu.classList.remove('slide');
 		}
 	}
