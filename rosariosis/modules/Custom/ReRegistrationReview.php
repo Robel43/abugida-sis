@@ -292,7 +292,8 @@ if ( $request_id )
 			( $request['REQUEST_TYPE'] === 'SEMESTER' ? _( 'Semester' ) : _( 'Academic Year' ) ) . '</div></div>';
 		echo '<div class="abg-rereg-row"><span class="abg-rereg-label">' . _( 'Target' ) . '</span><div class="abg-rereg-value">' .
 			AttrEscape( AbugidaReRegistrationTargetLabel( $request ) ) . '</div></div>';
-		echo '<div class="abg-rereg-row"><span class="abg-rereg-label">' . _( 'Status' ) . '</span><span class="abg-rereg-status">' .
+		echo '<div class="abg-rereg-row"><span class="abg-rereg-label">' . _( 'Status' ) . '</span><span class="abg-rereg-status ' .
+			AttrEscape( AbugidaReRegistrationStatusToneClass( $request['STATUS'] ) ) . '">' .
 			AttrEscape( AbugidaReRegistrationStatusLabel( $request['STATUS'] ) ) . '</span></div>';
 		echo '</div></div>';
 
@@ -301,8 +302,9 @@ if ( $request_id )
 			echo '<div class="abg-rereg-card"><h3>' . _( 'Payment' ) . '</h3>';
 			echo '<div class="abg-rereg-row"><span class="abg-rereg-label">' . _( 'Amount' ) . '</span><div class="abg-rereg-value">' .
 				Currency( $request['PAYMENT_AMOUNT'] ) . '</div></div>';
-			echo '<div class="abg-rereg-row"><span class="abg-rereg-label">' . _( 'Payment Status' ) . '</span><div class="abg-rereg-value">' .
-				AttrEscape( $request['PAYMENT_STATUS'] ) . '</div></div>';
+			echo '<div class="abg-rereg-row"><span class="abg-rereg-label">' . _( 'Payment Status' ) . '</span><span class="abg-rereg-status ' .
+				AttrEscape( AbugidaReRegistrationStatusToneClass( $request['PAYMENT_STATUS'] ) ) . '">' .
+				AttrEscape( AbugidaReRegistrationPaymentStatusLabel( $request['PAYMENT_STATUS'] ) ) . '</span></div>';
 			echo '</div>';
 		}
 
@@ -360,7 +362,7 @@ echo '<style>
 
 if ( ! $rows )
 {
-	echo ErrorMessage( [ _( 'No re-registration requests were found.' ) ], 'note' );
+	echo '<div class="abg-empty-state">' . _( 'No re-registration requests were found.' ) . '</div>';
 	return;
 }
 
@@ -377,7 +379,8 @@ foreach ( (array) $rows as $row )
 	echo '<td>' . AttrEscape( $row['REQUEST_TYPE'] === 'SEMESTER' ? _( 'Semester' ) : _( 'Academic Year' ) ) . '</td>';
 	echo '<td>' . (int) $row['TARGET_SYEAR'] . '</td>';
 	echo '<td>' . AttrEscape( $row['TARGET_GRADE'] ) . '</td>';
-	echo '<td>' . AttrEscape( AbugidaReRegistrationStatusLabel( $row['STATUS'] ) ) . '</td>';
+	echo '<td><span class="abg-rereg-status ' . AttrEscape( AbugidaReRegistrationStatusToneClass( $row['STATUS'] ) ) . '">' .
+		AttrEscape( AbugidaReRegistrationStatusLabel( $row['STATUS'] ) ) . '</span></td>';
 	echo '<td>' . AttrEscape( $row['CREATED_AT'] ) . '</td>';
 	echo '<td><a class="abg-rereg-view" href="' .
 		URLEscape( 'Modules.php?modname=Custom/ReRegistrationReview.php&request_id=' . (int) $row['ID'] ) . '">' .
