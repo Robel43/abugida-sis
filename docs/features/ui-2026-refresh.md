@@ -232,3 +232,21 @@ Responsive widths:
 ```
 
 Verify no page-level horizontal overflow, buttons remain reachable, tables scroll inside their own containers, and modal focus/Escape behavior remains intact.
+
+
+## Phase 2 browser-test fixes
+
+The Phase 2 browser matrix found two confirmed presentation defects and one intermittent resize artifact.
+
+Corrections applied:
+
+- RosarioSIS `.rt` ListOutput tables now use normal semantic table layout below 1024px and rely on the Abugida horizontal scroll wrapper. This removes the legacy fixed-height/block-cell strategy that clipped labels such as Actions, Reference, First Name and Payment Status.
+- the empty Re-Registration Payments result is now an inline informational state rather than a success modal;
+- legacy `fixedmenu` spacer nodes are suppressed at all widths because the Abugida shell already owns sidebar spacing. This prevents the spacer from reappearing after mobile-to-desktop live resize.
+
+Targeted retest:
+
+1. Application Payments at 830, 768, 480 and 360: all headers must be fully visible;
+2. narrow ListOutput tables must scroll inside their local wrapper with no document-level horizontal overflow;
+3. Re-Registration Payments with no matching rows must show an inline informational empty state with no modal;
+4. resize a staff page 360 -> 1440 and 1440 -> 360 repeatedly without reload; desktop content should return directly beside the 282px sidebar with no black spacer.
