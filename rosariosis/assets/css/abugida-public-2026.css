@@ -43,7 +43,7 @@ button.secondary,.button.secondary,a.back{background:#fff!important;color:#33415
 .amount{font-size:clamp(32px,6vw,46px)!important;letter-spacing:-.04em;color:var(--pub-text)!important}
 .instructions{padding:18px!important;line-height:1.65!important}
 .progress{height:9px!important;background:#e2e8f0!important}
-.progress span{background:linear-gradient(90deg,#2563eb,#38bdf8)!important}
+.progress span{background:linear-gradient(90deg,var(--pub-primary),color-mix(in srgb,var(--pub-primary),#fff 35%))!important}
 @media(max-width:860px){.page,.wrap{width:min(100% - 24px,760px)!important;padding-top:16px!important}.hero{border-radius:18px!important}.card{padding:22px!important}}
 @media(max-width:640px){.page,.wrap{width:calc(100% - 20px)!important}.topbar{align-items:flex-start}.hero{border-radius:16px!important}.card{padding:18px!important}.actions{display:grid!important;grid-template-columns:1fr!important}.actions>*{width:100%!important;margin-left:0!important}.panel-head{display:block}.panel-head .badge{margin-top:10px}}
 
