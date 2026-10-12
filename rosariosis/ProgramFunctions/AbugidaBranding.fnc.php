@@ -160,11 +160,32 @@ function AbugidaBrandingUpload( $input_name, $config_key, $file_prefix, $allowed
 	return $path;
 }
 
+function AbugidaBrandingUrl( $path )
+{
+	$path = trim( (string) $path );
+
+	if ( $path === '' )
+	{
+		return '';
+	}
+
+	if ( preg_match( '#^(https?:)?//#i', $path ) || str_starts_with( $path, '/' ) )
+	{
+		return $path;
+	}
+
+	$script_dir = str_replace( '\\', '/', dirname( (string) $_SERVER['SCRIPT_NAME'] ) );
+	$script_dir = $script_dir === '/' ? '' : rtrim( $script_dir, '/' );
+
+	return $script_dir . '/' . ltrim( $path, '/' );
+}
+
 function AbugidaBrandingCssVariables()
 {
 	$brand = AbugidaBranding();
-	$background = $brand['login_background'] ?
-		"url('" . str_replace( "'", '%27', $brand['login_background'] ) . "')" :
+	$background_url = $brand['login_background'] ? AbugidaBrandingUrl( $brand['login_background'] ) : '';
+	$background = $background_url ?
+		"url('" . str_replace( "'", '%27', $background_url ) . "')" :
 		'none';
 
 	return '--abg-primary:' . $brand['primary'] . ';' .
