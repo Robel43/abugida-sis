@@ -503,7 +503,7 @@ elseif ( isset( $_GET['submitted'] ) )
 							'Follow the status below for the next step in your registration.';
 					?></p>
 				</div>
-				<span class="badge"><?php echo abugida_reg_h( $applicant['STATUS'] ); ?></span>
+				<span class="badge"><?php echo abugida_reg_h( AbugidaApplicationStatusLabel( $applicant['STATUS'] ) ); ?></span>
 			</div>
 
 			<div class="meta">
