@@ -62,7 +62,14 @@ $reference_assets = [
 <body>
 	<header class="academy-header">
 		<div class="landing-container academy-header__inner">
-			<nav class="academy-menu" aria-label="Primary">
+			<a class="academy-brand" href="landing.php" aria-label="<?php echo abugida_landing_h( $platform ); ?> home">
+				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="">
+				<span class="academy-brand__text"><strong><?php echo abugida_landing_h( $platform ); ?></strong><?php if ( $brand['tagline'] ) { ?><small><?php echo abugida_landing_h( $brand['tagline'] ); ?></small><?php } ?></span>
+			</a>
+			<button class="academy-menu-toggle" type="button" aria-controls="academy-mobile-menu" aria-expanded="false">
+				<span aria-hidden="true">&#9776;</span><span>Menu</span>
+			</button>
+			<nav class="academy-menu" id="academy-mobile-menu" aria-label="Primary">
 				<a class="is-active" href="#home">Home</a>
 				<a href="#grades">Grades 9–12</a>
 				<a href="#packages">Packages</a>
@@ -275,5 +282,28 @@ $reference_assets = [
 		</section>
 	</main>
 
+	<script>
+	(function(){
+		var button=document.querySelector('.academy-menu-toggle');
+		var menu=document.getElementById('academy-mobile-menu');
+		if(!button||!menu)return;
+		button.addEventListener('click',function(){
+			var open=menu.classList.toggle('is-open');
+			button.setAttribute('aria-expanded',open?'true':'false');
+		});
+		menu.addEventListener('click',function(event){
+			if(event.target.closest('a')&&window.matchMedia('(max-width:760px)').matches){
+				menu.classList.remove('is-open');
+				button.setAttribute('aria-expanded','false');
+			}
+		});
+		window.addEventListener('resize',function(){
+			if(!window.matchMedia('(max-width:760px)').matches){
+				menu.classList.remove('is-open');
+				button.setAttribute('aria-expanded','false');
+			}
+		});
+	})();
+	</script>
 </body>
 </html>
