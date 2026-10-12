@@ -1302,3 +1302,15 @@ body.abg-modal-open { overflow: hidden; }
 	font-size: 13px;
 	font-weight: 900;
 }
+
+
+/* The Abugida shell owns desktop sidebar spacing; legacy fixedmenu spacers are redundant. */
+#menu.fixedmenu-fixed + div:not(#body) {
+	display: none !important;
+	width: 0 !important;
+	height: 0 !important;
+	min-width: 0 !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
