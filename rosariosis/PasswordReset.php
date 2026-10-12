@@ -456,7 +456,7 @@ function _printPageHead( $title )
 
 	echo ErrorMessage( $error );
 
-	echo ErrorMessage( $note, 'note' );
+	echo ErrorMessage( $note, 'info' );
 }
 
 
