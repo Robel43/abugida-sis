@@ -508,6 +508,7 @@ if ( empty( $_SESSION['STAFF_ID'] )
 		<?php if ( $abugida_brand['tagline'] ): ?>
 			<p><?php echo AttrEscape( $abugida_brand['tagline'] ); ?></p>
 		<?php endif; ?>
+		<p class="abg-login-intro"><?php echo _( 'Enter your details to log in to your account' ); ?></p>
 	</div>
 	<div class="abg-login-back"><a href="landing.php">&larr; <?php echo _( 'Back to Home' ); ?></a></div>
 	<form name="loginform" id="loginform" method="post">
@@ -565,17 +566,22 @@ if ( empty( $_SESSION['STAFF_ID'] )
 					?>" size="20" maxlength="42" required />
 					<?php echo _( 'Password' ); ?>
 				</label>
-				<div class="align-right">
+				<div class="abg-login-help">
 					<a href="PasswordReset.php" rel="nofollow">
-						<?php echo _( 'Password help' ); ?>
+						<?php echo _( 'Forgot your password?' ); ?>
 					</a>
 				</div>
 			</td>
 		</tr>
 	</table>
-	<p class="center">
-		<input type="submit" value="<?php echo AttrEscape( _( 'Login' ) ); ?>" class="button-primary" />
+	<p class="center abg-login-submit">
+		<input type="submit" value="<?php echo AttrEscape( _( 'Log in' ) ); ?>" class="button-primary" />
 	</p>
+
+	<div class="abg-login-register">
+		<span><?php echo _( 'First time using this site' ); ?></span>
+		<a href="registration.php"><?php echo _( 'Register' ); ?></a>
+	</div>
 
 	<?php // @since 7.6 Login form link action hook.
 	do_action( 'index.php|login_form_link' ); ?>
