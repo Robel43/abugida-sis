@@ -1637,3 +1637,10 @@ body.login .about-rosariosis summary {
 		grid-template-columns: 1fr;
 	}
 }
+
+
+/* Derive accent surfaces from configurable primary color. */
+:root {
+	--abg-primary-soft: color-mix(in srgb, var(--abg-primary), #fff 92%);
+	--abg-sidebar-hover: color-mix(in srgb, var(--abg-secondary), #fff 8%);
+}
