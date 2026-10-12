@@ -373,6 +373,9 @@ elseif ( isset( $_GET['submitted'] ) )
 		.mark{width:52px;height:52px;border-radius:14px;background:#fff;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 20px rgba(15,23,42,.08)}.mark img{width:100%;height:100%;object-fit:contain;padding:5px}
 		.identity h1{font-size:22px;margin:0;color:var(--navy)}
 		.identity p{font-size:13px;color:var(--muted);margin:3px 0 0}
+		.topbar-actions{display:flex;align-items:center;gap:10px}
+		.home-link{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#475569;text-decoration:none;font-size:13px;font-weight:800}
+		.home-link:hover{border-color:var(--pub-primary);color:var(--pub-primary);background:color-mix(in srgb,var(--pub-primary),#fff 94%)}
 		.secure{font-size:13px;color:var(--muted);background:rgba(255,255,255,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px}
 		.hero{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);background:var(--surface);border:1px solid rgba(219,227,239,.9);border-radius:24px;overflow:hidden;box-shadow:0 24px 70px rgba(15,31,56,.10)}
 		.intro{padding:44px;background:linear-gradient(155deg,var(--pub-secondary) 0%,color-mix(in srgb,var(--pub-secondary),var(--pub-primary) 35%) 60%,var(--pub-primary) 140%);color:#fff;position:relative}
@@ -420,7 +423,7 @@ elseif ( isset( $_GET['submitted'] ) )
 		.submitted{padding:18px;border-radius:14px;background:#f7fafc;border:1px solid var(--line);margin-bottom:20px}
 		.footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
 		@media(max-width:860px){.hero{grid-template-columns:1fr}.intro{padding:30px}.intro h2{font-size:30px}.panel{padding:28px}}
-		@media(max-width:640px){.page{padding:20px 14px 40px}.topbar{align-items:flex-start}.secure{display:none}.grid{grid-template-columns:1fr}.full{grid-column:auto}.intro{padding:25px}.panel{padding:22px}.actions{flex-direction:column}.actions button,.actions .button{width:100%}}
+		@media(max-width:640px){.page{padding:20px 14px 40px}.topbar{align-items:flex-start}.topbar-actions{align-items:flex-end;flex-direction:column}.secure{display:none}.home-link{min-height:36px;padding:7px 10px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.intro{padding:25px}.panel{padding:22px}.actions{flex-direction:column}.actions button,.actions .button{width:100%}}
 	</style>
 </head>
 <body>
@@ -433,7 +436,10 @@ elseif ( isset( $_GET['submitted'] ) )
 				<p>Online student registration</p>
 			</div>
 		</div>
-		<div class="secure">Registration portal</div>
+		<div class="topbar-actions">
+			<a class="home-link" href="landing.php">&larr; Back to Home</a>
+			<div class="secure">Registration portal</div>
+		</div>
 	</div>
 
 	<?php if ( $notice !== '' ) { ?>
