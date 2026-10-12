@@ -353,9 +353,9 @@ elseif ( isset( $_GET['submitted'] ) )
 	<script defer src="assets/js/abugida-public-2026.js"></script>
 	<style>
 		:root{
-			--navy:#0f1f38;
-			--blue:#2563eb;
-			--blue2:#1d4ed8;
+			--navy:var(--pub-secondary);
+			--blue:var(--pub-primary);
+			--blue2:color-mix(in srgb,var(--pub-primary),#000 12%);
 			--sky:#eef4ff;
 			--ink:#182230;
 			--muted:#667085;
@@ -370,12 +370,12 @@ elseif ( isset( $_GET['submitted'] ) )
 		.page{max-width:1120px;margin:0 auto;padding:42px 20px 64px}
 		.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:26px}
 		.identity{display:flex;align-items:center;gap:14px}
-		.mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,var(--blue),#60a5fa);display:grid;place-items:center;color:#fff;font-size:23px;font-weight:800;box-shadow:0 10px 24px rgba(37,99,235,.24)}
+		.mark{width:52px;height:52px;border-radius:14px;background:#fff;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 20px rgba(15,23,42,.08)}.mark img{width:100%;height:100%;object-fit:contain;padding:5px}
 		.identity h1{font-size:22px;margin:0;color:var(--navy)}
 		.identity p{font-size:13px;color:var(--muted);margin:3px 0 0}
 		.secure{font-size:13px;color:var(--muted);background:rgba(255,255,255,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px}
 		.hero{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);background:var(--surface);border:1px solid rgba(219,227,239,.9);border-radius:24px;overflow:hidden;box-shadow:0 24px 70px rgba(15,31,56,.10)}
-		.intro{padding:44px;background:linear-gradient(155deg,#102345 0%,#17356b 60%,#1d4ed8 140%);color:#fff;position:relative}
+		.intro{padding:44px;background:linear-gradient(155deg,var(--pub-secondary) 0%,color-mix(in srgb,var(--pub-secondary),var(--pub-primary) 35%) 60%,var(--pub-primary) 140%);color:#fff;position:relative}
 		.intro:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06);right:-80px;bottom:-80px}
 		.kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.11);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 		.intro h2{font-size:36px;line-height:1.12;margin:24px 0 14px;letter-spacing:-.02em}
@@ -413,7 +413,7 @@ elseif ( isset( $_GET['submitted'] ) )
 		.progress-wrap{margin-bottom:26px}
 		.progress-row{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12px;margin-bottom:7px}
 		.progress{height:8px;background:#e8edf5;border-radius:999px;overflow:hidden}
-		.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),#60a5fa);border-radius:999px}
+		.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--pub-primary),color-mix(in srgb,var(--pub-primary),#fff 35%));border-radius:999px}
 		.meta{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 		.meta-card{background:#f8fafc;border:1px solid #e6ebf2;border-radius:11px;padding:10px 12px;font-size:12px;color:var(--muted)}
 		.meta-card strong{color:var(--ink)}
@@ -427,7 +427,7 @@ elseif ( isset( $_GET['submitted'] ) )
 <div class="page">
 	<div class="topbar">
 		<div class="identity">
-			<div class="mark"><?php echo abugida_reg_h( mb_substr( $abugida_brand['platform_name'], 0, 1 ) ); ?></div>
+			<div class="mark"><img src="<?php echo abugida_reg_h( AbugidaBrandingUrl( $abugida_brand['logo'] ) ); ?>" alt="<?php echo abugida_reg_h( $abugida_brand['platform_name'] ); ?>"></div>
 			<div>
 				<h1><?php echo abugida_reg_h( $abugida_brand['platform_name'] ); ?></h1>
 				<p>Online student registration</p>
