@@ -304,3 +304,26 @@ The legacy oversized login surface has been reduced to a focused authentication 
 6. Verify favicon after a hard refresh/new tab.
 7. Restore/remove each custom asset using the Branding controls.
 8. Confirm public registration and payment retain responsive behavior after branding changes.
+
+
+## Phase 3 browser-test fixes
+
+The first branding/login browser pass found four presentation issues plus oversized action controls.
+
+Corrections applied:
+
+- branding asset URLs used inside CSS are now converted to application-root-aware web paths before being emitted, so login background images resolve correctly even when Abugida is deployed in a subdirectory;
+- the compact login card now uses viewport-aware grid centering and switches to top-aligned scrolling on short-height screens;
+- public Registration now displays the configured platform logo instead of a hardcoded letter mark;
+- public Registration hero, mark/progress accents, and Payment actions/status surfaces now derive from configured primary/secondary brand colors instead of hardcoded blue/slate values;
+- public Registration Payment now includes the configured platform logo/name;
+- generic staff action buttons are normalized to compact dimensions, including Configuration Save controls, while retaining a touch-friendly minimum height.
+
+Targeted retest:
+
+1. Configure a temporary login background and verify the computed URL points to the actual `assets/branding` asset;
+2. verify login card vertical centering at 1440, 768, 480 and 360 widths, including a short-height viewport;
+3. verify Registration and Registration Payment both display the configured logo;
+4. verify Registration hero and major public accents change with configured primary/secondary colors;
+5. verify Configuration Save and representative staff action buttons are compact rather than oversized;
+6. restore branding through the UI after the test.
