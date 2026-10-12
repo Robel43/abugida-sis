@@ -327,3 +327,28 @@ Targeted retest:
 4. verify Registration hero and major public accents change with configured primary/secondary colors;
 5. verify Configuration Save and representative staff action buttons are compact rather than oversized;
 6. restore branding through the UI after the test.
+
+
+## Student-facing branding propagation
+
+Branding is now applied consistently to student-facing surfaces as well as staff/admin pages.
+
+Updated behavior:
+
+- student portal hero gradients use the configured primary and secondary colors;
+- student portal primary action buttons use the configured primary color;
+- Student Dashboard displays the configured platform logo and platform name;
+- public Registration displays the configured platform logo;
+- public Registration hero/progress accents use configured colors;
+- public Registration Payment displays the configured platform logo/name and configured action colors;
+- public CSS/JS assets now include file modification query strings so branding changes are not masked by a stale browser stylesheet;
+- compact staff buttons now use border-box sizing so rendered height matches the intended control height.
+
+Targeted retest:
+
+1. temporarily configure a non-default logo and primary/secondary colors;
+2. verify Student Dashboard branding and student portal hero/action colors;
+3. verify Registration logo, hero gradient and progress bar colors;
+4. verify Registration Payment logo/name and primary action color;
+5. verify Configuration Save height is compact and no longer inflated by content-box padding;
+6. restore branding through the UI.
