@@ -32,23 +32,6 @@ function AbugidaApplicationHistory( $applicant_id, $from, $to, $action, $reason 
 }
 
 
-function AbugidaRegistrarStatusLabel( $status )
-{
-	$labels = [
-		'SUBMITTED' => 'PENDING',
-		'UNDER_REVIEW' => 'PENDING',
-		'APPROVED_FOR_PAYMENT' => 'APPROVED',
-		'DECLINED' => 'REJECTED',
-		'PAYMENT_SUBMITTED' => 'PAYMENT SUBMITTED',
-		'PAYMENT_DECLINED' => 'PAYMENT REJECTED',
-		'PAYMENT_VERIFIED' => 'PAYMENT VERIFIED',
-		'ACTIVE' => 'ACTIVE',
-	];
-
-	return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
-}
-
-
 function AbugidaFindConfiguredGradeId( $grade_number )
 {
 	$grade_number = (int) $grade_number;
@@ -201,13 +184,14 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 
 			AbugidaApplicationHistory( $applicant_id, $from, 'ACTIVE', 'Final registration confirmed' );
 
-			$message = "Your Abugida SIS student account has been created.\n\n" .
+			$platform_name = AbugidaBranding()['platform_name'];
+			$message = "Your " . $platform_name . " student account has been created.\n\n" .
 				"Username: " . $username . "\n" .
 				"Temporary password: " . $temp_password . "\n\n" .
 				"Please sign in and change your password.";
 
 			DBQuery( 'COMMIT' );
-			AbugidaSendEmail( $applicant['EMAIL'], 'Abugida SIS account created', $message );
+			AbugidaSendEmail( $applicant['EMAIL'], $platform_name . ' account created', $message );
 
 			$note[] = button( 'check' ) . '&nbsp;' . _( 'Student account created and registration completed.' );
 		}
@@ -282,7 +266,9 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		echo '<div class="abg-field"><span class="abg-label">' . _( 'Learning Approach' ) . '</span><div class="abg-value">' .
 			( $applicant['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</div></div>';
 		echo '<div class="abg-field"><span class="abg-label">' . _( 'Submitted' ) . '</span><div class="abg-value">' . AttrEscape( $applicant['SUBMITTED_AT'] ) . '</div></div>';
-		echo '<div class="abg-field"><span class="abg-label">' . _( 'Status' ) . '</span><span class="abg-status">' . AttrEscape( AbugidaRegistrarStatusLabel( $applicant['STATUS'] ) ) . '</span></div>';
+		echo '<div class="abg-field"><span class="abg-label">' . _( 'Status' ) . '</span><span class="abg-status ' .
+			AttrEscape( AbugidaStatusToneClass( $applicant['STATUS'] ) ) . '">' .
+			AttrEscape( AbugidaApplicationStatusLabel( $applicant['STATUS'] ) ) . '</span></div>';
 		echo '</div>';
 		echo '</div>';
 
@@ -402,7 +388,8 @@ foreach ( (array) $rows as $row )
 	echo '<td>' . AttrEscape( $row['PHONE'] ) . '</td>';
 	echo '<td>Grade ' . (int) $row['GRADE_LEVEL'] . '</td>';
 	echo '<td>' . ( $row['STUDY_APPROACH'] === 'DISTANCE_LEARNING' ? _( 'Distance Learning' ) : _( 'Online' ) ) . '</td>';
-	echo '<td>' . AttrEscape( AbugidaRegistrarStatusLabel( $row['STATUS'] ) ) . '</td>';
+	echo '<td><span class="abg-status ' . AttrEscape( AbugidaStatusToneClass( $row['STATUS'] ) ) . '">' .
+		AttrEscape( AbugidaApplicationStatusLabel( $row['STATUS'] ) ) . '</span></td>';
 	echo '<td>' . AttrEscape( $row['CREATED_AT'] ) . '</td>';
 	echo '<td><a class="abg-view" href="' .
 		URLEscape( 'Modules.php?modname=Custom/ApplicationReview.php&applicant_id=' . (int) $row['ID'] ) .
