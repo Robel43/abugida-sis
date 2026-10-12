@@ -32,6 +32,22 @@ $reference_assets = [
 	'grade11_social' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/4.png',
 	'grade10' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/6.png',
 	'grade9' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/7.png',
+	'sem2_g12_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2025/02/12N-of-how-to-1.jpg',
+	'sem2_g12_social' => 'https://selectacademy.edu.et/wp-content/uploads/2025/02/12S-of-how-to-.jpg',
+	'sem2_g11_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2025/02/11-2s-of-how-to-1-1.jpg',
+	'sem2_g11_social' => 'https://selectacademy.edu.et/wp-content/uploads/2025/02/11-2s-of-how-to-.jpg',
+	'sem2_g10' => 'https://selectacademy.edu.et/wp-content/uploads/2025/02/10-of-how-to-2.jpg',
+	'sem2_g9' => 'https://selectacademy.edu.et/wp-content/uploads/2025/02/9-of-how-to-.jpg',
+	'short_g12_social' => 'https://selectacademy.edu.et/wp-content/uploads/2025/01/Package-of-how-to-.jpg',
+	'short_g12_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2025/01/12N-of-how-to-.jpg',
+	'short_g11_social' => 'https://selectacademy.edu.et/wp-content/uploads/2025/01/11s-of-how-to-.jpg',
+	'short_g11_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2025/01/11N-of-how-to-.jpg',
+	'short_g10' => 'https://selectacademy.edu.et/wp-content/uploads/2025/01/10-of-how-to-.jpg',
+	'short_g9' => 'https://selectacademy.edu.et/wp-content/uploads/2025/01/10-of-how-to-1.jpg',
+	'esslce_social' => 'https://selectacademy.edu.et/wp-content/uploads/2024/12/ESSLCE-cover-social.jpg',
+	'esslce_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2024/12/ESSLCE-cover-natural.jpg',
+	'summary_social' => 'https://selectacademy.edu.et/wp-content/uploads/2024/12/Summary-Social-G9-12.jpg',
+	'summary_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2024/12/Summary-Natural-G9-121.jpg',
 ];
 ?><!doctype html>
 <html lang="en">
@@ -62,9 +78,10 @@ $reference_assets = [
 		<div class="landing-container academy-header__inner">
 			<nav class="academy-menu" aria-label="Primary">
 				<a class="is-active" href="#home">Home</a>
-				<a href="#grades">Grades</a>
+				<a href="#grades">Grades 9–12</a>
+				<a href="#packages">Packages</a>
+				<a href="#esslce">ESSLCE</a>
 				<a href="#services">Student Services</a>
-				<a href="#how-it-works">How It Works</a>
 				<a href="#about">About</a>
 			</nav>
 			<div class="academy-account">
@@ -134,6 +151,76 @@ $reference_assets = [
 						<img src="<?php echo abugida_landing_h( $reference_assets['grade12_natural'] ); ?>" alt="Grade 12">
 						<div><span>Grade 12</span><h3>Finish prepared</h3><p>Review your official academic record and complete your final-year services.</p></div>
 					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="academy-section academy-section--soft" id="packages">
+			<div class="landing-container">
+				<div class="academy-section__heading">
+					<span>Full packages</span>
+					<h2>Explore grade-level learning packages</h2>
+					<p>A visual catalogue inspired by the original Select Academy course grid, adapted here as a student-facing entry point.</p>
+				</div>
+				<div class="academy-package-grid academy-package-grid--three">
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade12_natural'] ); ?>" alt="Grade 12 Natural Science"><div><span>Grade 12</span><h3>Natural Science Full Package</h3><p>Access student services and your academic portal for Grade 12 Natural Science.</p><a href="index.php?login=1">Open portal</a></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade12_social'] ); ?>" alt="Grade 12 Social Science"><div><span>Grade 12</span><h3>Social Science Full Package</h3><p>Keep registration, records and portal access together in one place.</p><a href="index.php?login=1">Open portal</a></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade11_natural'] ); ?>" alt="Grade 11 Natural Science"><div><span>Grade 11</span><h3>Natural Science Full Package</h3><p>Continue your academic year using the same secure student account.</p><a href="index.php?login=1">Open portal</a></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade11_social'] ); ?>" alt="Grade 11 Social Science"><div><span>Grade 11</span><h3>Social Science Full Package</h3><p>View your official courses, grades and account information online.</p><a href="index.php?login=1">Open portal</a></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade10'] ); ?>" alt="Grade 10"><div><span>Grade 10</span><h3>Grade 10 Full Package</h3><p>Access a unified student experience from registration through results.</p><a href="index.php?login=1">Open portal</a></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade9'] ); ?>" alt="Grade 9"><div><span>Grade 9</span><h3>Grade 9 Full Package</h3><p>Start with online registration and continue with one student identity.</p><a href="registration.php">Register</a></div></article>
+				</div>
+			</div>
+		</section>
+
+		<section class="academy-section">
+			<div class="landing-container">
+				<div class="academy-section__heading">
+					<span>Semester 2</span>
+					<h2>Continue your semester without changing accounts</h2>
+					<p>The same visual browsing rhythm as the original site, connected here to the SIS re-registration and portal flow.</p>
+				</div>
+				<div class="academy-package-grid academy-package-grid--three">
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['sem2_g12_natural'] ); ?>" alt="Grade 12 Natural Semester 2"><div><span>Semester 2</span><h3>Grade 12 Natural</h3><p>Continue with your existing account and semester registration.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['sem2_g12_social'] ); ?>" alt="Grade 12 Social Semester 2"><div><span>Semester 2</span><h3>Grade 12 Social</h3><p>Keep your official student identity across the semester.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['sem2_g11_natural'] ); ?>" alt="Grade 11 Natural Semester 2"><div><span>Semester 2</span><h3>Grade 11 Natural</h3><p>Use re-registration when your next semester becomes available.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['sem2_g11_social'] ); ?>" alt="Grade 11 Social Semester 2"><div><span>Semester 2</span><h3>Grade 11 Social</h3><p>Continue without creating a duplicate student account.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['sem2_g10'] ); ?>" alt="Grade 10 Semester 2"><div><span>Semester 2</span><h3>Grade 10</h3><p>Access courses, grades and payments from the student portal.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['sem2_g9'] ); ?>" alt="Grade 9 Semester 2"><div><span>Semester 2</span><h3>Grade 9</h3><p>Progress to the next semester through the same portal.</p></div></article>
+				</div>
+			</div>
+		</section>
+
+		<section class="academy-section academy-section--soft">
+			<div class="landing-container">
+				<div class="academy-section__heading">
+					<span>Short notes & summaries</span>
+					<h2>Quick-access academic resources</h2>
+					<p>Visual content blocks based on the original package catalogue, while keeping the SIS actions focused on registration and portal access.</p>
+				</div>
+				<div class="academy-package-grid academy-package-grid--three">
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['short_g12_social'] ); ?>" alt="Grade 12 Social short notes"><div><span>Short Notes</span><h3>Grade 12 Social</h3><p>Use your portal account to access your school services and records.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['short_g12_natural'] ); ?>" alt="Grade 12 Natural short notes"><div><span>Short Notes</span><h3>Grade 12 Natural</h3><p>Stay connected to your student record and official results.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['short_g11_social'] ); ?>" alt="Grade 11 Social short notes"><div><span>Short Notes</span><h3>Grade 11 Social</h3><p>Review your academic information from one account.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['short_g11_natural'] ); ?>" alt="Grade 11 Natural short notes"><div><span>Short Notes</span><h3>Grade 11 Natural</h3><p>Keep the same identity across future semesters and years.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['short_g10'] ); ?>" alt="Grade 10 short notes"><div><span>Short Notes</span><h3>Grade 10</h3><p>Access your student profile and academic records online.</p></div></article>
+					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['short_g9'] ); ?>" alt="Grade 9 short notes"><div><span>Short Notes</span><h3>Grade 9</h3><p>Begin with online registration and continue into the portal.</p></div></article>
+				</div>
+			</div>
+		</section>
+
+		<section class="academy-section" id="esslce">
+			<div class="landing-container">
+				<div class="academy-section__heading">
+					<span>ESSLCE preparation</span>
+					<h2>Exam preparation and summary collections</h2>
+					<p>These visual cards mirror the exam-preparation blocks present in the source homepage.</p>
+				</div>
+				<div class="academy-feature-grid">
+					<article class="academy-feature-card academy-feature-card--large"><img src="<?php echo abugida_landing_h( $reference_assets['esslce_natural'] ); ?>" alt="ESSLCE Natural"><div><span>ESSLCE Prep Kit</span><h3>Natural Science</h3><p>Keep your official student account and academic records separate from learning content while accessing both through a coherent experience.</p><a href="index.php?login=1">Student login</a></div></article>
+					<article class="academy-feature-card academy-feature-card--large"><img src="<?php echo abugida_landing_h( $reference_assets['esslce_social'] ); ?>" alt="ESSLCE Social"><div><span>ESSLCE Prep Kit</span><h3>Social Science</h3><p>Use the same student identity for school administration and future academic services.</p><a href="index.php?login=1">Student login</a></div></article>
+					<article class="academy-feature-card"><img src="<?php echo abugida_landing_h( $reference_assets['summary_natural'] ); ?>" alt="Natural summary"><div><span>Summary</span><h3>Grade 9–12 Natural</h3><p>Academic summary collection.</p></div></article>
+					<article class="academy-feature-card"><img src="<?php echo abugida_landing_h( $reference_assets['summary_social'] ); ?>" alt="Social summary"><div><span>Summary</span><h3>Grade 9–12 Social</h3><p>Academic summary collection.</p></div></article>
 				</div>
 			</div>
 		</section>
