@@ -64,3 +64,9 @@ body.abg-public-modal-open{overflow:hidden}
 
 .identity .mark{background:#fff!important;border:1px solid var(--pub-line)!important;overflow:hidden}
 .identity .mark img{width:100%;height:100%;object-fit:contain;padding:4px}
+
+/* Unified public workflow status tones */
+.badge.is-success,.status.is-success{background:#ecfdf3!important;color:#166534!important;border-color:#bbf7d0!important}
+.badge.is-warning,.status.is-warning{background:#fff7ed!important;color:#9a3412!important;border-color:#fed7aa!important}
+.badge.is-danger,.status.is-danger{background:#fef2f2!important;color:#991b1b!important;border-color:#fecaca!important}
+.badge.is-info,.status.is-info{background:#f0f9ff!important;color:#0c4a6e!important;border-color:#bae6fd!important}
