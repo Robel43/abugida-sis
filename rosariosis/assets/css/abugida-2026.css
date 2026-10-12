@@ -1812,3 +1812,41 @@ body.login .abg-login-back a:hover{
 		margin: 0 auto !important;
 	}
 }
+
+
+/* Full-height desktop login panel */
+@media (min-width: 761px) {
+	body.login {
+		min-height: 100dvh;
+		height: 100dvh;
+		display: grid;
+		place-items: stretch end;
+		padding: 0;
+		overflow: hidden;
+	}
+
+	body.login #body {
+		width: min(470px, 42vw) !important;
+		height: 100dvh !important;
+		min-height: 100dvh !important;
+		max-height: 100dvh !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		border-top: 0 !important;
+		border-right: 0 !important;
+		border-bottom: 0 !important;
+		border-radius: 20px 0 0 20px !important;
+		overflow-y: auto !important;
+	}
+
+	body.login #body .popTable,
+	body.login #body .postbox,
+	body.login #body > table {
+		min-height: 100%;
+	}
+}
+
+/* Login no longer exposes the legacy About section. */
+body.login .about-rosariosis {
+	display: none !important;
+}
