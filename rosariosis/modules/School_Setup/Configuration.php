@@ -182,7 +182,14 @@ else
 					continue;
 				}
 
-				Config( $column, $value );
+				if ( str_starts_with( $column, 'BRAND_' ) )
+				{
+					AbugidaBrandingConfig( $column, $value );
+				}
+				else
+				{
+					Config( $column, $value );
+				}
 
 				$updated = true;
 			}
@@ -609,7 +616,7 @@ else
 			);
 
 			echo '<br><br>' . TextInput(
-				Config( 'BRAND_TAGLINE' ),
+				AbugidaBrandingConfig( 'BRAND_TAGLINE' ),
 				'values[config][BRAND_TAGLINE]',
 				_( 'Login Tagline' ),
 				'maxlength=120'
