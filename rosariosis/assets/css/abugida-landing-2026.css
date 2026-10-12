@@ -184,3 +184,51 @@ img{max-width:100%;display:block}
 	.academy-package-grid--three,.academy-feature-grid{grid-template-columns:1fr}
 	.academy-feature-card--large{grid-column:span 1}
 }
+
+
+/* Configurable landing identity and accessible mobile navigation */
+.academy-brand{display:flex;align-items:center;gap:10px;min-width:190px;text-decoration:none}
+.academy-brand img{width:40px;height:40px;object-fit:contain;border:1px solid var(--landing-line);border-radius:9px;background:#fff;padding:3px}
+.academy-brand__text{display:grid;line-height:1.15}
+.academy-brand__text strong{font-size:14px;color:#172033}
+.academy-brand__text small{margin-top:3px;max-width:210px;color:var(--landing-muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.academy-menu-toggle{display:none;align-items:center;gap:7px;min-height:38px;padding:8px 11px;border:1px solid var(--landing-line);border-radius:8px;background:#fff;color:#334155;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.academy-menu-toggle span:first-child{font-size:18px;line-height:1}
+
+@media(max-width:1000px){
+	.academy-brand{min-width:160px}
+	.academy-brand__text small{max-width:150px}
+}
+
+@media(max-width:760px){
+	.academy-header__inner{position:relative;flex-wrap:wrap}
+	.academy-brand{min-width:0;margin-right:auto}
+	.academy-brand__text strong{font-size:13px}
+	.academy-brand__text small{max-width:150px}
+	.academy-menu-toggle{display:inline-flex;order:2}
+	.academy-account{order:3}
+	.academy-menu{
+		display:none;
+		order:4;
+		width:100%;
+		margin:0;
+		padding:8px 0 12px;
+		border-top:1px solid var(--landing-line);
+		flex-direction:column;
+		align-items:stretch;
+		gap:0;
+	}
+	.academy-menu.is-open{display:flex}
+	.academy-menu a,
+	.academy-menu a:not(.is-active){
+		display:block;
+		padding:11px 4px;
+	}
+	.academy-menu a.is-active:after{display:none}
+}
+
+@media(max-width:480px){
+	.academy-brand img{width:36px;height:36px}
+	.academy-brand__text small{max-width:120px}
+	.academy-menu-toggle span:last-child{display:none}
+}
