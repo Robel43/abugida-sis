@@ -142,8 +142,9 @@ if ( $request_id )
 			AttrEscape( AbugidaReRegistrationTargetLabel( $request ) ) . '</div></div>';
 		echo '<div class="abg-fin-item"><div class="abg-fin-label">' . _( 'Amount Due' ) . '</div><div class="abg-fin-value">' .
 			Currency( $request['PAYMENT_AMOUNT'] ) . '</div></div>';
-		echo '<div class="abg-fin-item"><div class="abg-fin-label">' . _( 'Payment Status' ) . '</div><div class="abg-fin-value">' .
-			AttrEscape( $request['PAYMENT_STATUS'] ) . '</div></div>';
+		echo '<div class="abg-fin-item"><div class="abg-fin-label">' . _( 'Payment Status' ) . '</div><div class="abg-fin-value"><span class="abg-rereg-status ' .
+			AttrEscape( AbugidaReRegistrationStatusToneClass( $request['PAYMENT_STATUS'] ) ) . '">' .
+			AttrEscape( AbugidaReRegistrationPaymentStatusLabel( $request['PAYMENT_STATUS'] ) ) . '</span></div></div>';
 		echo '</div>';
 
 		if ( $request['RECEIPT_STORED_NAME'] )
@@ -222,8 +223,10 @@ foreach ( (array) $rows as $row )
 	echo '<td>' . AttrEscape( $row['STUDENT_NAME'] ) . ' (' . (int) $row['STUDENT_ID'] . ')</td>';
 	echo '<td>' . (int) $row['TARGET_SYEAR'] . ' / ' . AttrEscape( $row['TARGET_GRADE'] ) . '</td>';
 	echo '<td>' . Currency( $row['PAYMENT_AMOUNT'] ) . '</td>';
-	echo '<td>' . AttrEscape( $row['PAYMENT_STATUS'] ) . '</td>';
-	echo '<td>' . AttrEscape( AbugidaReRegistrationStatusLabel( $row['STATUS'] ) ) . '</td>';
+	echo '<td><span class="abg-rereg-status ' . AttrEscape( AbugidaReRegistrationStatusToneClass( $row['PAYMENT_STATUS'] ) ) . '">' .
+		AttrEscape( AbugidaReRegistrationPaymentStatusLabel( $row['PAYMENT_STATUS'] ) ) . '</span></td>';
+	echo '<td><span class="abg-rereg-status ' . AttrEscape( AbugidaReRegistrationStatusToneClass( $row['STATUS'] ) ) . '">' .
+		AttrEscape( AbugidaReRegistrationStatusLabel( $row['STATUS'] ) ) . '</span></td>';
 	echo '<td><a class="abg-fin-view" href="' .
 		URLEscape( 'Modules.php?modname=Custom/ReRegistrationPayments.php&request_id=' . (int) $row['ID'] ) . '">' .
 		_( 'Review' ) . '</a></td>';
