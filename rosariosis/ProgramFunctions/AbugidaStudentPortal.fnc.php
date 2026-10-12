@@ -308,6 +308,29 @@ function AbugidaStudentPortalStyles()
 			letter-spacing:-.02em;
 			color:#fff;
 		}
+		.abg-student-brandline{
+			position:relative;
+			z-index:1;
+			display:inline-flex;
+			align-items:center;
+			gap:9px;
+			margin-bottom:14px;
+			padding:6px 9px;
+			border-radius:999px;
+			background:rgba(255,255,255,.12);
+			color:#fff;
+			font-size:12px;
+			font-weight:800;
+			letter-spacing:.02em;
+		}
+		.abg-student-brandline img{
+			width:26px;
+			height:26px;
+			object-fit:contain;
+			border-radius:7px;
+			background:#fff;
+			padding:2px;
+		}
 		.abg-page-hero p{
 			position:relative;
 			z-index:1;
