@@ -15,8 +15,6 @@ require_once __DIR__ . '/ProgramFunctions/AbugidaWorkflow.fnc.php';
 const ABUGIDA_REG_MAX_UPLOAD_BYTES = 5242880;
 
 $abugida_brand = AbugidaBranding();
-$registration_background_url = $abugida_brand['login_background'] ?
-	AbugidaBrandingUrl( $abugida_brand['login_background'] ) : '';
 
 if ( empty( $_SESSION['abugida_reg_csrf'] ) )
 {
@@ -351,7 +349,7 @@ elseif ( isset( $_GET['submitted'] ) )
 	<title>Online Registration | <?php echo abugida_reg_h( $abugida_brand['platform_name'] ); ?></title>
 	<link rel="icon" href="<?php echo abugida_reg_h( $abugida_brand['favicon'] ); ?>">
 	<link rel="stylesheet" href="assets/css/abugida-public-2026.css?v=<?php echo (int) @filemtime( __DIR__ . '/assets/css/abugida-public-2026.css' ); ?>">
-	<style>:root{--pub-primary:<?php echo abugida_reg_h( $abugida_brand['primary'] ); ?>;--pub-secondary:<?php echo abugida_reg_h( $abugida_brand['secondary'] ); ?>;--pub-registration-bg:<?php echo $registration_background_url ? "url('" . abugida_reg_h( $registration_background_url ) . "')" : 'none'; ?>}</style>
+	<style>:root{--pub-primary:<?php echo abugida_reg_h( $abugida_brand['primary'] ); ?>;--pub-secondary:<?php echo abugida_reg_h( $abugida_brand['secondary'] ); ?>}</style>
 	<script defer src="assets/js/abugida-public-2026.js?v=<?php echo (int) @filemtime( __DIR__ . '/assets/js/abugida-public-2026.js' ); ?>"></script>
 	<style>
 		:root{
@@ -368,24 +366,24 @@ elseif ( isset( $_GET['submitted'] ) )
 			--danger:#b42318;
 		}
 		*{box-sizing:border-box}
-		body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);min-height:100dvh;background-color:#dfe7e8;background-image:linear-gradient(rgba(15,23,42,.28),rgba(15,23,42,.28)),var(--pub-registration-bg);background-size:cover;background-repeat:no-repeat;background-position:28% center;background-attachment:fixed}
-		.page{width:min(680px,48vw);min-width:560px;min-height:100dvh;height:100dvh;margin:0 0 0 auto;padding:0 34px 40px;background:rgba(255,255,255,.975);overflow-y:auto;box-shadow:-22px 0 60px rgba(15,23,42,.12)}
-		.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:28px 0 18px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+		body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#eef4ff 0,#f7f9fc 45%,#eef2f8 100%);color:var(--ink);min-height:100vh}
+		.page{max-width:1120px;margin:0 auto;padding:42px 20px 64px}
+		.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:26px}
 		.identity{display:flex;align-items:center;gap:14px}
 		.mark{width:52px;height:52px;border-radius:14px;background:#fff;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 20px rgba(15,23,42,.08)}.mark img{width:100%;height:100%;object-fit:contain;padding:5px}
 		.identity h1{font-size:22px;margin:0;color:var(--navy)}
 		.identity p{font-size:13px;color:var(--muted);margin:3px 0 0}
 		.secure{font-size:13px;color:var(--muted);background:rgba(255,255,255,.75);border:1px solid var(--line);padding:8px 12px;border-radius:999px}
-		.hero{display:block;background:transparent;border:0;border-radius:0;overflow:visible;box-shadow:none}
-		.intro{padding:18px 20px;margin:18px 0 20px;background:linear-gradient(135deg,var(--pub-secondary),color-mix(in srgb,var(--pub-secondary),var(--pub-primary) 34%));color:#fff;position:relative;border-radius:14px;overflow:hidden}
+		.hero{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);background:var(--surface);border:1px solid rgba(219,227,239,.9);border-radius:24px;overflow:hidden;box-shadow:0 24px 70px rgba(15,31,56,.10)}
+		.intro{padding:44px;background:linear-gradient(155deg,var(--pub-secondary) 0%,color-mix(in srgb,var(--pub-secondary),var(--pub-primary) 35%) 60%,var(--pub-primary) 140%);color:#fff;position:relative}
 		.intro:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06);right:-80px;bottom:-80px}
 		.kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.11);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-		.intro h2{font-size:22px;line-height:1.2;margin:12px 0 8px;letter-spacing:-.02em}
-		.intro p{margin:0;color:#e4ecff;line-height:1.6;font-size:13px}
-		.steps{margin:14px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:9px 14px}
-		.steps li{display:flex;gap:9px;align-items:flex-start;color:#e8efff;font-size:12px;line-height:1.45}
-		.stepdot{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.13);display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 22px}
-		.panel{padding:6px 0 22px;border:0!important;border-radius:0!important;box-shadow:none!important}
+		.intro h2{font-size:36px;line-height:1.12;margin:24px 0 14px;letter-spacing:-.02em}
+		.intro p{margin:0;color:#d9e5ff;line-height:1.7}
+		.steps{margin:30px 0 0;padding:0;list-style:none;display:grid;gap:15px}
+		.steps li{display:flex;gap:12px;align-items:flex-start;color:#e8efff}
+		.stepdot{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.13);display:grid;place-items:center;font-size:12px;font-weight:800;flex:0 0 26px}
+		.panel{padding:38px}
 		.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:24px}
 		.panel-head h3{margin:0;font-size:25px;color:var(--navy)}
 		.panel-head p{margin:6px 0 0;color:var(--muted);line-height:1.6;font-size:14px}
@@ -420,10 +418,9 @@ elseif ( isset( $_GET['submitted'] ) )
 		.meta-card{background:#f8fafc;border:1px solid #e6ebf2;border-radius:11px;padding:10px 12px;font-size:12px;color:var(--muted)}
 		.meta-card strong{color:var(--ink)}
 		.submitted{padding:18px;border-radius:14px;background:#f7fafc;border:1px solid var(--line);margin-bottom:20px}
-		.footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:18px;padding-bottom:8px}
-		@media(max-width:980px){.page{width:min(720px,58vw);min-width:520px}.steps{grid-template-columns:1fr}}
-		@media(max-width:860px){body{background-position:24% center}.page{width:min(100% - 24px,720px);min-width:0;height:auto;min-height:100dvh;margin:0 auto;padding:18px 24px 36px;border-radius:0}.topbar{padding-top:8px}.hero{display:block}.intro{padding:18px}.panel{padding:4px 0 20px}}
-		@media(max-width:640px){body{background-image:none;background:#f4f7fb}.page{width:100%;padding:14px 14px 34px}.topbar{align-items:flex-start}.secure{display:none}.grid{grid-template-columns:1fr}.full{grid-column:auto}.intro{padding:16px}.steps{grid-template-columns:1fr}.actions{flex-direction:column}.actions button,.actions .button{width:100%}}
+		.footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+		@media(max-width:860px){.hero{grid-template-columns:1fr}.intro{padding:30px}.intro h2{font-size:30px}.panel{padding:28px}}
+		@media(max-width:640px){.page{padding:20px 14px 40px}.topbar{align-items:flex-start}.secure{display:none}.grid{grid-template-columns:1fr}.full{grid-column:auto}.intro{padding:25px}.panel{padding:22px}.actions{flex-direction:column}.actions button,.actions .button{width:100%}}
 	</style>
 </head>
 <body>
