@@ -206,7 +206,7 @@ echo '<style>
 
 if ( ! $rows )
 {
-	echo ErrorMessage( [ _( 'No re-registration payments were found.' ) ], 'note' );
+	echo '<div class="abg-empty-state">' . _( 'No re-registration payments were found.' ) . '</div>';
 	return;
 }
 
