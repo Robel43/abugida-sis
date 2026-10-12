@@ -12,6 +12,7 @@ $enrollment = $profile['ENROLLMENT'];
 $courses = AbugidaStudentPortalCourses();
 $rank = AbugidaStudentPortalRankSummary();
 $billing = AbugidaStudentPortalBilling();
+$student_brand = AbugidaBranding();
 
 $current_semester = GetMP( UserMP(), 'MP' ) === 'SEM' ? GetMP( UserMP() ) : _( 'Semester' );
 
@@ -53,6 +54,8 @@ elseif ( $billing['STATUS'] === _( 'No Charges' ) )
 echo '<div class="abg-student-shell">';
 
 echo '<div class="abg-page-hero">';
+echo '<div class="abg-student-brandline"><img src="' . AttrEscape( AbugidaBrandingUrl( $student_brand['logo'] ) ) . '" alt="' .
+	AttrEscape( $student_brand['platform_name'] ) . '"><span>' . AttrEscape( $student_brand['platform_name'] ) . '</span></div>';
 echo '<h2>' . sprintf( _( 'Welcome, %s' ), AttrEscape( $student_name ) ) . '</h2>';
 echo '<p>' . _( 'A clear view of your courses, official grades, academic standing, payments, and student profile.' ) . '</p>';
 echo '</div>';
