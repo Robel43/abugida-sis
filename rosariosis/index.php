@@ -433,9 +433,11 @@ if ( empty( $_SESSION['STAFF_ID'] )
 
 	Warehouse( 'header' );
 
+	$abugida_brand = AbugidaBranding();
+
 	PopTable(
 		'header',
-		sprintf( _( '%s Login' ), Config( 'NAME' ) )
+		sprintf( _( '%s Login' ), $abugida_brand['platform_name'] )
 	);
 
 	if ( isset( $_REQUEST['reason'] ) )
@@ -484,8 +486,13 @@ if ( empty( $_SESSION['STAFF_ID'] )
 
 ?>
 
-	<img src="assets/themes/<?php echo URLEscape( Config( 'THEME' ) ); ?>/logo.png" class="logo center" alt="Logo" />
-	<h4 class="center"><?php echo ParseMLField( Config( 'TITLE' ) ); ?></h4>
+	<div class="abg-login-brand">
+		<img src="<?php echo URLEscape( $abugida_brand['logo'] ); ?>" class="logo center" alt="<?php echo AttrEscape( $abugida_brand['platform_name'] ); ?>" />
+		<h1><?php echo AttrEscape( $abugida_brand['platform_name'] ); ?></h1>
+		<?php if ( $abugida_brand['tagline'] ): ?>
+			<p><?php echo AttrEscape( $abugida_brand['tagline'] ); ?></p>
+		<?php endif; ?>
+	</div>
 	<form name="loginform" id="loginform" method="post">
 	<table class="cellspacing-0 width-100p">
 
