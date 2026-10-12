@@ -1658,7 +1658,9 @@ body.login .about-rosariosis summary {
 #body input[type="button"],
 #body input[type="reset"],
 #body button,
-#body .button,
+#body a.button,
+#body button.button,
+#body input.button,
 #body .button-primary,
 #body a.button-primary {
 	box-sizing: border-box !important;
@@ -1719,4 +1721,82 @@ body.login .abg-login-back a{
 }
 body.login .abg-login-back a:hover{
 	color:var(--abg-primary);
+}
+
+
+/* Legacy RosarioSIS image-button normalization.
+   button() renders <img class="button">; these must never inherit modern
+   action-button padding/min-height from the shared UI layer. */
+#body img.button,
+#body input[type="image"].button {
+	box-sizing: content-box !important;
+	width: auto !important;
+	height: 16px !important;
+	min-width: 0 !important;
+	min-height: 0 !important;
+	max-width: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	object-fit: contain;
+	vertical-align: -15%;
+}
+
+#body img.button.bigger {
+	height: 24px !important;
+	vertical-align: middle;
+}
+
+#body img.button.smaller {
+	height: 14px !important;
+}
+
+#body img.button.cal {
+	height: 32px !important;
+	margin-top: -9px !important;
+	vertical-align: middle;
+}
+
+/* Password show/hide icons are legacy image buttons inside the input wrapper. */
+#body .password-input-wrapper {
+	display: inline-block;
+	position: relative;
+	max-width: 100%;
+}
+
+#body .password-input-wrapper img.password-toggle {
+	width: 20px !important;
+	height: 20px !important;
+	min-width: 20px !important;
+	min-height: 20px !important;
+	padding: 2px !important;
+	margin-left: -25px !important;
+	margin-right: 3px !important;
+	margin-top: 9px !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	background: #fff !important;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+#body .password-input-wrapper img.password-hide {
+	display: none;
+}
+
+/* Keep icon-only action legends compact and aligned. */
+#body a:has(> img.button) {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	min-height: 28px;
+	text-decoration: none;
+}
+
+#body a:has(> img.button) > img.button {
+	flex: 0 0 auto;
 }
