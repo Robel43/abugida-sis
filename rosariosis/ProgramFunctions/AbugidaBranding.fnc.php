@@ -6,6 +6,38 @@
  * migration is required. Uploaded assets are stored under assets/branding.
  */
 
+function AbugidaBrandingConfig( $key, $value = null )
+{
+	$key = (string) $key;
+
+	if ( $key === '' )
+	{
+		return '';
+	}
+
+	if ( ! is_null( $value ) )
+	{
+		$exists = DBGetOne( "SELECT TITLE
+			FROM config
+			WHERE TITLE='" . DBEscapeString( $key ) . "'
+			AND SCHOOL_ID='0'
+			LIMIT 1" );
+
+		DBUpsert(
+			'config',
+			[ 'CONFIG_VALUE' => $value ],
+			[ 'TITLE' => $key, 'SCHOOL_ID' => 0 ],
+			$exists ? 'update' : 'insert'
+		);
+	}
+
+	return (string) DBGetOne( "SELECT CONFIG_VALUE
+		FROM config
+		WHERE TITLE='" . DBEscapeString( $key ) . "'
+		AND SCHOOL_ID='0'
+		LIMIT 1" );
+}
+
 function AbugidaBrandingHex( $value, $fallback )
 {
 	$value = trim( (string) $value );
@@ -15,7 +47,7 @@ function AbugidaBrandingHex( $value, $fallback )
 
 function AbugidaBranding()
 {
-	$platform_name = trim( (string) Config( 'BRAND_PLATFORM_NAME' ) );
+	$platform_name = trim( (string) AbugidaBrandingConfig( 'BRAND_PLATFORM_NAME' ) );
 
 	if ( $platform_name === '' )
 	{
@@ -34,12 +66,12 @@ function AbugidaBranding()
 
 	return [
 		'platform_name' => $platform_name,
-		'tagline' => trim( (string) Config( 'BRAND_TAGLINE' ) ),
-		'primary' => AbugidaBrandingHex( Config( 'BRAND_PRIMARY_COLOR' ), '#2563eb' ),
-		'secondary' => AbugidaBrandingHex( Config( 'BRAND_SECONDARY_COLOR' ), '#0f172a' ),
-		'logo' => AbugidaBrandingAsset( Config( 'BRAND_LOGO' ), 'assets/themes/' . Config( 'THEME' ) . '/logo.png' ),
-		'favicon' => AbugidaBrandingAsset( Config( 'BRAND_FAVICON' ), 'favicon.ico' ),
-		'login_background' => AbugidaBrandingAsset( Config( 'BRAND_LOGIN_BACKGROUND' ), '' ),
+		'tagline' => trim( (string) AbugidaBrandingConfig( 'BRAND_TAGLINE' ) ),
+		'primary' => AbugidaBrandingHex( AbugidaBrandingConfig( 'BRAND_PRIMARY_COLOR' ), '#2563eb' ),
+		'secondary' => AbugidaBrandingHex( AbugidaBrandingConfig( 'BRAND_SECONDARY_COLOR' ), '#0f172a' ),
+		'logo' => AbugidaBrandingAsset( AbugidaBrandingConfig( 'BRAND_LOGO' ), 'assets/themes/' . Config( 'THEME' ) . '/logo.png' ),
+		'favicon' => AbugidaBrandingAsset( AbugidaBrandingConfig( 'BRAND_FAVICON' ), 'favicon.ico' ),
+		'login_background' => AbugidaBrandingAsset( AbugidaBrandingConfig( 'BRAND_LOGIN_BACKGROUND' ), '' ),
 	];
 }
 
@@ -68,7 +100,7 @@ function AbugidaBrandingDeleteAsset( $config_key )
 		@unlink( $current );
 	}
 
-	Config( $config_key, '' );
+	AbugidaBrandingConfig( $config_key, '' );
 }
 
 function AbugidaBrandingUpload( $input_name, $config_key, $file_prefix, $allowed_mimes )
@@ -123,7 +155,7 @@ function AbugidaBrandingUpload( $input_name, $config_key, $file_prefix, $allowed
 		throw new RuntimeException( _( 'Unable to save the branding image.' ) );
 	}
 
-	Config( $config_key, $path );
+	AbugidaBrandingConfig( $config_key, $path );
 
 	return $path;
 }
