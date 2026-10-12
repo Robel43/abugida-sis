@@ -1,6 +1,78 @@
 <?php
 /** Stage 2 transactions, audit and notification delivery using RosarioSIS permissions. */
 require_once __DIR__ . '/AbugidaEmail.fnc.php';
+require_once __DIR__ . '/AbugidaBranding.fnc.php';
+
+
+function AbugidaApplicationStatusLabel( $status )
+{
+	$labels = [
+		'DRAFT' => _( 'Draft' ),
+		'SUBMITTED' => _( 'Submitted' ),
+		'UNDER_REVIEW' => _( 'Under Review' ),
+		'APPROVED_FOR_PAYMENT' => _( 'Approved - Payment Required' ),
+		'DECLINED' => _( 'Returned for Correction' ),
+		'PAYMENT_SUBMITTED' => _( 'Payment Submitted' ),
+		'PAYMENT_DECLINED' => _( 'Payment Rejected' ),
+		'PAYMENT_VERIFIED' => _( 'Payment Verified' ),
+		'ACTIVE' => _( 'Active' ),
+	];
+
+	return isset( $labels[ $status ] ) ? $labels[ $status ] : str_replace( '_', ' ', ucwords( strtolower( (string) $status ), '_' ) );
+}
+
+function AbugidaPaymentStatusLabel( $status )
+{
+	$labels = [
+		'' => _( 'Not Required' ),
+		'NOT_REQUIRED' => _( 'Not Required' ),
+		'PENDING' => _( 'Pending' ),
+		'SUBMITTED' => _( 'Submitted' ),
+		'DECLINED' => _( 'Rejected' ),
+		'VERIFIED' => _( 'Verified' ),
+		'PAID' => _( 'Paid' ),
+	];
+
+	return isset( $labels[ (string) $status ] ) ? $labels[ (string) $status ] :
+		str_replace( '_', ' ', ucwords( strtolower( (string) $status ), '_' ) );
+}
+
+function AbugidaDeliveryStatusLabel( $status )
+{
+	$labels = [
+		'PENDING' => _( 'Pending' ),
+		'SENDING' => _( 'Sending' ),
+		'SENT' => _( 'Sent' ),
+		'FAILED' => _( 'Failed' ),
+		'UNKNOWN' => _( 'Delivery Unknown' ),
+		'CANCELLED' => _( 'Cancelled' ),
+	];
+
+	return isset( $labels[ $status ] ) ? $labels[ $status ] :
+		str_replace( '_', ' ', ucwords( strtolower( (string) $status ), '_' ) );
+}
+
+function AbugidaStatusToneClass( $status )
+{
+	$status = strtoupper( (string) $status );
+
+	if ( in_array( $status, [ 'ACTIVE', 'COMPLETED', 'PAYMENT_VERIFIED', 'VERIFIED', 'PAID', 'SENT' ], true ) )
+	{
+		return 'is-success';
+	}
+
+	if ( in_array( $status, [ 'DECLINED', 'PAYMENT_DECLINED', 'FAILED', 'REJECTED' ], true ) )
+	{
+		return 'is-danger';
+	}
+
+	if ( in_array( $status, [ 'APPROVED_FOR_PAYMENT', 'PAYMENT_SUBMITTED', 'READY_FOR_FINAL', 'PENDING', 'SUBMITTED', 'UNDER_REVIEW', 'SENDING' ], true ) )
+	{
+		return 'is-warning';
+	}
+
+	return 'is-info';
+}
 
 function AbugidaWorkflowDB(): PDO
 {
@@ -66,16 +138,16 @@ function AbugidaNotification(array $applicant, string $status, string $reason): 
     $name = trim($applicant['first_name'] . ' ' . $applicant['last_name']);
     $intro = "Dear $name,\n\nApplication reference: {$applicant['application_reference']}\n\n";
     if ($status === 'APPROVED_FOR_PAYMENT') {
-        return ['Abugida SIS application approved', $intro . 'Your application has been approved.' . "\n\nAmount payable: ETB " . number_format((float)$applicant['payment_amount'], 2) .
+        return [AbugidaBranding()['platform_name'] . ' application approved', $intro . 'Your application has been approved.' . "\n\nAmount payable: ETB " . number_format((float)$applicant['payment_amount'], 2) .
             "\n\nPayment instructions:\n{$applicant['payment_instructions']}\n\nPayment link:\n" . AbugidaPublicURL('registration-payment.php', ['token' => $applicant['payment_access_token']])];
     }
     if ($status === 'DECLINED') {
-        return ['Abugida SIS application update', $intro . "Your application requires correction.\n\nReason: $reason\n\nUse the same phone number to correct and resubmit your existing application:\n" . AbugidaPublicURL('registration.php')];
+        return [AbugidaBranding()['platform_name'] . ' application update', $intro . "Your application requires correction.\n\nReason: $reason\n\nUse the same phone number to correct and resubmit your existing application:\n" . AbugidaPublicURL('registration.php')];
     }
     if ($status === 'PAYMENT_VERIFIED') {
-        return ['Abugida SIS payment verified', $intro . "Your payment of ETB " . number_format((float)$applicant['payment_amount'], 2) . " has been verified. The Registrar will complete your enrollment.\n\nStatus:\n" . AbugidaPublicURL('registration-payment.php', ['token' => $applicant['payment_access_token']])];
+        return [AbugidaBranding()['platform_name'] . ' payment verified', $intro . "Your payment of ETB " . number_format((float)$applicant['payment_amount'], 2) . " has been verified. The Registrar will complete your enrollment.\n\nStatus:\n" . AbugidaPublicURL('registration-payment.php', ['token' => $applicant['payment_access_token']])];
     }
-    return ['Abugida SIS payment update', $intro . "Your payment proof requires correction.\n\nReason: $reason\n\nUpload a corrected receipt here:\n" . AbugidaPublicURL('registration-payment.php', ['token' => $applicant['payment_access_token']])];
+    return [AbugidaBranding()['platform_name'] . ' payment update', $intro . "Your payment proof requires correction.\n\nReason: $reason\n\nUpload a corrected receipt here:\n" . AbugidaPublicURL('registration-payment.php', ['token' => $applicant['payment_access_token']])];
 }
 
 function AbugidaReviewDecision(int $id, string $actor, string $decision, string $reason = ''): int
@@ -161,7 +233,7 @@ function AbugidaNotificationPanel(int $applicantId, string $actor): void
     $query->execute([$applicantId, $actor]);
     echo '<h3>Email notifications</h3>';
     foreach ($query as $row) {
-        echo '<p>' . AttrEscape($row['subject']) . ': <b>' . AttrEscape($row['delivery_status']) . '</b> (' . (int)$row['attempts'] . ' attempts)';
+        echo '<p>' . AttrEscape($row['subject']) . ': <b>' . AttrEscape( AbugidaDeliveryStatusLabel( $row['delivery_status'] ) ) . '</b> (' . (int)$row['attempts'] . ' attempts)';
         if ($row['last_error']) { echo '<br>' . AttrEscape($row['last_error']); }
         echo '</p>';
         if (in_array($row['delivery_status'], ['PENDING', 'FAILED'], true) && AbugidaStaffAllowed($module, true)) {
