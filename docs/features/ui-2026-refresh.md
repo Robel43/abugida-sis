@@ -390,3 +390,18 @@ The login page now includes a Back to Home link to `landing.php`.
 - configured logo/name/colors/favicon propagate to landing;
 - desktop, tablet and 360px mobile layouts have no document-level horizontal overflow;
 - existing login POST and password-reset flows remain functional.
+
+
+## Expanded Select Academy-inspired landing catalogue
+
+The landing page now includes additional visual blocks based on the source homepage structure and assets supplied by the user:
+
+- Grades 9–12 visual cards;
+- Full Package catalogue;
+- Semester 2 package catalogue;
+- Short Notes and Summary catalogue;
+- ESSLCE Natural and Social preparation feature cards;
+- Grade 9–12 Natural/Social summary cards;
+- source-provided education imagery and package artwork.
+
+The visual structure follows the reference site's catalogue-heavy browsing pattern while keeping Abugida branding, colors, logo, favicon and SIS actions configurable. Register and Login continue to route into Abugida workflows rather than the source site's commerce/course URLs.
