@@ -274,7 +274,7 @@ if ( ! Config( 'STUDENTS_EMAIL_FIELD' ) )
 	$note[] = _( 'Password reset is not activated for students.' );
 }
 
-echo ErrorMessage( $note, 'note' );
+echo ErrorMessage( $note, 'info' );
 
 // Forgot your password? form.
 ?>
