@@ -1,6 +1,7 @@
 <?php
 require_once 'ProgramFunctions/Theme.fnc.php';
 require_once 'ProgramFunctions/FileUpload.fnc.php';
+require_once 'ProgramFunctions/AbugidaBranding.fnc.php';
 
 //FJ add School Configuration
 // move the Modules config.inc.php to the database table
@@ -52,6 +53,66 @@ else
 {
 	if ( $_REQUEST['modfunc'] === 'update' )
 	{
+		if ( $_REQUEST['tab'] === 'branding' && AllowEdit() )
+		{
+			try
+			{
+				if ( ! empty( $_POST['branding_reset_logo'] ) )
+				{
+					AbugidaBrandingDeleteAsset( 'BRAND_LOGO' );
+				}
+
+				if ( ! empty( $_POST['branding_reset_favicon'] ) )
+				{
+					AbugidaBrandingDeleteAsset( 'BRAND_FAVICON' );
+				}
+
+				if ( ! empty( $_POST['branding_reset_background'] ) )
+				{
+					AbugidaBrandingDeleteAsset( 'BRAND_LOGIN_BACKGROUND' );
+				}
+
+				AbugidaBrandingUpload(
+					'BRAND_LOGO_FILE',
+					'BRAND_LOGO',
+					'platform-logo',
+					[
+						'image/png' => 'png',
+						'image/jpeg' => 'jpg',
+						'image/webp' => 'webp',
+					]
+				);
+
+				AbugidaBrandingUpload(
+					'BRAND_FAVICON_FILE',
+					'BRAND_FAVICON',
+					'favicon',
+					[
+						'image/png' => 'png',
+						'image/x-icon' => 'ico',
+						'image/vnd.microsoft.icon' => 'ico',
+						'image/jpeg' => 'jpg',
+						'image/webp' => 'webp',
+					]
+				);
+
+				AbugidaBrandingUpload(
+					'BRAND_LOGIN_BACKGROUND_FILE',
+					'BRAND_LOGIN_BACKGROUND',
+					'login-background',
+					[
+						'image/png' => 'png',
+						'image/jpeg' => 'jpg',
+						'image/webp' => 'webp',
+					]
+				);
+			}
+			catch ( RuntimeException $exception )
+			{
+				$error[] = $exception->getMessage();
+			}
+		}
+
 		if ( ! empty( $_FILES['LOGO_FILE'] )
 			&& AllowEdit() )
 		{
@@ -100,6 +161,24 @@ else
 				{
 					$numeric_error = true;
 
+					continue;
+				}
+
+				if ( $column === 'BRAND_PLATFORM_NAME' )
+				{
+					$value = trim( (string) $value );
+
+					if ( $value !== '' )
+					{
+						Config( 'NAME', mb_substr( $value, 0, 60 ) );
+						Config( 'TITLE', $value );
+					}
+				}
+
+				if ( in_array( $column, [ 'BRAND_PRIMARY_COLOR', 'BRAND_SECONDARY_COLOR' ], true )
+					&& ! preg_match( '/^#[0-9A-Fa-f]{6}$/', (string) $value ) )
+				{
+					$error[] = _( 'Brand colors must use a six-digit hexadecimal value such as #2563eb.' );
 					continue;
 				}
 
@@ -214,6 +293,11 @@ else
 			$tabs[] = [
 				'title' => Config( 'NAME' ),
 				'link' => 'Modules.php?modname=' . $_REQUEST['modname'] . '&tab=system',
+			];
+
+			$tabs[] = [
+				'title' => _( 'Branding' ),
+				'link' => 'Modules.php?modname=' . $_REQUEST['modname'] . '&tab=branding',
 			];
 		}
 
@@ -503,6 +587,77 @@ else
 				$display_name_options,
 				false
 			) . '</td></tr></table>';
+		}
+
+		if ( $_REQUEST['tab'] === 'branding'
+			&& ! $multiple_schools_admin_has_1_school )
+		{
+			$brand = AbugidaBranding();
+
+			echo '<div class="abg-brand-config">';
+			echo '<div class="abg-brand-config__intro"><h3>' . _( 'Platform Branding' ) . '</h3>';
+			echo '<p>' . _( 'Customize the identity shown on the login page, browser tab, navigation shell and public registration pages.' ) . '</p></div>';
+
+			echo '<div class="abg-brand-config__grid">';
+			echo '<section class="abg-brand-config__card"><h4>' . _( 'Identity' ) . '</h4>';
+
+			echo TextInput(
+				$brand['platform_name'],
+				'values[config][BRAND_PLATFORM_NAME]',
+				_( 'Platform Name' ),
+				'required maxlength=60'
+			);
+
+			echo '<br><br>' . TextInput(
+				Config( 'BRAND_TAGLINE' ),
+				'values[config][BRAND_TAGLINE]',
+				_( 'Login Tagline' ),
+				'maxlength=120'
+			);
+
+			echo '<div class="abg-brand-color-grid">';
+			echo '<label class="abg-brand-color-field"><span>' . _( 'Primary Color' ) . '</span><input type="color" name="values[config][BRAND_PRIMARY_COLOR]" value="' .
+				AttrEscape( $brand['primary'] ) . '"><code>' . AttrEscape( $brand['primary'] ) . '</code></label>';
+			echo '<label class="abg-brand-color-field"><span>' . _( 'Secondary Color' ) . '</span><input type="color" name="values[config][BRAND_SECONDARY_COLOR]" value="' .
+				AttrEscape( $brand['secondary'] ) . '"><code>' . AttrEscape( $brand['secondary'] ) . '</code></label>';
+			echo '</div></section>';
+
+			echo '<section class="abg-brand-config__card"><h4>' . _( 'Logo' ) . '</h4>';
+			if ( $brand['logo'] )
+			{
+				echo '<div class="abg-brand-preview abg-brand-preview--logo"><img src="' .
+					URLEscape( $brand['logo'] ) . '?v=' . time() . '" alt="' . AttrEscape( $brand['platform_name'] ) . '"></div>';
+			}
+			echo FileInput( 'BRAND_LOGO_FILE', _( 'Platform logo' ) . ' (PNG, JPG, WebP)', 'accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"' );
+			echo '<label class="abg-brand-reset"><input type="checkbox" name="branding_reset_logo" value="1"> ' . _( 'Restore theme logo' ) . '</label>';
+			echo '</section>';
+
+			echo '<section class="abg-brand-config__card"><h4>' . _( 'Favicon' ) . '</h4>';
+			if ( $brand['favicon'] )
+			{
+				echo '<div class="abg-brand-preview abg-brand-preview--favicon"><img src="' .
+					URLEscape( $brand['favicon'] ) . '?v=' . time() . '" alt="' . _( 'Favicon preview' ) . '"></div>';
+			}
+			echo FileInput( 'BRAND_FAVICON_FILE', _( 'Browser favicon' ) . ' (ICO, PNG, JPG, WebP)', 'accept=".ico,.png,.jpg,.jpeg,.webp,image/x-icon,image/png,image/jpeg,image/webp"' );
+			echo '<label class="abg-brand-reset"><input type="checkbox" name="branding_reset_favicon" value="1"> ' . _( 'Restore default favicon' ) . '</label>';
+			echo '</section>';
+
+			echo '<section class="abg-brand-config__card"><h4>' . _( 'Login Background' ) . '</h4>';
+			if ( $brand['login_background'] )
+			{
+				echo '<div class="abg-brand-preview abg-brand-preview--background" style="background-image:url(' .
+					"'" . URLEscape( $brand['login_background'] ) . '?v=' . time() . "'" .
+					')"></div>';
+			}
+			echo FileInput( 'BRAND_LOGIN_BACKGROUND_FILE', _( 'Login background image' ) . ' (PNG, JPG, WebP)', 'accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"' );
+			echo '<label class="abg-brand-reset"><input type="checkbox" name="branding_reset_background" value="1"> ' . _( 'Remove login background' ) . '</label>';
+			echo '</section>';
+			echo '</div>';
+
+			echo '<div class="abg-brand-config__note">' .
+				_( 'Recommended logo: transparent PNG or WebP. Recommended login background: 1600×1000 or larger. Files are limited to 5 MB.' ) .
+				'</div>';
+			echo '</div>';
 		}
 
 		if ( $_REQUEST['tab'] === 'school' )
