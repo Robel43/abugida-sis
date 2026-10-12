@@ -424,6 +424,22 @@ elseif ( isset( $_REQUEST['create_account'] ) )
 }
 
 
+// Public student landing page is the default unauthenticated entry point.
+// Explicit login requests, authentication POSTs, password-reset reasons and
+// redirect targets continue to use the existing login workflow.
+if ( empty( $_SESSION['STAFF_ID'] )
+	&& empty( $_SESSION['STUDENT_ID'] )
+	&& ! isset( $_REQUEST['create_account'] )
+	&& $_SERVER['REQUEST_METHOD'] === 'GET'
+	&& ! isset( $_GET['login'] )
+	&& ! isset( $_REQUEST['reason'] )
+	&& ! isset( $_REQUEST['redirect_to'] )
+	&& ! isset( $_REQUEST['modfunc'] ) )
+{
+	header( 'Location: landing.php' );
+	exit;
+}
+
 // Login screen.
 if ( empty( $_SESSION['STAFF_ID'] )
 	&& empty( $_SESSION['STUDENT_ID'] )
@@ -493,6 +509,7 @@ if ( empty( $_SESSION['STAFF_ID'] )
 			<p><?php echo AttrEscape( $abugida_brand['tagline'] ); ?></p>
 		<?php endif; ?>
 	</div>
+	<div class="abg-login-back"><a href="landing.php">&larr; <?php echo _( 'Back to Home' ); ?></a></div>
 	<form name="loginform" id="loginform" method="post">
 	<table class="cellspacing-0 width-100p">
 
