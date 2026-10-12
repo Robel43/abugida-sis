@@ -250,3 +250,57 @@ Targeted retest:
 2. narrow ListOutput tables must scroll inside their local wrapper with no document-level horizontal overflow;
 3. Re-Registration Payments with no matching rows must show an inline informational empty state with no modal;
 4. resize a staff page 360 -> 1440 and 1440 -> 360 repeatedly without reload; desktop content should return directly beside the 282px sidebar with no black spacer.
+
+
+## Phase 3 - configurable branding and compact login
+
+The System Configuration area now includes a Branding tab for full administrators.
+
+Configurable items:
+
+- Platform Name;
+- Login Tagline;
+- Primary Color;
+- Secondary Color;
+- Platform Logo;
+- Browser Favicon;
+- Login Background Image.
+
+Branding is stored globally in the existing `config` table with `SCHOOL_ID=0`, so the same identity is available before login and on public registration pages. No database migration is required.
+
+Uploaded branding files are stored in:
+
+```text
+assets/branding/
+```
+
+Supported logo/background formats: PNG, JPG, WebP.
+Favicon additionally supports ICO.
+Maximum upload size: 5 MB.
+
+The Platform Name is also synchronized to the legacy RosarioSIS `NAME` and `TITLE` settings so older screens that still read those settings display the configured platform name.
+
+Applied surfaces:
+
+- browser page title;
+- favicon;
+- login screen;
+- application sidebar logo;
+- global primary/secondary palette;
+- public registration page;
+- public registration payment page.
+
+### Login redesign
+
+The legacy oversized login surface has been reduced to a focused authentication card with a maximum width of approximately 470px. The configured logo, platform name and tagline are displayed above the credentials, and an optional configured background image fills the login viewport.
+
+### Phase 3 browser test focus
+
+1. Open Configuration > Branding as administrator.
+2. Change Platform Name and verify login, browser title, sidebar and public registration.
+3. Change Primary and Secondary colors and verify buttons/accent surfaces/sidebar.
+4. Upload logo, favicon and login background; save and hard-refresh.
+5. Log out and verify the compact login card at 1440, 768, 480 and 360.
+6. Verify favicon after a hard refresh/new tab.
+7. Restore/remove each custom asset using the Branding controls.
+8. Confirm public registration and payment retain responsive behavior after branding changes.
