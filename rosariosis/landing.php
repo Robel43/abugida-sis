@@ -66,7 +66,7 @@ $reference_assets = [
 				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="">
 				<span class="academy-brand__text"><strong><?php echo abugida_landing_h( $platform ); ?></strong><?php if ( $brand['tagline'] ) { ?><small><?php echo abugida_landing_h( $brand['tagline'] ); ?></small><?php } ?></span>
 			</a>
-			<button class="academy-menu-toggle" type="button" aria-controls="academy-mobile-menu" aria-expanded="false">
+			<button class="academy-menu-toggle" type="button" aria-label="Menu" aria-controls="academy-mobile-menu" aria-expanded="false">
 				<span aria-hidden="true">&#9776;</span><span>Menu</span>
 			</button>
 			<nav class="academy-menu" id="academy-mobile-menu" aria-label="Primary">
