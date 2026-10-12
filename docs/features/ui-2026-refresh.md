@@ -352,3 +352,41 @@ Targeted retest:
 4. verify Registration Payment logo/name and primary action color;
 5. verify Configuration Save height is compact and no longer inflated by content-box padding;
 6. restore branding through the UI.
+
+
+## Public student landing page
+
+A new public entry page is available at:
+
+```text
+landing.php
+```
+
+Unauthenticated visits to `index.php` now redirect to the landing page unless the request is an explicit login, authentication POST, password-reset/login reason, account creation flow, or protected redirect target.
+
+Primary actions:
+
+- Register -> `registration.php`
+- Login -> `index.php?login=1`
+
+The landing page follows the same broad information architecture as the referenced Select Academy site—top utility bar, sticky navigation, hero, statistics, service cards, process section, CTA and footer—while using original Abugida/SIS copy and the platform's configurable branding.
+
+Branding applied to landing:
+
+- platform name;
+- logo;
+- favicon;
+- primary color;
+- secondary color;
+- tagline.
+
+The login page now includes a Back to Home link to `landing.php`.
+
+### Landing page test focus
+
+- unauthenticated `index.php` redirects to `landing.php`;
+- Register opens `registration.php`;
+- Login opens `index.php?login=1`;
+- configured logo/name/colors/favicon propagate to landing;
+- desktop, tablet and 360px mobile layouts have no document-level horizontal overflow;
+- existing login POST and password-reset flows remain functional.
