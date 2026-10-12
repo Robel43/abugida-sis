@@ -1690,7 +1690,9 @@ body.login .about-rosariosis summary {
 	#body input[type="button"],
 	#body input[type="reset"],
 	#body button,
-	#body .button,
+	#body a.button,
+	#body button.button,
+	#body input.button,
 	#body .button-primary,
 	#body a.button-primary {
 		min-height: 42px !important;
