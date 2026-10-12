@@ -53,7 +53,8 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 			}
 			else { $notification_id = (int) ( $_POST['notification_id'] ?? 0 ); }
 			$delivery = AbugidaDeliverNotification( $notification_id, $applicant_id, 'FINANCE' );
-			$note[] = $delivery === 'SENT' ? 'Notification accepted by the SMTP server.' : 'Notification status: ' . $delivery . '. The saved decision is preserved; see Email notifications below.';
+			$note[] = $delivery === 'SENT' ? 'Notification accepted by the SMTP server.' :
+				'Notification status: ' . AbugidaDeliveryStatusLabel( $delivery ) . '. The saved decision is preserved; see Email notifications below.';
 		}
 		catch ( RuntimeException $exception )
 		{
@@ -77,8 +78,12 @@ if ( ! empty( $_REQUEST['applicant_id'] ) )
 		echo '<tr><td><b>' . _( 'Applicant' ) . '</b></td><td>' . AttrEscape( $applicant['FIRST_NAME'] . ' ' . $applicant['LAST_NAME'] ) . '</td></tr>';
 		echo '<tr><td><b>' . _( 'Phone' ) . '</b></td><td>' . AttrEscape( $applicant['PHONE'] ) . '</td></tr>';
 		echo '<tr><td><b>' . _( 'Amount Due' ) . '</b></td><td>' . AttrEscape( $applicant['PAYMENT_AMOUNT'] ) . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Payment Status' ) . '</b></td><td>' . AttrEscape( $applicant['PAYMENT_STATUS'] ) . '</td></tr>';
-		echo '<tr><td><b>' . _( 'Application Status' ) . '</b></td><td>' . AttrEscape( $applicant['STATUS'] ) . '</td></tr>';
+		echo '<tr><td><b>' . _( 'Payment Status' ) . '</b></td><td><span class="abg-status ' .
+			AttrEscape( AbugidaStatusToneClass( $applicant['PAYMENT_STATUS'] ) ) . '">' .
+			AttrEscape( AbugidaPaymentStatusLabel( $applicant['PAYMENT_STATUS'] ) ) . '</span></td></tr>';
+		echo '<tr><td><b>' . _( 'Application Status' ) . '</b></td><td><span class="abg-status ' .
+			AttrEscape( AbugidaStatusToneClass( $applicant['STATUS'] ) ) . '">' .
+			AttrEscape( AbugidaApplicationStatusLabel( $applicant['STATUS'] ) ) . '</span></td></tr>';
 		echo '</table>';
 
 		if ( $applicant['RECEIPT_STORED_NAME'] )
@@ -124,6 +129,8 @@ $rows = DBGet( "SELECT ID,APPLICATION_REFERENCE,FIRST_NAME,LAST_NAME,PHONE,PAYME
 foreach ( $rows as $key => $row )
 {
 	$rows[$key]['VIEW_PAYMENT'] = _( 'View Payment' );
+	$rows[$key]['PAYMENT_STATUS_LABEL'] = AbugidaPaymentStatusLabel( $row['PAYMENT_STATUS'] );
+	$rows[$key]['STATUS_LABEL'] = AbugidaApplicationStatusLabel( $row['STATUS'] );
 }
 
 $columns = [
@@ -133,8 +140,8 @@ $columns = [
 	'LAST_NAME' => _( 'Last Name' ),
 	'PHONE' => _( 'Phone' ),
 	'PAYMENT_AMOUNT' => _( 'Amount' ),
-	'PAYMENT_STATUS' => _( 'Payment Status' ),
-	'STATUS' => _( 'Application Status' ),
+	'PAYMENT_STATUS_LABEL' => _( 'Payment Status' ),
+	'STATUS_LABEL' => _( 'Application Status' ),
 	'RECEIPT_SUBMITTED_AT' => _( 'Receipt Submitted' ),
 ];
 
