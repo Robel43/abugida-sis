@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/Warehouse.php';
+require_once __DIR__ . '/ProgramFunctions/AbugidaBranding.fnc.php';
 require_once __DIR__ . '/registration-schema.inc.php';
 abugida_registration_require_schema();
 require_once __DIR__ . '/ProgramFunctions/AbugidaWorkflow.fnc.php';
@@ -11,6 +12,8 @@ header( 'Referrer-Policy: no-referrer' );
 header( 'Cache-Control: no-store' );
 
 const ABUGIDA_PAYMENT_MAX_UPLOAD_BYTES = 5242880;
+
+$abugida_brand = AbugidaBranding();
 
 function abugida_payment_h( $value )
 {
@@ -150,8 +153,10 @@ if ( isset( $_GET['submitted'] ) )
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Payment | Abugida SIS</title>
+<title>Payment | <?php echo abugida_payment_h( $abugida_brand['platform_name'] ); ?></title>
+	<link rel="icon" href="<?php echo abugida_payment_h( $abugida_brand['favicon'] ); ?>">
 	<link rel="stylesheet" href="assets/css/abugida-public-2026.css">
+	<style>:root{--pub-primary:<?php echo abugida_payment_h( $abugida_brand['primary'] ); ?>;--pub-secondary:<?php echo abugida_payment_h( $abugida_brand['secondary'] ); ?>}</style>
 	<script defer src="assets/js/abugida-public-2026.js"></script>
 <style>
 body{margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#182230}
