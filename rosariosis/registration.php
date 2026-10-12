@@ -7,11 +7,14 @@
  */
 
 require_once __DIR__ . '/Warehouse.php';
+require_once __DIR__ . '/ProgramFunctions/AbugidaBranding.fnc.php';
 require_once __DIR__ . '/registration-schema.inc.php';
 abugida_registration_require_schema();
 require_once __DIR__ . '/ProgramFunctions/AbugidaWorkflow.fnc.php';
 
 const ABUGIDA_REG_MAX_UPLOAD_BYTES = 5242880;
+
+$abugida_brand = AbugidaBranding();
 
 if ( empty( $_SESSION['abugida_reg_csrf'] ) )
 {
@@ -343,8 +346,10 @@ elseif ( isset( $_GET['submitted'] ) )
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Online Registration | Abugida SIS</title>
+	<title>Online Registration | <?php echo abugida_reg_h( $abugida_brand['platform_name'] ); ?></title>
+	<link rel="icon" href="<?php echo abugida_reg_h( $abugida_brand['favicon'] ); ?>">
 	<link rel="stylesheet" href="assets/css/abugida-public-2026.css">
+	<style>:root{--pub-primary:<?php echo abugida_reg_h( $abugida_brand['primary'] ); ?>;--pub-secondary:<?php echo abugida_reg_h( $abugida_brand['secondary'] ); ?>}</style>
 	<script defer src="assets/js/abugida-public-2026.js"></script>
 	<style>
 		:root{
@@ -422,9 +427,9 @@ elseif ( isset( $_GET['submitted'] ) )
 <div class="page">
 	<div class="topbar">
 		<div class="identity">
-			<div class="mark">A</div>
+			<div class="mark"><?php echo abugida_reg_h( mb_substr( $abugida_brand['platform_name'], 0, 1 ) ); ?></div>
 			<div>
-				<h1>Abugida SIS</h1>
+				<h1><?php echo abugida_reg_h( $abugida_brand['platform_name'] ); ?></h1>
 				<p>Online student registration</p>
 			</div>
 		</div>
@@ -609,7 +614,7 @@ elseif ( isset( $_GET['submitted'] ) )
 		<?php } ?>
 		</main>
 	</div>
-	<div class="footer-note">Abugida SIS • Student Registration Portal</div>
+	<div class="footer-note"><?php echo abugida_reg_h( $abugida_brand['platform_name'] ); ?> • Student Registration Portal</div>
 </div>
 </body>
 </html>
