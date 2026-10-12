@@ -312,7 +312,8 @@ if ( $latest )
 {
 	echo '<div class="abg-student-section">';
 	echo '<div class="abg-section-header"><div><h3>' . _( 'Latest Request' ) . '</h3><p>' .
-		AttrEscape( $latest['REQUEST_REFERENCE'] ) . '</p></div><span class="abg-rereg-status">' .
+		AttrEscape( $latest['REQUEST_REFERENCE'] ) . '</p></div><span class="abg-rereg-status ' .
+		AttrEscape( AbugidaReRegistrationStatusToneClass( $latest['STATUS'] ) ) . '">' .
 		AttrEscape( AbugidaReRegistrationStatusLabel( $latest['STATUS'] ) ) . '</span></div>';
 
 	echo '<div class="abg-info-list">';
@@ -323,7 +324,7 @@ if ( $latest )
 	echo '<div class="abg-info-item"><div class="abg-student-label">' . _( 'Submitted' ) . '</div><div class="abg-info-value">' .
 		AttrEscape( $latest['CREATED_AT'] ) . '</div></div>';
 	echo '<div class="abg-info-item"><div class="abg-student-label">' . _( 'Payment Status' ) . '</div><div class="abg-info-value">' .
-		AttrEscape( $latest['PAYMENT_STATUS'] ) . '</div></div>';
+		AttrEscape( AbugidaReRegistrationPaymentStatusLabel( $latest['PAYMENT_STATUS'] ) ) . '</div></div>';
 	echo '</div>';
 
 	if ( $latest['STATUS'] === 'DECLINED' )
