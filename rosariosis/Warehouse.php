@@ -675,6 +675,8 @@ function Warehouse( $mode )
 {
 	global $_ROSARIO;
 
+	require_once 'ProgramFunctions/AbugidaBranding.fnc.php';
+
 	if ( isset( $_REQUEST['_ROSARIO_PDF'] ) )
 	{
 		if ( $mode === 'header' )
@@ -723,9 +725,9 @@ function Warehouse( $mode )
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-	<title><?php echo ParseMLField( Config( 'TITLE' ) ); ?></title>
-	<link rel="icon" href="favicon.ico" sizes="32x32">
-	<link rel="icon" href="apple-touch-icon.png" sizes="128x128">
+	<?php $abugida_brand = AbugidaBranding(); ?>
+	<title><?php echo AttrEscape( $abugida_brand['platform_name'] ); ?></title>
+	<link rel="icon" href="<?php echo URLEscape( $abugida_brand['favicon'] ); ?>">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="token" content="<?php echo AttrEscape( $_SESSION['token'] ); ?>">
@@ -742,7 +744,7 @@ function Warehouse( $mode )
 	<?php if ( $abugida_ui_js_hash ): ?>
 		<script defer src="<?php echo $abugida_ui_js; ?>?<?php echo $abugida_ui_js_hash; ?>"></script>
 	<?php endif; ?>
-	<style>.highlight,.highlight-hover:hover{background-color:<?php echo Preferences( 'HIGHLIGHT' ); ?> !important;}</style>
+	<style>:root{<?php echo AbugidaBrandingCssVariables(); ?>}.highlight,.highlight-hover:hover{background-color:<?php echo Preferences( 'HIGHLIGHT' ); ?> !important;}</style>
 	<?php
 
 			if ( $_ROSARIO['page'] === 'modules'
