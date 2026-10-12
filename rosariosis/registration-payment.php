@@ -168,13 +168,20 @@ h1{margin-top:0}.muted{color:#667085}.amount{font-size:34px;font-weight:800;marg
 .instructions{white-space:pre-wrap;background:#f8fafc;border:1px solid #e5eaf1;border-radius:12px;padding:16px;margin:18px 0}
 input[type=file]{width:100%;padding:12px;border:1px solid #d4dbe6;border-radius:10px}
 button,a{display:inline-block;margin-top:18px;padding:12px 16px;border-radius:10px;text-decoration:none;border:0;font-weight:700}
-button{background:#2563eb;color:#fff}.back{background:#eef2f7;color:#344054;margin-left:8px}
-.status{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef4ff;color:#1d4ed8;font-size:12px;font-weight:800}
+button{background:var(--pub-primary);color:#fff}.back{background:#eef2f7;color:#344054;margin-left:8px}
+.status{display:inline-block;padding:6px 10px;border-radius:999px;background:color-mix(in srgb,var(--pub-primary),#fff 91%);color:var(--pub-primary);font-size:12px;font-weight:800}
+.payment-brand{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #e2e8f0}
+.payment-brand img{width:56px;height:56px;object-fit:contain;border:1px solid #e2e8f0;border-radius:12px;background:#fff;padding:5px}
+.payment-brand strong{display:block;font-size:18px;color:#0f172a}.payment-brand span{display:block;margin-top:2px;color:#64748b;font-size:12px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <div class="card">
+<div class="payment-brand">
+<img src="<?php echo abugida_payment_h( AbugidaBrandingUrl( $abugida_brand['logo'] ) ); ?>" alt="<?php echo abugida_payment_h( $abugida_brand['platform_name'] ); ?>">
+<div><strong><?php echo abugida_payment_h( $abugida_brand['platform_name'] ); ?></strong><span>Registration payment</span></div>
+</div>
 <h1>Registration Payment</h1>
 <p class="muted">Application <?php echo abugida_payment_h( $applicant['APPLICATION_REFERENCE'] ); ?></p>
 <span class="status"><?php echo abugida_payment_h( $applicant['PAYMENT_STATUS'] ); ?></span>
