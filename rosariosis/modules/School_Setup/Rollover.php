@@ -271,7 +271,7 @@ $table_list .= '<script src="assets/js/csp/modules/schoolSetup/Rollover.js?v=12.
 $note[] = _( 'Greyed items already have data in the next school year (They might have been rolled).' );
 $note[] = _( 'Rolling greyed items will delete already existing data in the next school year.' );
 
-$table_list .= ErrorMessage( $note, 'note' );
+$table_list .= ErrorMessage( $note, 'info' );
 
 // Hook.
 do_action( 'School_Setup/Rollover.php|rollover_warnings' );
