@@ -155,9 +155,9 @@ if ( isset( $_GET['submitted'] ) )
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Payment | <?php echo abugida_payment_h( $abugida_brand['platform_name'] ); ?></title>
 	<link rel="icon" href="<?php echo abugida_payment_h( $abugida_brand['favicon'] ); ?>">
-	<link rel="stylesheet" href="assets/css/abugida-public-2026.css">
+	<link rel="stylesheet" href="assets/css/abugida-public-2026.css?v=<?php echo (int) @filemtime( __DIR__ . '/assets/css/abugida-public-2026.css' ); ?>">
 	<style>:root{--pub-primary:<?php echo abugida_payment_h( $abugida_brand['primary'] ); ?>;--pub-secondary:<?php echo abugida_payment_h( $abugida_brand['secondary'] ); ?>}</style>
-	<script defer src="assets/js/abugida-public-2026.js"></script>
+	<script defer src="assets/js/abugida-public-2026.js?v=<?php echo (int) @filemtime( __DIR__ . '/assets/js/abugida-public-2026.js' ); ?>"></script>
 <style>
 body{margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#182230}
 .wrap{max-width:760px;margin:48px auto;padding:0 18px}
