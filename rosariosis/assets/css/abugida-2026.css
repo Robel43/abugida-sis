@@ -1707,3 +1707,16 @@ body.login .about-rosariosis summary {
 		margin: 0 auto !important;
 	}
 }
+
+body.login .abg-login-back{
+	padding:14px 24px 0;
+}
+body.login .abg-login-back a{
+	color:var(--abg-text-muted);
+	font-size:12px;
+	font-weight:700;
+	text-decoration:none;
+}
+body.login .abg-login-back a:hover{
+	color:var(--abg-primary);
+}
