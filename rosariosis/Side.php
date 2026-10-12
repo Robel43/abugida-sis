@@ -8,6 +8,7 @@
  */
 
 require_once 'Warehouse.php';
+require_once 'ProgramFunctions/AbugidaBranding.fnc.php';
 
 if ( ! function_exists( 'SideMarkingPeriodSelect' ) ) :
 /**
@@ -391,8 +392,9 @@ if ( ! isset( $_REQUEST['sidefunc'] )
 
 	<?php // User Information. ?>
 
-	<a href="Modules.php?modname=misc/Portal.php" class="center">
-		<img src="assets/themes/<?php echo Preferences( 'THEME' ); ?>/logo.png" class="logo" alt="Logo">
+	<?php $abugida_brand = AbugidaBranding(); ?>
+	<a href="Modules.php?modname=misc/Portal.php" class="center" aria-label="<?php echo AttrEscape( $abugida_brand['platform_name'] ); ?>">
+		<img src="<?php echo URLEscape( $abugida_brand['logo'] ); ?>" class="logo" alt="<?php echo AttrEscape( $abugida_brand['platform_name'] ); ?>">
 	</a>
 	<form action="Side.php?sidefunc=update" method="POST" target="menu-top">
 		<span class="username br-after"><?php echo User( 'NAME' ); ?></span>
