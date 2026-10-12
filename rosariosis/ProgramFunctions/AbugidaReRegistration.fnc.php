@@ -24,6 +24,43 @@ function AbugidaReRegistrationStatusLabel( $status )
 	return isset( $labels[$status] ) ? $labels[$status] : $status;
 }
 
+function AbugidaReRegistrationPaymentStatusLabel( $status )
+{
+	$labels = [
+		'' => _( 'Not Required' ),
+		'NOT_REQUIRED' => _( 'Not Required' ),
+		'PENDING' => _( 'Pending' ),
+		'SUBMITTED' => _( 'Submitted' ),
+		'DECLINED' => _( 'Rejected' ),
+		'VERIFIED' => _( 'Verified' ),
+	];
+
+	return isset( $labels[(string) $status] ) ? $labels[(string) $status] :
+		str_replace( '_', ' ', ucwords( strtolower( (string) $status ), '_' ) );
+}
+
+function AbugidaReRegistrationStatusToneClass( $status )
+{
+	$status = strtoupper( (string) $status );
+
+	if ( in_array( $status, [ 'COMPLETED', 'PAYMENT_VERIFIED', 'VERIFIED' ], true ) )
+	{
+		return 'is-success';
+	}
+
+	if ( in_array( $status, [ 'DECLINED', 'PAYMENT_DECLINED' ], true ) )
+	{
+		return 'is-danger';
+	}
+
+	if ( in_array( $status, [ 'SUBMITTED', 'APPROVED_FOR_PAYMENT', 'PAYMENT_SUBMITTED', 'READY_FOR_FINAL', 'PENDING' ], true ) )
+	{
+		return 'is-warning';
+	}
+
+	return 'is-info';
+}
+
 function AbugidaReRegistrationHistory( $request_id, $from, $to, $action, $actor_type, $reason = '' )
 {
 	DBInsert(
