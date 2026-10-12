@@ -13,7 +13,8 @@ $note = $error = $warning = [];
  * Error Message
  *
  * Use 'fatal' code to exit program.
- * Use 'note' code for Notes and Update messages.
+ * Use 'note' code for successful Notes / Update messages.
+ * Use 'info' code for informational messages that should remain inline.
  *
  * If there are missing vals or similar, show them a msg.
  * Pass in an array with error messages and this will display them
@@ -30,7 +31,7 @@ $note = $error = $warning = [];
  * @global string $print_data PDF print data
  *
  * @param  array  $errors Array of errors or notes.
- * @param  string $code   error|fatal|warning|note (optional). Defaults to 'error'.
+ * @param  string $code   error|fatal|warning|note|info (optional). Defaults to 'error'.
  * @return string Error / Note Message, exits if 'fatal' code
  */
 function ErrorMessage( $errors, $code = 'error' )
@@ -56,6 +57,11 @@ function ErrorMessage( $errors, $code = 'error' )
 	{
 		// Warning.
 		$return = '<div class="error abg-feedback-warning"><p>' . button( 'warning', _( 'Warning' ) );
+	}
+	elseif ( $code === 'info' )
+	{
+		// Informational notice: not a completed action.
+		$return = '<div class="abg-feedback-info"><p><b>' . _( 'Information' ) . '</b>';
 	}
 
 	if ( count( $errors ) === 1 )
