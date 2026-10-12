@@ -7,6 +7,7 @@
  */
 
 require_once 'ProgramFunctions/AbugidaClassRank.fnc.php';
+require_once 'ProgramFunctions/AbugidaBranding.fnc.php';
 
 function AbugidaStudentPortalGuard()
 {
@@ -263,7 +264,15 @@ function AbugidaStudentPortalProfile()
 
 function AbugidaStudentPortalStyles()
 {
+	$brand = AbugidaBranding();
+	$primary = $brand['primary'];
+	$secondary = $brand['secondary'];
+
 	echo '<style>
+		:root{
+			--abg-student-primary:' . AttrEscape( $primary ) . ';
+			--abg-student-secondary:' . AttrEscape( $secondary ) . ';
+		}
 		.abg-student-shell{
 			max-width:1200px;
 			margin:0 auto;
@@ -272,7 +281,7 @@ function AbugidaStudentPortalStyles()
 		.abg-page-hero{
 			position:relative;
 			overflow:hidden;
-			background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 55%,#38bdf8 100%);
+			background:linear-gradient(135deg,var(--abg-student-secondary) 0%,color-mix(in srgb,var(--abg-student-secondary),var(--abg-student-primary) 35%) 55%,var(--abg-student-primary) 100%);
 			color:#fff;
 			border-radius:20px;
 			padding:28px 30px;
@@ -397,8 +406,8 @@ function AbugidaStudentPortalStyles()
 			min-height:40px;
 			padding:9px 14px;
 			border-radius:10px;
-			background:#2563eb;
-			border:1px solid #2563eb;
+			background:var(--abg-student-primary);
+			border:1px solid var(--abg-student-primary);
 			color:#fff !important;
 			text-decoration:none !important;
 			font-weight:800;
@@ -407,14 +416,14 @@ function AbugidaStudentPortalStyles()
 			transition:background .18s ease,transform .18s ease,box-shadow .18s ease;
 		}
 		.abg-student-link:hover{
-			background:#1d4ed8;
-			border-color:#1d4ed8;
+			background:color-mix(in srgb,var(--abg-student-primary),#000 12%);
+			border-color:color-mix(in srgb,var(--abg-student-primary),#000 12%);
 			transform:translateY(-1px);
 			box-shadow:0 9px 22px rgba(37,99,235,.26);
 		}
 		.abg-student-link.secondary{
 			background:#fff;
-			color:#2563eb !important;
+			color:var(--abg-student-primary) !important;
 			border-color:#cbd5e1;
 			box-shadow:none;
 		}
@@ -468,7 +477,7 @@ function AbugidaStudentPortalStyles()
 		.abg-badge.success{background:#dcfce7;color:#166534}
 		.abg-badge.warning{background:#fef3c7;color:#92400e}
 		.abg-badge.danger{background:#fee2e2;color:#991b1b}
-		.abg-badge.info{background:#dbeafe;color:#1d4ed8}
+		.abg-badge.info{background:#dbeafe;color:var(--abg-student-primary)}
 		.abg-badge.neutral{background:#f1f5f9;color:#475569}
 		.abg-info-list{
 			display:grid;
