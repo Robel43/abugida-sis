@@ -2029,3 +2029,18 @@ body.login .about-rosariosis {
 	color: #0c4a6e !important;
 	border: 1px solid #bae6fd !important;
 }
+
+
+/* Informational feedback stays inline; it is not an action-success modal. */
+#body .abg-feedback-info{
+	margin:12px 0;
+	padding:12px 14px;
+	border:1px solid #bae6fd;
+	border-radius:11px;
+	background:#f0f9ff;
+	color:#0c4a6e;
+	font-size:13px;
+	line-height:1.55;
+}
+#body .abg-feedback-info p{margin:0}
+#body .abg-feedback-info ul{margin:8px 0 0 18px}
