@@ -60,20 +60,6 @@ $reference_assets = [
 	<style>:root{--landing-primary:<?php echo abugida_landing_h( $brand['primary'] ); ?>;--landing-secondary:<?php echo abugida_landing_h( $brand['secondary'] ); ?>}</style>
 </head>
 <body>
-	<div class="academy-top">
-		<div class="landing-container academy-top__inner">
-			<a class="academy-logo" href="landing.php">
-				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="<?php echo abugida_landing_h( $platform ); ?>">
-				<span><?php echo abugida_landing_h( strtoupper( $platform ) ); ?></span>
-			</a>
-			<div class="academy-top__contact">
-				<span>Student Information System</span>
-				<a href="index.php?login=1">Login</a>
-				<a href="registration.php">Register</a>
-			</div>
-		</div>
-	</div>
-
 	<header class="academy-header">
 		<div class="landing-container academy-header__inner">
 			<nav class="academy-menu" aria-label="Primary">
@@ -289,19 +275,5 @@ $reference_assets = [
 		</section>
 	</main>
 
-	<footer class="academy-footer">
-		<div class="landing-container academy-footer__inner">
-			<div class="academy-footer__brand">
-				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="<?php echo abugida_landing_h( $platform ); ?>">
-				<div><strong><?php echo abugida_landing_h( $platform ); ?></strong><span>Student Information System</span></div>
-			</div>
-			<nav>
-				<a href="#home">Home</a>
-				<a href="registration.php">Register</a>
-				<a href="index.php?login=1">Login</a>
-			</nav>
-			<p>&copy; <?php echo date( 'Y' ); ?> <?php echo abugida_landing_h( $platform ); ?></p>
-		</div>
-	</footer>
 </body>
 </html>
