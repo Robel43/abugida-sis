@@ -184,7 +184,7 @@ button{background:var(--pub-primary);color:#fff}.back{background:#eef2f7;color:#
 </div>
 <h1>Registration Payment</h1>
 <p class="muted">Application <?php echo abugida_payment_h( $applicant['APPLICATION_REFERENCE'] ); ?></p>
-<span class="status"><?php echo abugida_payment_h( AbugidaPaymentStatusLabel( $applicant['PAYMENT_STATUS'] ) ); ?></span>
+<span class="status <?php echo abugida_payment_h( AbugidaStatusToneClass( $applicant['PAYMENT_STATUS'] ) ); ?>"><?php echo abugida_payment_h( AbugidaPaymentStatusLabel( $applicant['PAYMENT_STATUS'] ) ); ?></span>
 
 <?php if ( $notice ) { ?><div class="notice"><?php echo abugida_payment_h( $notice ); ?></div><?php } ?>
 <?php if ( $errors ) { ?><div class="error"><?php echo abugida_payment_h( implode( ' ', $errors ) ); ?></div><?php } ?>
