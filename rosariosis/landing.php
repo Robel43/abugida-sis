@@ -146,7 +146,7 @@ $reference_assets = [
 				<div class="academy-section__heading">
 					<span>Full packages</span>
 					<h2>Explore grade-level learning packages</h2>
-					<p>A visual catalogue inspired by the original Select Academy course grid, adapted here as a student-facing entry point.</p>
+					<p>Browse grade-level learning packages and continue into the services available through your student account.</p>
 				</div>
 				<div class="academy-package-grid academy-package-grid--three">
 					<article class="academy-package-card"><img src="<?php echo abugida_landing_h( $reference_assets['grade12_natural'] ); ?>" alt="Grade 12 Natural Science"><div><span>Grade 12</span><h3>Natural Science Full Package</h3><p>Access student services and your academic portal for Grade 12 Natural Science.</p><a href="index.php?login=1">Open portal</a></div></article>
