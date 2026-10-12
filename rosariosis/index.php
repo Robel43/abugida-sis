@@ -610,22 +610,7 @@ if ( empty( $_SESSION['STAFF_ID'] )
 		<input type="hidden" name="redirect_to" value="<?php echo URLEscape( $_REQUEST['redirect_to'] ); ?>" />
 	<?php endif; ?>
 	</form>
-	<details class="about-rosariosis">
-		<summary><?php echo _( 'About' ); ?></summary>
-		<?php // System disclaimer. ?>
-		<p class="size-3">
-			<?php
-				echo sprintf(
-					_( 'This is a restricted network. Use of this network, its equipment, and resources is monitored at all times and requires explicit permission from the network administrator and %s. If you do not have this permission in writing, you are violating the regulations of this network and can and will be prosecuted to the full extent of the law. By continuing into this system, you are acknowledging that you are aware of and agree to these terms.'),
-					ParseMLField( Config( 'TITLE' ) )
-				);
-			?>
-		</p>
-		<p class="center size-1">
-			&copy; 2004-2009 The Miller Group &amp; Learners Circle
-			<br />&copy; 2012-2026 <a href="https://www.rosariosis.org" rel="noreferrer">RosarioSIS</a>
-		</p>
-	</details>
+
 
 <?php PopTable( 'footer' );
 
