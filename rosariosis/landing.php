@@ -3,6 +3,8 @@
  * Public student landing page.
  *
  * Entry point for prospective and existing students.
+ * Layout inspired by the Select Academy public site while preserving
+ * configurable Abugida branding and SIS-specific actions.
  */
 
 require_once __DIR__ . '/Warehouse.php';
@@ -18,6 +20,19 @@ function abugida_landing_h( $value )
 
 $logo_url = AbugidaBrandingUrl( $brand['logo'] );
 $favicon_url = AbugidaBrandingUrl( $brand['favicon'] );
+
+$reference_assets = [
+	'hero' => 'https://selectacademy.edu.et/wp-content/uploads/2024/12/girls-with-mobi-green.jpg',
+	'icon_courses' => 'https://selectacademy.edu.et/wp-content/uploads/2024/11/Icon-1.png',
+	'icon_students' => 'https://selectacademy.edu.et/wp-content/uploads/2024/11/Icon-2.png',
+	'icon_teachers' => 'https://selectacademy.edu.et/wp-content/uploads/2024/11/Icon-4.png',
+	'grade12_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/3.png',
+	'grade12_social' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/2.png',
+	'grade11_natural' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/5.png',
+	'grade11_social' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/4.png',
+	'grade10' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/6.png',
+	'grade9' => 'https://selectacademy.edu.et/wp-content/uploads/2026/01/7.png',
+];
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -29,166 +44,175 @@ $favicon_url = AbugidaBrandingUrl( $brand['favicon'] );
 	<style>:root{--landing-primary:<?php echo abugida_landing_h( $brand['primary'] ); ?>;--landing-secondary:<?php echo abugida_landing_h( $brand['secondary'] ); ?>}</style>
 </head>
 <body>
-	<div class="landing-topbar">
-		<div class="landing-container landing-topbar__inner">
-			<div class="landing-topbar__brand">
+	<div class="academy-top">
+		<div class="landing-container academy-top__inner">
+			<a class="academy-logo" href="landing.php">
 				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="<?php echo abugida_landing_h( $platform ); ?>">
-				<span><?php echo abugida_landing_h( $platform ); ?></span>
-			</div>
-			<div class="landing-topbar__meta">
+				<span><?php echo abugida_landing_h( strtoupper( $platform ) ); ?></span>
+			</a>
+			<div class="academy-top__contact">
 				<span>Student Information System</span>
 				<a href="index.php?login=1">Login</a>
+				<a href="registration.php">Register</a>
 			</div>
 		</div>
 	</div>
 
-	<header class="landing-nav">
-		<div class="landing-container landing-nav__inner">
-			<a class="landing-brand" href="landing.php">
-				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="<?php echo abugida_landing_h( $platform ); ?>">
-				<div>
-					<strong><?php echo abugida_landing_h( $platform ); ?></strong>
-					<span><?php echo $brand['tagline'] ? abugida_landing_h( $brand['tagline'] ) : 'Your school journey, in one place'; ?></span>
-				</div>
-			</a>
-
-			<nav class="landing-nav__links" aria-label="Primary">
-				<a href="#home">Home</a>
+	<header class="academy-header">
+		<div class="landing-container academy-header__inner">
+			<nav class="academy-menu" aria-label="Primary">
+				<a class="is-active" href="#home">Home</a>
+				<a href="#grades">Grades</a>
 				<a href="#services">Student Services</a>
 				<a href="#how-it-works">How It Works</a>
 				<a href="#about">About</a>
 			</nav>
-
-			<div class="landing-nav__actions">
-				<a class="landing-btn landing-btn--ghost" href="index.php?login=1">Login</a>
-				<a class="landing-btn landing-btn--primary" href="registration.php">Register</a>
+			<div class="academy-account">
+				<a href="index.php?login=1">Login</a>
+				<a class="academy-register" href="registration.php">Register</a>
 			</div>
 		</div>
 	</header>
 
 	<main>
-		<section class="landing-hero" id="home">
-			<div class="landing-container landing-hero__grid">
-				<div class="landing-hero__content">
-					<span class="landing-eyebrow">Student portal and registration</span>
-					<h1>Start your academic journey with <span><?php echo abugida_landing_h( $platform ); ?></span></h1>
-					<p>Register as a new student, sign in to your existing account, follow your academic progress, view grades and payments, and complete re-registration from one secure place.</p>
-					<div class="landing-hero__actions">
-						<a class="landing-btn landing-btn--primary landing-btn--large" href="registration.php">Register Now</a>
-						<a class="landing-btn landing-btn--light landing-btn--large" href="index.php?login=1">Student Login</a>
-					</div>
-					<div class="landing-hero__trust">
-						<span>✓ Secure registration</span>
-						<span>✓ Academic records</span>
-						<span>✓ Payment tracking</span>
+		<section class="academy-hero" id="home">
+			<div class="landing-container academy-hero__grid">
+				<div class="academy-hero__copy">
+					<span class="academy-kicker"><?php echo abugida_landing_h( $platform ); ?></span>
+					<h1>Your choice for <span>simple, secure student services</span></h1>
+					<p>Apply online, access your student portal, follow grades and payments, and continue into the next semester or academic year from one responsive system.</p>
+					<div class="academy-hero__actions">
+						<a class="academy-btn academy-btn--primary" href="registration.php">Register Now</a>
+						<a class="academy-btn academy-btn--outline" href="index.php?login=1">Student Login</a>
 					</div>
 				</div>
-
-				<div class="landing-hero__visual" aria-hidden="true">
-					<div class="landing-hero__orb landing-hero__orb--one"></div>
-					<div class="landing-hero__orb landing-hero__orb--two"></div>
-					<div class="landing-portal-card">
-						<div class="landing-portal-card__head">
-							<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="">
-							<div><strong><?php echo abugida_landing_h( $platform ); ?></strong><span>Student Dashboard</span></div>
-						</div>
-						<div class="landing-portal-card__stats">
-							<div><span>Academic year</span><strong>2026</strong></div>
-							<div><span>Courses</span><strong>8</strong></div>
-							<div><span>Status</span><strong>Active</strong></div>
-						</div>
-						<div class="landing-portal-card__progress">
-							<span>Academic progress</span>
-							<div><i></i></div>
-						</div>
-						<div class="landing-portal-card__rows">
-							<span></span><span></span><span></span>
-						</div>
-					</div>
+				<div class="academy-hero__image">
+					<img src="<?php echo abugida_landing_h( $reference_assets['hero'] ); ?>" alt="Students learning with a mobile device">
 				</div>
 			</div>
 		</section>
 
-		<section class="landing-stats">
-			<div class="landing-container landing-stats__grid">
-				<div><strong>Online</strong><span>Student Registration</span></div>
-				<div><strong>24/7</strong><span>Portal Access</span></div>
-				<div><strong>1</strong><span>Student Account</span></div>
-				<div><strong>100%</strong><span>Responsive Experience</span></div>
+		<section class="academy-stats" aria-label="Platform highlights">
+			<div class="landing-container academy-stats__grid">
+				<article>
+					<img src="<?php echo abugida_landing_h( $reference_assets['icon_courses'] ); ?>" alt="">
+					<div><strong>Online</strong><span>Student Registration</span></div>
+				</article>
+				<article>
+					<img src="<?php echo abugida_landing_h( $reference_assets['icon_teachers'] ); ?>" alt="">
+					<div><strong>24/7</strong><span>Portal Access</span></div>
+				</article>
+				<article>
+					<img src="<?php echo abugida_landing_h( $reference_assets['icon_students'] ); ?>" alt="">
+					<div><strong>1 Account</strong><span>Across Academic Years</span></div>
+				</article>
 			</div>
 		</section>
 
-		<section class="landing-section" id="services">
+		<section class="academy-section" id="grades">
 			<div class="landing-container">
-				<div class="landing-section__heading">
+				<div class="academy-section__heading">
+					<span>Academic access</span>
+					<h2>One portal for every stage of the student journey</h2>
+					<p>Use the same identity from initial application through enrollment, academic reporting and re-registration.</p>
+				</div>
+
+				<div class="academy-package-grid">
+					<article class="academy-package-card">
+						<img src="<?php echo abugida_landing_h( $reference_assets['grade9'] ); ?>" alt="Grade 9">
+						<div><span>Grade 9</span><h3>Start strong</h3><p>Registration, academic records and student portal access.</p></div>
+					</article>
+					<article class="academy-package-card">
+						<img src="<?php echo abugida_landing_h( $reference_assets['grade10'] ); ?>" alt="Grade 10">
+						<div><span>Grade 10</span><h3>Stay connected</h3><p>Keep track of your subjects, payments and official results.</p></div>
+					</article>
+					<article class="academy-package-card">
+						<img src="<?php echo abugida_landing_h( $reference_assets['grade11_natural'] ); ?>" alt="Grade 11">
+						<div><span>Grade 11</span><h3>Progress with confidence</h3><p>Access academic information and continue enrollment securely.</p></div>
+					</article>
+					<article class="academy-package-card">
+						<img src="<?php echo abugida_landing_h( $reference_assets['grade12_natural'] ); ?>" alt="Grade 12">
+						<div><span>Grade 12</span><h3>Finish prepared</h3><p>Review your official academic record and complete your final-year services.</p></div>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="academy-section academy-section--soft" id="services">
+			<div class="landing-container">
+				<div class="academy-section__heading">
 					<span>Student services</span>
-					<h2>Everything you need in one place</h2>
-					<p>Use the same platform from your first application through future-year re-registration.</p>
+					<h2>Everything students need, clearly organized</h2>
 				</div>
-
-				<div class="landing-cards">
-					<article class="landing-card">
-						<div class="landing-card__icon">01</div>
+				<div class="academy-service-grid">
+					<article>
+						<div class="academy-service-icon">01</div>
 						<h3>New Student Registration</h3>
-						<p>Start an application, save progress, submit documents, follow approval, and complete payment.</p>
-						<a href="registration.php">Start registration →</a>
+						<p>Submit an application, upload required documents, follow review and complete payment.</p>
+						<a href="registration.php">Start registration</a>
 					</article>
-					<article class="landing-card">
-						<div class="landing-card__icon">02</div>
+					<article>
+						<div class="academy-service-icon">02</div>
 						<h3>Student Portal</h3>
-						<p>View your courses, official grades, class rank, payments, profile, and academic information.</p>
-						<a href="index.php?login=1">Login to portal →</a>
+						<p>View courses, official grades, class rank, profile details and payment history.</p>
+						<a href="index.php?login=1">Login to portal</a>
 					</article>
-					<article class="landing-card">
-						<div class="landing-card__icon">03</div>
+					<article>
+						<div class="academy-service-icon">03</div>
 						<h3>Re-Registration</h3>
-						<p>Continue into the next semester or academic year without creating a new account.</p>
-						<a href="index.php?login=1">Continue studies →</a>
+						<p>Continue into a future semester or academic year without creating a new account.</p>
+						<a href="index.php?login=1">Continue studies</a>
 					</article>
 				</div>
 			</div>
 		</section>
 
-		<section class="landing-section landing-section--muted" id="how-it-works">
-			<div class="landing-container landing-flow">
-				<div class="landing-section__heading landing-section__heading--left">
-					<span>Simple process</span>
-					<h2>From application to active student account</h2>
-					<p>Designed to make the school registration process clear for students and families.</p>
+		<section class="academy-section academy-process" id="how-it-works">
+			<div class="landing-container academy-process__grid">
+				<div class="academy-process__visual">
+					<img src="<?php echo abugida_landing_h( $reference_assets['grade12_social'] ); ?>" alt="Student registration and portal">
 				</div>
-				<div class="landing-flow__steps">
-					<div><b>1</b><strong>Apply</strong><span>Complete the online student registration form.</span></div>
-					<div><b>2</b><strong>Review</strong><span>The Registrar reviews your application and documents.</span></div>
-					<div><b>3</b><strong>Pay</strong><span>Submit the required payment receipt when approved.</span></div>
-					<div><b>4</b><strong>Access</strong><span>Receive your student account and log in to the portal.</span></div>
+				<div>
+					<div class="academy-section__heading academy-section__heading--left">
+						<span>How it works</span>
+						<h2>A straightforward path from application to active student</h2>
+					</div>
+					<div class="academy-steps">
+						<div><b>1</b><span><strong>Apply online</strong><small>Complete the registration form and submit your information.</small></span></div>
+						<div><b>2</b><span><strong>Registrar review</strong><small>Your application and documents are reviewed by the school.</small></span></div>
+						<div><b>3</b><span><strong>Complete payment</strong><small>Upload the required receipt when your application is approved.</small></span></div>
+						<div><b>4</b><span><strong>Access your account</strong><small>Use the same student identity for portal access and future re-registration.</small></span></div>
+					</div>
 				</div>
 			</div>
 		</section>
 
-		<section class="landing-cta" id="about">
-			<div class="landing-container landing-cta__inner">
+		<section class="academy-cta" id="about">
+			<div class="landing-container academy-cta__inner">
 				<div>
-					<span>Ready to begin?</span>
-					<h2>Register today or continue with your existing student account.</h2>
+					<span><?php echo abugida_landing_h( $platform ); ?></span>
+					<h2>Ready to begin your student journey?</h2>
+					<p>Register as a new student or sign in with your existing account.</p>
 				</div>
-				<div class="landing-cta__actions">
-					<a class="landing-btn landing-btn--light landing-btn--large" href="registration.php">Register</a>
-					<a class="landing-btn landing-btn--outline-light landing-btn--large" href="index.php?login=1">Login</a>
+				<div class="academy-cta__actions">
+					<a class="academy-btn academy-btn--light" href="registration.php">Register</a>
+					<a class="academy-btn academy-btn--outline-light" href="index.php?login=1">Login</a>
 				</div>
 			</div>
 		</section>
 	</main>
 
-	<footer class="landing-footer">
-		<div class="landing-container landing-footer__inner">
-			<div class="landing-footer__brand">
+	<footer class="academy-footer">
+		<div class="landing-container academy-footer__inner">
+			<div class="academy-footer__brand">
 				<img src="<?php echo abugida_landing_h( $logo_url ); ?>" alt="<?php echo abugida_landing_h( $platform ); ?>">
 				<div><strong><?php echo abugida_landing_h( $platform ); ?></strong><span>Student Information System</span></div>
 			</div>
-			<div class="landing-footer__links">
+			<nav>
+				<a href="#home">Home</a>
 				<a href="registration.php">Register</a>
 				<a href="index.php?login=1">Login</a>
-			</div>
+			</nav>
 			<p>&copy; <?php echo date( 'Y' ); ?> <?php echo abugida_landing_h( $platform ); ?></p>
 		</div>
 	</footer>
