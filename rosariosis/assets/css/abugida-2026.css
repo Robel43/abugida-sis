@@ -1212,3 +1212,93 @@ body.abg-modal-open { overflow: hidden; }
 		font-size: 23px !important;
 	}
 }
+
+
+/* Phase 2 browser-test fixes */
+
+/* Use one responsive strategy for RosarioSIS ListOutput tables:
+   keep semantic table layout and let the Abugida scroll wrapper handle narrow screens.
+   This disables FlatSIS' rotated/block .rt layout whose fixed heights clip labels
+   once modern padding is applied. */
+@media (max-width: 1023px) {
+	#body table.rt {
+		display: table !important;
+		position: static !important;
+		width: max-content !important;
+		min-width: 100% !important;
+		table-layout: auto !important;
+	}
+
+	#body table.rt thead {
+		display: table-header-group !important;
+		float: none !important;
+		max-width: none !important;
+	}
+
+	#body table.rt tbody {
+		display: table-row-group !important;
+		width: auto !important;
+		position: static !important;
+		overflow: visible !important;
+		white-space: normal !important;
+	}
+
+	#body table.rt tr,
+	#body table.rt thead tr,
+	#body table.rt tbody tr {
+		display: table-row !important;
+		border-right: 0 !important;
+	}
+
+	#body table.rt th,
+	#body table.rt td,
+	#body .list.rt th,
+	#body .list.rt td {
+		display: table-cell !important;
+		float: none !important;
+		width: auto !important;
+		height: auto !important;
+		min-height: 0 !important;
+		line-height: 1.4 !important;
+		padding: 10px 12px !important;
+		vertical-align: middle !important;
+		white-space: nowrap;
+		overflow: visible !important;
+		text-overflow: clip !important;
+	}
+
+	#body table.rt input,
+	#body table.rt select,
+	#body table.rt textarea {
+		max-width: none;
+	}
+}
+
+#body .abg-info-state,
+#body .abg-empty-state {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 14px 0;
+	padding: 14px 16px;
+	border: 1px solid #bae6fd;
+	border-radius: 12px;
+	background: var(--abg-info-soft);
+	color: #0c4a6e;
+	box-shadow: var(--abg-shadow-sm);
+}
+
+#body .abg-info-state::before,
+#body .abg-empty-state::before {
+	content: "i";
+	flex: 0 0 24px;
+	width: 24px;
+	height: 24px;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	background: #e0f2fe;
+	color: var(--abg-info);
+	font-size: 13px;
+	font-weight: 900;
+}
