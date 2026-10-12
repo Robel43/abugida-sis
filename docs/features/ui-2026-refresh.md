@@ -405,3 +405,98 @@ The landing page now includes additional visual blocks based on the source homep
 - source-provided education imagery and package artwork.
 
 The visual structure follows the reference site's catalogue-heavy browsing pattern while keeping Abugida branding, colors, logo, favicon and SIS actions configurable. Register and Login continue to route into Abugida workflows rather than the source site's commerce/course URLs.
+
+
+## Phase 3 cleanup
+
+Final cleanup work completed on the UI branch:
+
+- application, payment, delivery and re-registration states now use human-readable labels instead of raw database codes;
+- workflow states use consistent success / warning / danger / information badge tones across staff, student and public pages;
+- empty re-registration request/payment lists remain inline informational states rather than false success dialogs;
+- student-facing re-registration payment statuses are humanized;
+- notification delivery statuses are humanized;
+- account-creation and workflow notification branding uses the configured platform name;
+- public landing copy no longer exposes reference-site wording;
+- legacy image-button selectors are excluded from generic mobile action sizing;
+- public registration and payment status chips use the same workflow color semantics.
+
+## Final source validation
+
+Source-level regression checks completed on `feature/ui-2026-refresh`:
+
+- unauthenticated `index.php` routes to `landing.php`;
+- Login Register action routes to `registration.php`;
+- Registration Back to Home routes to `landing.php`;
+- registration/payment pages use human-readable workflow labels;
+- landing, login, public registration, public payment and student portal read configurable branding;
+- branding helper exposes logo, favicon and login background;
+- warning markup receives `abg-feedback-warning`;
+- JS classifies warnings before generic errors;
+- mobile menu handlers remain idempotent;
+- legacy `img.button` icons have explicit compact dimensions;
+- student re-registration payment labels are human-readable;
+- no public-facing `Select Academy SIS` literal remains in the primary entry pages;
+- PR contains no database migration files.
+
+The PR remains draft until the final Docker/browser matrix below is completed.
+
+## Final Docker/browser regression matrix
+
+Run on the current branch at 1440, 1024, 830, 768, 480 and 360 where applicable.
+
+### Public entry and branding
+- landing page loads from unauthenticated root;
+- Login and Register routes work;
+- configured platform name/logo/favicon/primary/secondary colors propagate;
+- login background loads correctly;
+- public Registration and Registration Payment show configured branding;
+- Registration Back to Home works.
+
+### Login
+- desktop right panel remains slim, full-height and flush right;
+- mobile panel is centered and scroll-safe;
+- Forgot Password, Register and Back to Home work;
+- invalid login error appears in modal;
+- no About section;
+- no document-level horizontal overflow.
+
+### Responsive shell
+- desktop sidebar visible at 1024/1440;
+- drawer opens with one click/Enter at <=874;
+- drawer is above backdrop and links navigate;
+- backdrop and Escape close;
+- repeated 360 -> 1440 -> 360 resize leaves no spacer/gap.
+
+### Staff workflows
+- Online Applications list/detail;
+- Application Payments list/detail;
+- Registration Fees;
+- Grade Import;
+- Class Rank;
+- Class Grade Reports;
+- Re-Registration Requests;
+- Re-Registration Payments;
+- readable status labels and consistent badge colors;
+- no oversized legacy icons.
+
+### Feedback
+- error modal;
+- success modal;
+- real warning modal;
+- keyboard focus trapped in modal;
+- Escape dismisses and focus restores.
+
+### Student portal
+- Dashboard, Courses, Grades, Payments, Profile and Re-Registration;
+- configured branding visible;
+- URL student-id tampering does not change student identity;
+- grades/ranks/payments unchanged from validated integration baseline.
+
+### Functional smoke
+- one invalid Grade Import validation;
+- one Class Rank recalculation;
+- one read-only staff report;
+- one registration validation error;
+- one public payment validation error;
+- no approval, payment verification, enrollment or grade mutation is required solely for UI validation.
