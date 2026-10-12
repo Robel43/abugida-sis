@@ -500,3 +500,32 @@ Run on the current branch at 1440, 1024, 830, 768, 480 and 360 where applicable.
 - one registration validation error;
 - one public payment validation error;
 - no approval, payment verification, enrollment or grade mutation is required solely for UI validation.
+
+
+## Final regression fixes after 2026-10-12 browser pass
+
+Three confirmed issues from the final Docker/browser regression were corrected:
+
+1. Landing branding
+   - the configured platform logo is now rendered in the landing header;
+   - configured platform name is rendered beside it;
+   - configured tagline is rendered when present.
+
+2. Landing mobile navigation
+   - a dedicated Menu control appears at mobile widths;
+   - Grades 9–12, Packages, ESSLCE, Student Services and About are available from the expanded menu;
+   - selecting a menu link closes the mobile menu;
+   - the control exposes `aria-controls` and `aria-expanded`.
+
+3. Informational feedback semantics
+   - `ErrorMessage()` now supports an explicit `info` type;
+   - informational messages remain inline and use a blue information treatment;
+   - the student password-reset availability notice now uses `info`;
+   - the Rollover greyed-item explanation now uses `info`;
+   - real success notes remain `note` and continue to use the success modal.
+
+Targeted retest required before PR readiness:
+- temporary branding change must show logo, platform name and tagline on `landing.php`;
+- 360px and 480px landing menu must expose all hidden navigation items;
+- Forgot Password must show the student-reset-disabled message inline with no Success modal;
+- Rollover warning must remain a warning modal, and the greyed-item explanation must remain inline with no queued Success modal.
