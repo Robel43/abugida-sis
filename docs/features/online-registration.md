@@ -13,7 +13,7 @@ Provide a standalone applicant-facing registration page for Abugida SIS without 
 For local Docker development:
 
 ```text
-http://localhost:8090/registration.php
+http://localhost:8400/registration.php
 ```
 
 ## Current Scope
@@ -32,7 +32,9 @@ The applicant can:
 - see previously saved values preloaded;
 - submit a completed application.
 
-The feature does **not** create a permanent RosarioSIS student record or login account.
+The public application stage itself does **not** create a permanent RosarioSIS
+student record or login account. Permanent records are created only after payment
+verification and explicit final Registrar confirmation.
 
 ## Current Access Model
 
@@ -49,18 +51,24 @@ This is intentionally a prototype-stage access model and should be strengthened 
 
 ## Applicant Status
 
-Current statuses:
+Current workflow states include:
 
 ```text
 DRAFT
 SUBMITTED
+UNDER_REVIEW
+DECLINED
+APPROVED_FOR_PAYMENT
+PAYMENT_SUBMITTED
+PAYMENT_DECLINED
+PAYMENT_VERIFIED
+ACTIVE
 ```
 
-A DRAFT application is editable.
-
-A SUBMITTED application is read-only on the public page.
-
-Registrar review states such as APPROVED_FOR_PAYMENT and DECLINED will be added in the Registrar workflow feature.
+DRAFT and DECLINED applications can be edited/resubmitted. Submitted/review/payment
+states are read-only to the applicant except where the workflow explicitly allows a
+corrected receipt. ACTIVE indicates that final Registrar confirmation created the
+permanent student account.
 
 ## Data Storage
 
@@ -107,7 +115,7 @@ for both fresh and existing MariaDB databases. Do not reset Docker volumes.
 
 1. Apply the migration.
 2. Start Docker with `docker compose up -d`.
-3. Open `http://localhost:8090/registration.php`.
+3. Open `http://localhost:8400/registration.php`.
 4. Enter a new phone number.
 5. Fill only part of the form and select **Save and continue later**.
 6. Select **Use another phone number**.
@@ -129,11 +137,23 @@ for both fresh and existing MariaDB databases. Do not reset Docker volumes.
 
 The phone-only resume mechanism is not considered strong authentication and is expected to be replaced or supplemented before production.
 
-## Future Work
+## Current downstream workflow
 
-- Registrar review queue.
-- Decline/reapply workflow.
-- Multiple applications per family phone number if required.
-- Online payment integration.
-- Permanent student creation after verified payment and final Registrar approval.
-- SMS account notification after the permanent account is created.
+The integrated system now includes Registrar review, decline/correction/resubmission,
+grade-based payment approval, Finance receipt verification/correction, final Registrar
+account creation, and SMTP notifications. Online payment-gateway integration is not
+implemented; Finance verifies uploaded receipts manually.
+
+Potential future work includes stronger applicant authentication (OTP/SMS or another
+verification method), family/shared-phone handling if required, and external payment
+gateway integration.
+
+
+## Validated user-flow result — 12–13 October 2026
+
+A synthetic applicant completed the full flow on `Stable/sis`: draft save/resume,
+validation, submission, Registrar rejection and correction, approval for ETB 5,000,
+receipt submission, Finance rejection and replacement, payment verification, final
+Registrar confirmation, account creation, and successful student login. One applicant
+record and one permanent student were retained with no duplicate enrollment from
+repeated workflow testing.
