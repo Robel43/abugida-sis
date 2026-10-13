@@ -37,7 +37,7 @@ echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname']
 DrawHeader(
 	CheckBoxOnclick(
 		'include_all_courses',
-		_( 'Include All Courses' )
+		_( 'Include All Subjects' )
 	),
 	CheckBoxOnclick(
 		'include_inactive',
@@ -158,14 +158,14 @@ else
 
 if ( $_REQUEST['include_all_courses'] == 'Y' )
 {
-	$columns += [ 'COURSE_TITLE' => _( 'Course' ) ];
+	$columns += [ 'COURSE_TITLE' => _( 'Subject' ) ];
 }
 
 $columns += [ 'TYPE_TITLE' => _( 'Category' ), 'TITLE' => _( 'Assignment' ), 'COMMENT' => _( 'Comment' ) ];
 
 if ( $_REQUEST['include_inactive'] )
 {
-	$columns += [ 'ACTIVE' => _( 'School Status' ), 'ACTIVE_SCHEDULE' => _( 'Course Status' ) ];
+	$columns += [ 'ACTIVE' => _( 'School Status' ), 'ACTIVE_SCHEDULE' => _( 'Subject Status' ) ];
 }
 
 $modname = str_replace( 'AnomalousGrades', 'Grades', $_REQUEST['modname'] );
