@@ -48,7 +48,7 @@ if ( User( 'PROFILE' ) === 'student' )
 		'title' => _( 'Student Portal' ),
 		'default' => 'Students/StudentDashboard.php',
 		'Students/StudentDashboard.php' => _( 'Dashboard' ),
-		'Students/MyCourses.php' => _( 'My Courses' ),
+		'Students/MyCourses.php' => _( 'My Subjects' ),
 		'Students/MyGrades.php' => _( 'My Grades' ),
 		'Students/MyPayments.php' => _( 'Payments' ),
 		'Students/MyProfile.php' => _( 'My Profile' ),
