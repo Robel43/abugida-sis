@@ -542,7 +542,7 @@ function GetStuList( &$extra = [] )
 						] ) . ' AS ACTIVE_SCHEDULE';
 
 					$extra['columns_after']['ACTIVE'] = _( 'School Status' );
-					$extra['columns_after']['ACTIVE_SCHEDULE'] = _( 'Course Status' );
+					$extra['columns_after']['ACTIVE_SCHEDULE'] = _( 'Subject Status' );
 				}
 			}
 
