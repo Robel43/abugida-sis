@@ -627,6 +627,20 @@ Typical deployment sequence:
 
 Production credentials must never be committed to GitHub.
 
+## Academic Terminology
+
+Abugida SIS uses the school-facing academic hierarchy **Grade -> Subject -> Section** across applicable administrator, teacher, parent, and student interfaces.
+
+RosarioSIS internal terminology remains unchanged for compatibility:
+
+- internal `Subject` -> user-facing **Grade**
+- internal `Course` -> user-facing **Subject**
+- internal `Course Period` -> user-facing **Section**
+
+Database tables, request parameters, PHP identifiers, URLs, permission keys, and integration identifiers are not renamed. This keeps the terminology change presentation-only and avoids breaking existing business logic.
+
+See `docs/features/scheduling-terminology.md` for the full scope, role coverage, and validation matrix.
+
 ## Project Status
 
 As of 13 October 2026, `Stable/sis` is the validated baseline. A full synthetic
