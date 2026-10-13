@@ -57,7 +57,7 @@ Stable/sis -> feature branch -> local test -> push -> PR -> Stable/sis
 unchanged for now. The project owner will decide when to promote `Stable/sis` into
 `develop`.
 
-## 3. Branch naming
+## 4. Branch naming
 
 Recommended prefixes:
 
@@ -82,7 +82,7 @@ docs/installation-guide
 
 Use short lowercase names separated by hyphens.
 
-## 4. Start a new feature
+## 5. Start a new feature
 
 Always update `Stable/sis` first:
 
@@ -105,7 +105,7 @@ git branch
 
 The current feature branch should have `*` beside it.
 
-## 5. Develop and test locally
+## 6. Develop and test locally
 
 Work only on the feature branch.
 
@@ -137,7 +137,7 @@ git commit -m "Add payment verification workflow"
 
 The same branch should also contain the related documentation under `docs/`.
 
-## 6. Push the feature branch
+## 7. Push the feature branch
 
 Push the feature branch to GitHub:
 
@@ -158,7 +158,7 @@ origin/main
 origin/Stable/sis
 ```
 
-## 7. Open a Pull Request to Stable/sis
+## 8. Open a Pull Request to Stable/sis
 
 Create a Pull Request on GitHub:
 
@@ -167,7 +167,7 @@ base: Stable/sis
 compare: feature/payment-verification
 ```
 
-The PR is the controlled merge step and creates a clear history of the feature entering `develop`.
+The PR is the controlled merge step and creates a clear history of the feature entering the current validated baseline.
 
 No separate code-review approval is required.
 
@@ -182,7 +182,7 @@ Before merging their own PR, the developer must confirm:
 
 Then the developer may merge the PR into `Stable/sis`.
 
-## 8. If develop changed during feature development
+## 9. If Stable/sis changed during feature development
 
 Update the local feature branch before merging:
 
@@ -190,7 +190,7 @@ Update the local feature branch before merging:
 git checkout Stable/sis
 git pull origin Stable/sis
 git checkout feature/payment-verification
-git merge develop
+git merge Stable/sis
 ```
 
 Resolve conflicts locally.
@@ -205,9 +205,9 @@ git push
 
 The existing Pull Request updates automatically after the push.
 
-## 9. After merging into develop
+## 10. After merging into Stable/sis
 
-Update local `develop`:
+Update local `Stable/sis`:
 
 ```powershell
 git checkout Stable/sis
@@ -222,7 +222,7 @@ git branch -d feature/payment-verification
 
 The remote feature branch can also be deleted from GitHub after merge.
 
-## 10. Start the next feature
+## 11. Start the next feature
 
 Always start the next task from the latest `Stable/sis`.
 
@@ -234,7 +234,7 @@ git pull origin Stable/sis
 git checkout -b feature/next-feature
 ```
 
-## 11. Release process
+## 12. Release process
 
 The normal path is:
 
@@ -248,17 +248,17 @@ Developers are responsible for:
 feature branch -> Stable/sis
 ```
 
-The project owner/maintainer is responsible for:
+The project owner/maintainer is responsible for deciding when to promote:
 
 ```text
-develop -> main
+Stable/sis -> develop -> main
 ```
 
-When the integrated version on `develop` has been tested and accepted, the project owner/maintainer promotes it to `main` and can tag the release.
+Until that decision, `develop` and `main` remain unchanged.
 
 Developers must not independently merge into `main`.
 
-## 12. Hotfix process
+## 13. Hotfix process
 
 A production hotfix starts from `main` only with project-owner coordination.
 
@@ -271,17 +271,17 @@ main -> hotfix/* -> main
 
 The fix must also return to `develop` so future releases retain it.
 
-## 13. Pull rules
+## 14. Pull rules
 
 | Situation | Pull from |
 | --- | --- |
 | Starting a normal feature | `origin/Stable/sis` |
 | Continuing feature work | own feature branch |
-| Updating feature with team changes | `origin/Stable/sis` |
-| Checking latest integrated version | `origin/Stable/sis` |
+| Updating feature with accepted changes | `origin/Stable/sis` |
+| Checking current validated baseline | `origin/Stable/sis` |
 | Checking stable release | `origin/main` |
 
-## 14. Push and merge rules
+## 15. Push and merge rules
 
 | Work | Push directly to | Merge destination |
 | --- | --- | --- |
@@ -291,10 +291,10 @@ The fix must also return to `develop` so future releases retain it.
 | Refactor | own `refactor/*` branch | `develop` |
 | Production release | not a normal developer action | project owner later promotes `Stable/sis` -> `develop` -> `main` |
 
-## 15. Developer checklist before merging to develop
+## 16. Developer checklist before merging to Stable/sis
 
 1. Confirm the active branch with `git branch`.
-2. Pull current `develop` and merge it into the feature branch if necessary.
+2. Pull current `Stable/sis` and merge it into the feature branch if necessary.
 3. Run `git status`.
 4. Test the feature locally.
 5. Test important error/negative paths.
@@ -303,10 +303,10 @@ The fix must also return to `develop` so future releases retain it.
 8. Include required database changes.
 9. Update the relevant documentation under `docs/`.
 10. Push the feature branch.
-11. Open PR to `develop`.
+11. Open PR to `Stable/sis`.
 12. Merge the PR only after the above checks pass.
 
-## Example complete workflow
+## 17. Example complete workflow
 
 ```powershell
 # Update integration branch
@@ -332,7 +332,7 @@ Then on GitHub:
 
 ```text
 Pull Request:
-feature/student-application -> develop
+feature/student-application -> Stable/sis
 ```
 
 After local testing and documentation are complete, the developer may merge the PR.
@@ -345,4 +345,4 @@ git pull origin Stable/sis
 git branch -d feature/student-application
 ```
 
-The developer is now ready to start the next task from the updated `develop`.
+The developer is now ready to start the next task from the updated `Stable/sis`.
