@@ -723,7 +723,7 @@ if ( ! $_REQUEST['modfunc'] )
 
 		if ( $RosarioModules['Scheduling'] && User( 'PROFILE' ) === 'admin' )
 		{
-			$widgets += [ 'course' => _( 'Course' ), 'request' => _( 'Request' ) ];
+			$widgets += [ 'course' => _( 'Subject' ), 'request' => _( 'Request' ) ];
 		}
 
 		if ( $RosarioModules['Attendance'] )
