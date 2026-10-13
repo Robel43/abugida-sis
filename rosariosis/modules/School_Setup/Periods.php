@@ -135,7 +135,7 @@ if ( ! $_REQUEST['modfunc'] )
 		'SORT_ORDER' => _( 'Sort Order' ),
 		'LENGTH' => _( 'Length (minutes)' ),
 		'BLOCK' => _( 'Block' ),
-		'COURSE_PERIODS' => _( 'Course Periods' ),
+		'COURSE_PERIODS' => _( 'Sections' ),
 	]; // 'ATTENDANCE' => _('Used for Attendance'),'START_TIME' => _('Start Time'),'END_TIME' => _('End Time'));
 
 	$link['add']['html'] = [];
