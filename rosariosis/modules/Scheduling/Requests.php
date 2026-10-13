@@ -158,7 +158,7 @@ if ( ! $_REQUEST['modfunc']
 		ORDER BY c.TITLE", $functions );
 
 	$columns = [
-		'COURSE' => _( 'Course' ),
+		'COURSE' => _( 'Grade' ),
 		'WITH_TEACHER_ID' => _( 'Teacher' ),
 		'WITH_PERIOD_ID' => _( 'Period' ),
 	];
@@ -170,7 +170,7 @@ if ( ! $_REQUEST['modfunc']
 		AND SCHOOL_ID='" . UserSchool() . "'", [ 'TITLE' => 'ParseMLField' ] );
 
 	$subjects = '<select name="subject_id" id="subject_id" class="onchange-subject-id">';
-	$subjects .= '<option value="">' . _( 'All Subjects' ) . '</option>';
+	$subjects .= '<option value="">' . _( 'All Grades' ) . '</option>';
 
 	foreach ( (array) $subjects_RET as $subject )
 	{
@@ -190,7 +190,7 @@ if ( ! $_REQUEST['modfunc']
 
 	$link['add']['span'] = '<span class="nobr"> <label for="subject_id" class="a11y-hidden">' .
 		_( 'Subject' ) . '</label>' . $subjects .
-		' <label>' . _( 'Course Title' ) .
+		' <label>' . _( 'Subject Title' ) .
 		' <input type="text" id="course_title" name="course_title" class="onkey-course-title"></label></span>
 		<div id="courses_div"></div>';
 
