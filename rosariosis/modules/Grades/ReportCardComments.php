@@ -182,7 +182,7 @@ if ( ! $_REQUEST['modfunc'] )
 		{
 			$subject_select .= '<option value="">' . sprintf(
 				_( 'No %s were found.' ),
-				mb_strtolower( ngettext( 'Subject', 'Subjects', 0 ) )
+				mb_strtolower( ngettext( 'Grade', 'Grades', 0 ) )
 			) . '</option>';
 		}
 		else
