@@ -40,7 +40,7 @@ function BottomButtonBackUpdate( $back_php_self )
 
 		case 'course':
 
-			$back_text = _( 'Course List' );
+			$back_text = _( 'Subject List' );
 		break;
 
 		default:
