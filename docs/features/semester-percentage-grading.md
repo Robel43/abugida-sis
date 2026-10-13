@@ -131,7 +131,7 @@ The table stores the student, grade level, period, average percentage, rank posi
 
 ## Student-facing use
 
-The planned student dashboard will show:
+The implemented Student Portal **My Grades** page shows:
 
 - subject percentages for Semester 1 and Semester 2;
 - Semester Average;
@@ -139,7 +139,7 @@ The planned student dashboard will show:
 - Full Year Cumulative Average;
 - Full Year Class Rank.
 
-The dashboard must not calculate GPA.
+The Student Portal does not calculate or display GPA.
 
 
 ## Sidebar semester context
@@ -158,3 +158,15 @@ The new staff-facing programs require RosarioSIS profile permissions:
 - `Grades/ClassRank.php`
 
 Migration `009_grade_program_permissions.sql` grants these programs to existing administrator-type profiles. More restrictive custom roles can still be configured through **Users > Profiles**.
+
+
+## Validated calculation — 13 October 2026
+
+The full `Stable/sis` lifecycle test produced the following synthetic result set:
+
+- Semester 1: 95, 85, 90, 80 → average 87.50%, tied rank 1/8;
+- Semester 2: 90, 80, 85, 75 → average 82.50%, tied rank 2/8;
+- Full Year: (87.50 + 82.50) / 2 = 85.00%, tied rank 1/8.
+
+The administrator Class Rank page and the student's My Grades page agreed on these
+values. Competition ties were preserved and no GPA conversion was used.
