@@ -1009,7 +1009,7 @@ if (  ( ! $_REQUEST['modfunc']
 					FROM courses
 					WHERE COURSE_ID='" . (int) $_REQUEST['course_id'] . "'" ) );
 
-				$title = $course_title . ' - ' . _( 'New Course Period' );
+				$title = $course_title . ' - ' . _( 'New Section' );
 
 				$RET = [];
 
