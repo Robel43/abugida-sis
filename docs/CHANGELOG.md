@@ -7,11 +7,12 @@ All significant Abugida SIS changes should be recorded in this file.
 ## Unreleased - Scheduling terminology
 
 ### Changed
-- Scheduling setup menu/page label changed from **Courses** to **Subjects**.
-- User-facing **Subject** labels changed to **Grade**.
-- User-facing **Course** labels changed to **Subject**.
-- User-facing **Course Period** labels changed to **Section/Sections**.
-- Internal database and request identifiers remain unchanged.
+- Academic terminology is now applied globally across authenticated administrator, teacher, parent, and student interfaces.
+- User-facing **Subject/Subjects** is presented as **Grade/Grades**.
+- User-facing **Course/Courses** is presented as **Subject/Subjects**.
+- User-facing **Course Period/Course Periods** is presented as **Section/Sections**.
+- Dynamic page content and user-visible accessibility/title attributes receive the same mapping.
+- Internal database, URL, request, PHP, SQL, and integration identifiers remain unchanged.
 
 ## 2026-10-13 - Stable/sis validated baseline
 
