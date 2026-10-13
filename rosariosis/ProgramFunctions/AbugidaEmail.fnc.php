@@ -1,5 +1,7 @@
 <?php
 /** Existing Abugida PHPMailer transport; configuration never comes from a request. */
+require_once __DIR__ . '/AbugidaBranding.fnc.php';
+
 foreach (['Exception', 'SMTP', 'PHPMailer'] as $class) {
     require_once __DIR__ . '/../classes/PHPMailer/PHPMailer/' . $class . '.php';
 }
@@ -29,13 +31,19 @@ function AbugidaMailSetting($env, $legacy, $default = '')
 
 function AbugidaMailConfig(): array
 {
+    $fromName = trim((string)AbugidaMailSetting('ABUGIDA_SMTP_FROM_NAME', 'AbugidaMailFromName'));
+
+    if ($fromName === '') {
+        $fromName = AbugidaBranding()['platform_name'];
+    }
+
     return [
         'host' => trim(AbugidaMailSetting('ABUGIDA_SMTP_HOST', 'AbugidaMailHost')),
         'port' => (int)AbugidaMailSetting('ABUGIDA_SMTP_PORT', 'AbugidaMailPort', 587),
         'username' => AbugidaMailSetting('ABUGIDA_SMTP_USERNAME', 'AbugidaMailUsername'),
         'password' => AbugidaMailSetting('ABUGIDA_SMTP_PASSWORD', 'AbugidaMailPassword'),
         'from' => trim(AbugidaMailSetting('ABUGIDA_SMTP_FROM', 'AbugidaMailFrom')),
-        'name' => AbugidaMailSetting('ABUGIDA_SMTP_FROM_NAME', 'AbugidaMailFromName', 'Abugida SIS'),
+        'name' => $fromName,
         'encryption' => strtolower(AbugidaMailSetting('ABUGIDA_SMTP_ENCRYPTION', 'AbugidaMailEncryption', 'tls')),
         'auth' => filter_var(AbugidaMailSetting('ABUGIDA_SMTP_AUTH', 'AbugidaMailAuth', true), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
     ];
@@ -115,7 +123,22 @@ function AbugidaSendEmail($to, $subject, $message, $messageId = '')
 
 function AbugidaPublicURL($path, $query = [])
 {
-    $base = rtrim(trim(AbugidaMailSetting('ABUGIDA_BASE_URL', 'AbugidaBaseURL', 'http://localhost:8090')), '/');
+    $base = rtrim(trim((string)AbugidaMailSetting('ABUGIDA_BASE_URL', 'AbugidaBaseURL')), '/');
+
+    // In local development, follow the active localhost port even when an older
+    // localhost base URL remains in the local SMTP configuration.
+    $requestHost = trim((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $requestIsLocal = (bool)preg_match('/^(localhost|127\.0\.0\.1)(:[0-9]{1,5})?$/i', $requestHost);
+    $configuredHost = $base !== '' ? (string)(parse_url($base, PHP_URL_HOST) ?? '') : '';
+    $configuredIsLocal = in_array(strtolower($configuredHost), ['localhost', '127.0.0.1'], true);
+
+    if ($requestIsLocal && ($base === '' || $configuredIsLocal)) {
+        $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
+        $base = $scheme . '://' . $requestHost;
+    } elseif ($base === '') {
+        $base = 'http://localhost:8400';
+    }
+
     $parts = parse_url($base);
     if (!$parts || !in_array($parts['scheme'] ?? '', ['http', 'https'], true) || empty($parts['host']) ||
         isset($parts['user'], $parts['pass']) || isset($parts['user']) || isset($parts['query']) || isset($parts['fragment']) ||
