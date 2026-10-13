@@ -330,15 +330,23 @@ body:not(.modules) #body .header2 {
 	display: block;
 	padding: 7px 10px !important;
 	border-radius: 8px;
-	color: #94a3b8 !important;
+	color: #eaf2ff !important;
 	font-size: 13px;
+	font-weight: 550;
 	text-decoration: none !important;
-	transition: background var(--abg-transition), color var(--abg-transition);
+	transition: background var(--abg-transition), color var(--abg-transition), box-shadow var(--abg-transition);
 }
 
-.adminmenu .wp-submenu a:hover {
+.adminmenu .wp-submenu a:hover,
+.adminmenu .wp-submenu a:focus-visible {
 	color: #fff !important;
-	background: rgba(255,255,255,.065) !important;
+	background: rgba(15,23,42,.28) !important;
+}
+
+.adminmenu .wp-submenu a#selectedMenuLink {
+	color: #fff !important;
+	background: rgba(15,23,42,.82) !important;
+	box-shadow: inset 3px 0 0 rgba(255,255,255,.72);
 }
 
 .adminmenu .menu-inter {
@@ -513,7 +521,7 @@ button:not(.button-primary) {
 }
 
 #body .error { background: var(--abg-danger-soft) !important; color: #991b1b !important; }
-#body .warning { background: var(--abg-warning-soft) !important; color: #9a3412 !important; }
+#body .warning:not(.abg-badge):not(.abg-status):not(.abg-rereg-status) { background: var(--abg-warning-soft) !important; color: #9a3412 !important; }
 #body .note { background: var(--abg-success-soft) !important; color: #166534 !important; }
 
 /* Toasts */
