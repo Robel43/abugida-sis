@@ -264,7 +264,7 @@ if ( ! $_REQUEST['modfunc']
 	{
 		echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&modfunc=save&_ROSARIO_PDF=true' ) . '" method="POST">';
 
-		$extra['header_right'] = Buttons( _( 'Create Class Pictures for Selected Course Periods' ) );
+		$extra['header_right'] = Buttons( _( 'Create Class Pictures for Selected Sections' ) );
 
 		$extra['extra_header_left'] = '<table>';
 
@@ -283,7 +283,7 @@ if ( ! $_REQUEST['modfunc']
 
 	if ( $_REQUEST['modfunc'] === 'list' )
 	{
-		echo '<br /><div class="center">' . Buttons( _( 'Create Class Pictures for Selected Course Periods' ) ) . '</div>';
+		echo '<br /><div class="center">' . Buttons( _( 'Create Class Pictures for Selected Sections' ) ) . '</div>';
 		echo '</form>';
 	}
 }
