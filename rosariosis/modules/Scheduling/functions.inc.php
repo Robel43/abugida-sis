@@ -29,7 +29,7 @@ function MyWidgets( $item )
 
 					if ( ! $extra['NoSearchTerms'] )
 					{
-						$_ROSARIO['SearchTerms'] .= '<b>' . _( 'Last Year Course' ) . ': </b>' .
+						$_ROSARIO['SearchTerms'] .= '<b>' . _( 'Last Year Subject' ) . ': </b>' .
 							( ! empty( $_REQUEST['w_ly_course_period_id_not'] ) ? _( 'Not' ) . ' ' : '' ) .
 							ParseMLField( $subject_title ) . '<br />';
 					}
@@ -47,7 +47,7 @@ function MyWidgets( $item )
 
 					if ( ! $extra['NoSearchTerms'] )
 					{
-						$_ROSARIO['SearchTerms'] .= '<b>' . _( 'Last Year Course' ) . ': </b>' .
+						$_ROSARIO['SearchTerms'] .= '<b>' . _( 'Last Year Subject' ) . ': </b>' .
 							( ! empty( $_REQUEST['w_ly_course_period_id_not'] ) ? _( 'Not' ) . ' ' : '' ) .
 							ParseMLField( $course_title ) . '<br />';
 					}
@@ -67,7 +67,7 @@ function MyWidgets( $item )
 
 					if ( ! $extra['NoSearchTerms'] )
 					{
-						$_ROSARIO['SearchTerms'] .= '<b>' . _( 'Last Year Course Period' ) . ': </b>' .
+						$_ROSARIO['SearchTerms'] .= '<b>' . _( 'Last Year Section' ) . ': </b>' .
 							( ! empty( $_REQUEST['w_ly_course_period_id_not'] ) ? _( 'Not' ) . ' ' : '' ) .
 							$course[1]['COURSE_TITLE'] . ': ' . $course[1]['TITLE'] . '<br />';
 					}
@@ -75,7 +75,7 @@ function MyWidgets( $item )
 			}
 
 			// @since 12.0 Use colorBox instead of popup window
-			$extra['search'] .= '<tr class="st"><td>' . _( 'Last Year Course' ) . '</td>
+			$extra['search'] .= '<tr class="st"><td>' . _( 'Last Year Subject' ) . '</td>
 				<td><div id="ly_course_div"></div>
 				<a href="Modules.php?modname=misc/ChooseCourse.php&last_year=true" class="colorbox">' .
 					_( 'Choose' ) . '</a></td></tr>';
