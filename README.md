@@ -8,13 +8,9 @@ Abugida SIS is intended to provide a centralized administrative system for schoo
 
 The planned solution supports:
 
-- Public online application with draft/resume support
-- Supporting-document and Fayda ID upload
-- Registrar review, rejection/correction, and approval for payment
-- Grade-based registration fee configuration
-- Secure payment-link access and receipt submission
-- Finance verification and payment rejection/resubmission
-- Final Registrar confirmation and permanent student-account creation
+- Student application and registration
+- Document review and registrar approval
+- Finance verification and installment tracking
 - Grade levels, sections, subjects, and semesters
 - Staff roles and permission control
 - Student academic records
@@ -102,38 +98,6 @@ Recommended Course Period settings:
 - official grading scale selected, with teacher grade-scale changes disabled where Moodle is authoritative.
 
 Course Periods should be understood as **section/class instances**, not as physical timetable periods.
-
-## Online Registration, Approval, and Payment Workflow
-
-The current `develop` branch includes an end-to-end online registration workflow.
-
-### Applicant flow
-
-1. Applicant starts or resumes an application at `/registration.php` using the same phone number.
-2. Applicant enters personal information, selects Grade 7-12, chooses Online or Distance Learning, and uploads both a supporting document and Fayda ID.
-3. Applicant may save a draft and return later.
-4. After submission, the Registrar reviews the application.
-5. If declined, the applicant can correct and resubmit.
-6. If approved, the system uses the configured registration fee for the selected grade and exposes payment instructions.
-7. A secure tokenized payment link can be included in notification email.
-8. Applicant uploads payment proof through `/registration-payment.php`.
-9. Finance verifies or rejects the payment.
-10. After verified payment, the Registrar performs final confirmation and creates the permanent student record, enrollment, Student ID, and username.
-
-Internal work queues:
-
-- `Students -> Online Applications` for Registrar roles.
-- `Student Billing -> Application Payments` for Finance roles.
-- `Student Billing -> Registration Fees` for grade-based fee configuration.
-- `Custom -> Email Test` for SMTP diagnostics where enabled.
-
-Database migrations for this workflow are stored under `database/migrations/` and must be applied in numeric order from `001` through `006`.
-
-Detailed documentation:
-
-- `docs/features/online-registration.md`
-- `docs/features/online-registration-ui-fayda.md`
-- `docs/features/registration-approval-payment-workflow.md`
 
 ## Registration and Automatic Section Assignment
 
@@ -656,6 +620,4 @@ Production credentials must never be committed to GitHub.
 
 ## Project Status
 
-Abugida SIS is under active development. The `develop` branch currently includes the public application flow, Fayda/supporting-document uploads, Registrar review, grade-based registration fees, secure payment access, Finance verification, final student-account creation, workflow history, and SMTP diagnostics.
-
-Remaining major work includes automatic section assignment, expanded role/permission hardening, Moodle integration, grade synchronization, grade-review workflow, reporting, and broader audit/operational controls.
+Abugida SIS is under active development. Planned work includes registrar workflow customization, finance workflow, role-based access control, Moodle integration, grade synchronization, grade-review workflow, reporting, and audit logging.
