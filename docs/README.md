@@ -49,12 +49,13 @@ Use `FEATURE_TEMPLATE.md` as the starting point.
 The team follows this model:
 
 ```text
-develop -> feature branch -> local test -> push feature branch -> PR -> CI -> develop
+Stable/sis -> feature/fix branch -> local test -> PR -> Stable/sis
 ```
 
 There is no mandatory code-review approval step.
 
-The developer responsible for a feature may merge their own Pull Request into `develop` after confirming that:
+While `Stable/sis` is the validated working baseline, the developer responsible for
+a feature may merge their own Pull Request back into `Stable/sis` after confirming that:
 
 - the feature works locally;
 - required documentation is complete;
@@ -65,11 +66,13 @@ The developer responsible for a feature may merge their own Pull Request into `d
 
 `main` is off limits for normal developer work.
 
-Only the project owner/maintainer promotes accepted integrated work from:
+Promotion of the validated line is deferred until the project owner decides:
 
 ```text
-develop -> main
+Stable/sis -> develop -> main
 ```
+
+Until then, new work branches from `Stable/sis`, not `develop`.
 
 Detailed development guides:
 
@@ -102,9 +105,9 @@ A feature is not considered complete until:
 - required database changes are included;
 - documentation is updated on the same feature branch;
 - the feature branch is pushed to GitHub;
-- a Pull Request is opened to `develop`;
+- a Pull Request is opened to `Stable/sis` (or another destination explicitly chosen by the maintainer);
 - required automated checks pass;
 - the developer confirms the feature is ready;
-- the Pull Request is merged into `develop`.
+- the Pull Request is merged only after focused regression passes.
 
 Normal developers must not push or merge feature work into `main`.
