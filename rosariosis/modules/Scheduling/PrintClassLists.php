@@ -132,7 +132,7 @@ if ( ! $_REQUEST['modfunc']
 		echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&modfunc=save&search_modfunc=list&_ROSARIO_PDF=true' .
 			issetVal( $extra['action'], '' )  ) . '" method="POST" name="search">';
 
-		$submit_button = Buttons( _( 'Create Class Lists for Selected Course Periods' ) );
+		$submit_button = Buttons( _( 'Create Class Lists for Selected Sections' ) );
 
 		DrawHeader(
 			'<label><input type="checkbox" name="include_inactive" value="Y" /> ' .
