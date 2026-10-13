@@ -439,7 +439,7 @@ Source-level regression checks completed on `feature/ui-2026-refresh`:
 - no public-facing `Select Academy SIS` literal remains in the primary entry pages;
 - PR contains no database migration files.
 
-The PR remains draft until the final Docker/browser matrix below is completed.
+The final Docker/browser matrix below was completed and accepted on 13 October 2026. The validated result is part of the current `Stable/sis` baseline.
 
 ## Final Docker/browser regression matrix
 
@@ -524,11 +524,11 @@ Three confirmed issues from the final Docker/browser regression were corrected:
    - the Rollover greyed-item explanation now uses `info`;
    - real success notes remain `note` and continue to use the success modal.
 
-Targeted retest required before PR readiness:
-- temporary branding change must show logo, platform name and tagline on `landing.php`;
-- 360px and 480px landing menu must expose all hidden navigation items;
-- Forgot Password must show the student-reset-disabled message inline with no Success modal;
-- Rollover warning must remain a warning modal, and the greyed-item explanation must remain inline with no queued Success modal.
+Targeted retest requirements were completed before acceptance:
+- temporary branding change showed logo, platform name and tagline on `landing.php`;
+- 360px and 480px landing menu exposed all hidden navigation items;
+- Forgot Password showed the student-reset-disabled message inline with no Success modal;
+- Rollover warning remained a warning modal, and the greyed-item explanation remained inline with no queued Success modal.
 
 
 ## Final acceptance and targeted fixes — 13 October 2026
