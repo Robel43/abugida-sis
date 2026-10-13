@@ -914,8 +914,8 @@ window.onpageshow=function(event) {
 	browserHistoryCacheBuster(event);
 };
 
-// onunload: Fix for Firefox to execute Javascript on history back.
-window.onunload = function() {};
+// Modern browsers restrict the unload event and it prevents bfcache in some cases.
+// The pageshow handler above is sufficient for current back/forward-cache protection.
 
 // ListOutput JS.
 var LOSearch = function(ev, val, url) {
