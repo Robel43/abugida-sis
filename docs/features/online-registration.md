@@ -48,18 +48,20 @@ This is intentionally a prototype-stage access model and should be strengthened 
 
 ## Applicant Status
 
-Current statuses:
+Current workflow statuses include:
 
 ```text
 DRAFT
 SUBMITTED
+DECLINED
+APPROVED_FOR_PAYMENT
+PAYMENT_SUBMITTED
+PAYMENT_DECLINED
+PAYMENT_VERIFIED
+ACTIVE
 ```
 
-A DRAFT application is editable.
-
-A SUBMITTED application is read-only on the public page.
-
-Registrar review states such as APPROVED_FOR_PAYMENT and DECLINED will be added in the Registrar workflow feature.
+A DRAFT application is editable. A DECLINED application can be corrected and resubmitted. After approval, payment becomes available. Finance can verify or reject submitted payment proof. Final Registrar confirmation creates the permanent student record and moves the application to ACTIVE.
 
 ## Data Storage
 
@@ -136,11 +138,18 @@ Get-Content .\database\migrations\001_online_registration.sql -Raw | docker comp
 
 The phone-only resume mechanism is not considered strong authentication and is expected to be replaced or supplemented before production.
 
+## Implemented Follow-on Workflow
+
+The Registrar review, decline/correction, approval-for-payment, payment-proof submission, Finance verification, and final student creation workflow is implemented and documented in:
+
+`docs/features/registration-approval-payment-workflow.md`
+
+Additional implemented extensions include Fayda ID upload, study-approach selection, secure payment-access tokens, grade-based registration fees, and SMTP/email diagnostics.
+
 ## Future Work
 
-- Registrar review queue.
-- Decline/reapply workflow.
+- Replace or strengthen phone-only draft-resume authentication before public production use.
 - Multiple applications per family phone number if required.
-- Online payment integration.
-- Permanent student creation after verified payment and final Registrar approval.
-- SMS account notification after the permanent account is created.
+- Direct payment-gateway integration if required.
+- SMS notification/account delivery if required.
+- Automatic section assignment and Moodle provisioning after activation.
