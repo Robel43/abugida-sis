@@ -73,7 +73,7 @@ if ( UserStudentID()
 			);
 		}
 
-		$LO_columns = [ 'TITLE' => _( 'Course Title' ), 'TEACHER' => _( 'Teacher' ), 'UNGRADED' => _( 'Ungraded' ) ];
+		$LO_columns = [ 'TITLE' => _( 'Subject Title' ), 'TEACHER' => _( 'Teacher' ), 'UNGRADED' => _( 'Ungraded' ) ];
 
 		$LO_columns['PERCENT'] = _( 'Percent' );
 
@@ -320,7 +320,7 @@ if ( UserStudentID()
 	{
 		if ( $_REQUEST['id'] === 'all' )
 		{
-			DrawHeader( _( 'All Courses' ), '' );
+			DrawHeader( _( 'All Subjects' ), '' );
 		}
 		else
 		{
