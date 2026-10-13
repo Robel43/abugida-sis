@@ -576,7 +576,7 @@ if ( ! isset( $_REQUEST['sidefunc'] )
 			} ?>
 
 		<span class="br-after">
-			<label for="period" class="a11y-hidden"><?php echo _( 'Course Periods' ); ?></label>
+			<label for="period" class="a11y-hidden"><?php echo _( 'Sections' ); ?></label>
 			<select name="period" id="period" autocomplete="off" class="onchange-ajax-post-form">
 			<?php $optgroup = $current_cp_found = false;
 
