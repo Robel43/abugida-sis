@@ -513,49 +513,49 @@ git commit -m "Add payment verification workflow"
 git push -u origin feature/payment-verification
 ```
 
-Developers push **their own branch**, not `main` or `develop`.
+Developers push **their own feature/fix branch**. Do not push normal development work directly to `Stable/sis`, `develop`, or `main`.
 
 Then create a Pull Request:
 
 ```text
-feature/payment-verification -> develop
+feature/payment-verification -> Stable/sis
 ```
 
-Before merging their own PR into `develop`, the developer must confirm:
+Before merging their own PR into `Stable/sis`, the developer must confirm:
 
 - the feature works locally;
 - relevant error paths have been tested;
 - no secrets or user-generated data are committed;
 - any database changes are included and documented;
 - the relevant documentation under `docs/` is updated;
-- the branch merges cleanly with the current `develop`.
+- the branch merges cleanly with the current `Stable/sis`.
 
 ## Keeping a feature branch current
 
-If `develop` changes while a feature is being developed:
+If `Stable/sis` changes while a feature is being developed:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 git checkout feature/payment-verification
-git merge develop
+git merge Stable/sis
 ```
 
 Resolve conflicts locally, test again, commit if required, and push the updated feature branch.
 
 ## After a feature is merged
 
-Once the developer merges the Pull Request into `develop`:
+Once the developer merges the Pull Request into `Stable/sis`:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 git branch -d feature/payment-verification
 ```
 
 The remote feature branch can also be deleted after merge.
 
-For the next task, always start again from the latest `develop`.
+For the next task, always start again from the latest `Stable/sis`.
 
 ## Release flow
 
@@ -613,16 +613,17 @@ A tested release from `main` can be deployed to a standard PHP/MySQL or MariaDB 
 
 Typical deployment sequence:
 
-1. Test and accept the integrated version on `develop`.
-2. Project owner/maintainer merges `develop` into `main`.
-3. Tag the release.
-4. Back up the production files and database.
-5. Upload/deploy the application source.
-6. Create the production `config.inc.php` outside Git history.
-7. Run required database migrations.
-8. Verify PHP extensions and filesystem permissions.
-9. Perform smoke testing.
-10. Confirm registration, finance, academic, reporting, and Moodle integration workflows.
+1. Test and accept the integrated version on `Stable/sis`.
+2. When the project owner decides to promote the validated line, merge `Stable/sis` into `develop`.
+3. Project owner/maintainer then promotes the accepted `develop` state into `main`.
+4. Tag the release.
+5. Back up the production files and database.
+6. Upload/deploy the application source.
+7. Create the production `config.inc.php` outside Git history.
+8. Run required database migrations.
+9. Verify PHP extensions and filesystem permissions.
+10. Perform smoke testing.
+11. Confirm registration, finance, academic, reporting, and Moodle integration workflows.
 
 Production credentials must never be committed to GitHub.
 
