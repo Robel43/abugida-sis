@@ -9,7 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         AbugidaRequireStaffPost('Custom/EmailTest.php');
         $recipient = trim((string)($_POST['test_email'] ?? ''));
         if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) { throw new RuntimeException('Enter a valid recipient email address.'); }
-        $sent = AbugidaSendEmail($recipient, 'Abugida SIS SMTP test', "This is an Abugida SIS SMTP test.\n\nApplication URL: " . AbugidaPublicURL('registration.php'));
+        $platformName = AbugidaBranding()['platform_name'];
+        $sent = AbugidaSendEmail(
+            $recipient,
+            $platformName . ' SMTP test',
+            'This is a ' . $platformName . " SMTP test.\n\nApplication URL: " . AbugidaPublicURL('registration.php')
+        );
         if ($sent) { $test_note[] = 'The SMTP server accepted the test message. Confirm receipt in the destination mailbox.'; }
         else { $test_error[] = AttrEscape($GLOBALS['AbugidaMailLastError']); }
     } catch (RuntimeException $exception) { $test_error[] = AttrEscape($exception->getMessage()); }
