@@ -368,7 +368,7 @@ else
 	{
 		$LO_columns += [
 			'ACTIVE' => _( 'School Status' ),
-			'ACTIVE_SCHEDULE' => _( 'Course Status' ) ];
+			'ACTIVE_SCHEDULE' => _( 'Subject Status' ) ];
 	}
 
 	$link['FULL_NAME']['link'] = 'Modules.php?modname=' . $_REQUEST['modname'] .
