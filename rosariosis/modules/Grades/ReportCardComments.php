@@ -170,7 +170,7 @@ if ( ! $_REQUEST['modfunc'] )
 		$subject_onchange_URL = URLEscape( "Modules.php?modname=" . $_REQUEST['modname'] .
 			"&subject_id=" );
 
-		$subject_select = '<label for="subject_id" class="a11y-hidden">' . _( 'Subject' ) . '</label>
+		$subject_select = '<label for="subject_id" class="a11y-hidden">' . _( 'Grade' ) . '</label>
 		<select name="subject_id" ' .
 			// @since RosarioSIS 12.5 CSP remove unsafe-inline Javascript
 			// Note: `this.value` inside link is automatically replaced
@@ -182,7 +182,7 @@ if ( ! $_REQUEST['modfunc'] )
 		{
 			$subject_select .= '<option value="">' . sprintf(
 				_( 'No %s were found.' ),
-				mb_strtolower( ngettext( 'Course', 'Courses', 0 ) )
+				mb_strtolower( ngettext( 'Subject', 'Subjects', 0 ) )
 			) . '</option>';
 		}
 		else
@@ -199,7 +199,7 @@ if ( ! $_REQUEST['modfunc'] )
 			'&subject_id=' . $_REQUEST['subject_id'] .
 			"&course_id=" );
 
-		$course_select  = '<label for="course_id" class="a11y-hidden">' . _( 'Course' ) . '</label>
+		$course_select  = '<label for="course_id" class="a11y-hidden">' . _( 'Subject' ) . '</label>
 		<select name="course_id" ' .
 			// @since RosarioSIS 12.5 CSP remove unsafe-inline Javascript
 			// Note: `this.value` inside link is automatically replaced
@@ -211,7 +211,7 @@ if ( ! $_REQUEST['modfunc'] )
 		{
 			$course_select .= '<option value="">' . sprintf(
 				_( 'No %s were found.' ),
-				mb_strtolower( ngettext( 'Course', 'Courses', 0 ) )
+				mb_strtolower( ngettext( 'Subject', 'Subjects', 0 ) )
 			) . '</option>';
 		}
 		else
@@ -256,7 +256,7 @@ if ( ! $_REQUEST['modfunc'] )
 	FROM report_card_comment_categories rc
 	WHERE rc.COURSE_ID='" . (int) $_REQUEST['course_id'] . "'
 	UNION
-	SELECT 0,'" . _( 'All Courses' ) . "',NULL,2,NULL,(SELECT count(1) FROM report_card_comments WHERE SCHOOL_ID='" . UserSchool() . "' AND COURSE_ID='0' AND SYEAR='" . UserSyear() . "')
+	SELECT 0,'" . _( 'All Subjects' ) . "',NULL,2,NULL,(SELECT count(1) FROM report_card_comments WHERE SCHOOL_ID='" . UserSchool() . "' AND COURSE_ID='0' AND SYEAR='" . UserSyear() . "')
 	UNION
 	SELECT -1,'" . _( 'General' ) . "',NULL,3,NULL,(SELECT count(1) FROM report_card_comments WHERE SCHOOL_ID='" . UserSchool() . "' AND COURSE_ID IS NULL AND SYEAR='" . UserSyear() . "')
 	ORDER BY 4,SORT_ORDER", [], [ 'ID' ] );
