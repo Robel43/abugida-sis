@@ -119,7 +119,7 @@ $tables = [
 	'attendance_calendars' => _( 'Calendars' ),
 	'report_card_grades' => _( 'Grading Scales' ),
 	'attendance_codes' => _( 'Attendance Codes' ),
-	'courses' => _( 'Courses' ),
+	'courses' => _( 'Subjects' ),
 	'student_enrollment_codes' => _( 'Student Enrollment Codes' ),
 	'student_enrollment' => _( 'Students' ),
 	'report_card_comments' => _( 'Report Card Comments' ),
@@ -249,7 +249,7 @@ foreach ( (array) $tables as $table => $name )
 		$table_list .= '<br />&#10551;&nbsp;<label><input type="checkbox" value="Y" id="course_periods" name="course_periods"' .
 			$checked . $disabled . '>&nbsp;';
 
-		$cp_title = _( 'Course Periods' );
+		$cp_title = _( 'Sections' );
 
 		if ( $exists_table_count > 0 )
 		{
