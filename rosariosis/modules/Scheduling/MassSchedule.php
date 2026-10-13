@@ -167,11 +167,11 @@ if ( ! $_REQUEST['modfunc'] )
 	{
 		echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&modfunc=save' ) . '" method="POST">';
 
-		DrawHeader( '', SubmitButton( _( 'Add Courses to Selected Students' ) ) );
+		DrawHeader( '', SubmitButton( _( 'Add Subjects to Selected Students' ) ) );
 
 		echo '<br />';
 
-		PopTable( 'header', _( 'Courses to Add' ) );
+		PopTable( 'header', _( 'Subjects to Add' ) );
 
 		echo '<table><tr><td><div id="course_div">';
 
@@ -192,7 +192,7 @@ if ( ! $_REQUEST['modfunc'] )
 		// @since 12.9 Use button() with "+" icon instead of text link
 		echo '</div>' . button(
 			'add',
-			_( 'Choose a Course' ),
+			_( 'Choose a Subject' ),
 			URLEscape( $popup_url ),
 			'colorbox'
 		) . '</td></tr>';
@@ -239,7 +239,7 @@ if ( ! $_REQUEST['modfunc'] )
 	if ( $_REQUEST['search_modfunc'] === 'list' )
 	{
 		echo '<br /><div class="center">' .
-			SubmitButton( _( 'Add Courses to Selected Students' ) ) . '</div></form>';
+			SubmitButton( _( 'Add Subjects to Selected Students' ) ) . '</div></form>';
 	}
 }
 
