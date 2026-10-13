@@ -730,7 +730,7 @@ if ( $_REQUEST['modfunc'] === 'detail' )
 	if ( ! empty( $RET[1]['COURSE'] ) )
 	{
 		echo '<tr><td>' .
-			NoInput( $RET[1]['COURSE'], _( 'Course' ) ) .
+			NoInput( $RET[1]['COURSE'], _( 'Subject' ) ) .
 		'</td></tr>';
 	}
 
