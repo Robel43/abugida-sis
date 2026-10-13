@@ -188,8 +188,8 @@ if ( isset( $_REQUEST['course_modfunc'] )
 		ListOutput(
 			$courses_RET,
 			[ 'TITLE' => _( 'Subject' ) ],
-			'Grade',
-			'Grades',
+			'Subject',
+			'Subjects',
 			$link,
 			[],
 			$LO_options
@@ -1660,8 +1660,8 @@ if (  ( ! $_REQUEST['modfunc']
 	ListOutput(
 		$subjects_RET,
 		$columns,
-		'Subject',
-		'Subjects',
+		'Grade',
+		'Grades',
 		$link,
 		[],
 		$LO_options
@@ -1749,8 +1749,8 @@ if (  ( ! $_REQUEST['modfunc']
 		ListOutput(
 			$courses_RET,
 			$columns,
-			'Grade',
-			'Grades',
+			'Subject',
+			'Subjects',
 			$link,
 			[],
 			$LO_options
@@ -1868,8 +1868,8 @@ if (  ( ! $_REQUEST['modfunc']
 			ListOutput(
 				$periods_RET,
 				$columns,
-				'Course Period',
-				'Course Periods',
+				'Section',
+				'Sections',
 				$link,
 				[],
 				$LO_options
