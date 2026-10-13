@@ -171,7 +171,7 @@ if ( UserStudentID()
 	DrawHeader( PrepareDate( $date, '_date', false, [ 'submit' => true ] ), SubmitButton() );
 
 	DrawHeader(
-		CheckBoxOnclick( 'include_inactive', _( 'Include Inactive Courses' ) ),
+		CheckBoxOnclick( 'include_inactive', _( 'Include Inactive Subjects' ) ),
 		( AllowEdit() ?
 			CheckBoxOnclick( 'include_seats', _( 'Show Available Seats' ) ) :
 			'' )
@@ -255,12 +255,12 @@ if ( UserStudentID()
 	// @since 12.0 Use colorBox instead of popup window
 	$link['add']['link'] = '"' . URLEscape( $popup_url ) . '" class="colorbox"';
 
-	$link['add']['title'] = _( 'Add a Course' );
+	$link['add']['title'] = _( 'Add a Subject' );
 
 	$link['add']['first'] = 10; // Number of rows before add link moves to top.
 
 	$columns = [
-		'TITLE' => _( 'Course' ),
+		'TITLE' => _( 'Subject' ),
 		'PERIOD_PULLDOWN' => _( 'Period' ) . ' ' . _( 'Days' ) . ' - ' . _( 'Short Name' ) . ' - ' . _( 'Teacher' ),
 		'ROOM' => _( 'Room' ),
 		'COURSE_MARKING_PERIOD_ID' => _( 'Term' ),
@@ -302,7 +302,7 @@ if ( UserStudentID()
 
 	VerifySchedule( $schedule_RET );
 
-	ListOutput( $schedule_RET, $columns, 'Course', 'Courses', $link, [], [ 'valign-middle' => true ] );
+	ListOutput( $schedule_RET, $columns, 'Subject', 'Subjects', $link, [], [ 'valign-middle' => true ] );
 
 	echo '<br /><div class="center">' . SubmitButton() . '</div>';
 	echo '</form>';
