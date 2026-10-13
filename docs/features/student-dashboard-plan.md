@@ -1,8 +1,9 @@
-# Student Dashboard - Implementation Plan
+# Student Dashboard - Historical Implementation Plan
 
 ## Implementation status
 
-The first student-facing version is now implemented on `feature/student-dashboard`.
+The student-facing version is implemented and included in the validated
+`Stable/sis` baseline.
 
 See:
 
@@ -10,13 +11,15 @@ See:
 docs/features/student-portal.md
 ```
 
-The implemented first version includes Dashboard, My Courses, My Grades, Payments, and My Profile.
+The implemented portal includes Dashboard, My Courses, My Grades, Payments,
+My Profile, and Re-Registration.
 
 ## Purpose
 
 The Student Dashboard will provide each authenticated student with a clear, read-only view of the most important information held about them in Abugida SIS.
 
-This is the next planned feature after the Excel Grade Import and semester grading work.
+This document is retained as the original design plan. The implemented behavior is
+documented in `docs/features/student-portal.md`.
 
 ## Core dashboard areas
 
@@ -156,3 +159,11 @@ Build the student side in this order:
 7. additional student services.
 
 This sequence validates the read-only data-access model before adding more functionality.
+
+
+## Validation status
+
+The 12–13 October 2026 full lifecycle test verified all six student pages using the
+newly created synthetic account. Direct `student_id=2` URL manipulation did not
+change displayed identity or expose another student's courses, grades, payments,
+profile, or re-registration data.
