@@ -94,7 +94,7 @@ else
 
 	$columns = [
 		'FULL_NAME' => _( 'Student' ),
-		'COURSE_TITLE' => _( 'Course' ),
+		'COURSE_TITLE' => _( 'Subject' ),
 		'ELIGIBILITY_CODE' => _( 'Grade' ),
 	];
 
