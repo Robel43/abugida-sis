@@ -184,7 +184,7 @@ else
 
 	$columns = [
 		'FULL_NAME' => _( 'Teacher' ),
-		'CP_TITLE' => _( 'Course Period' ),
+		'CP_TITLE' => _( 'Section' ),
 	];
 
 	$group = [ 'STAFF_ID' ];
