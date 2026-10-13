@@ -97,7 +97,7 @@ $categories_RET = DBGet( "SELECT rc.ID,rc.TITLE,rc.COLOR,1,rc.SORT_ORDER
 		WHERE COURSE_ID=rc.COURSE_ID
 		AND CATEGORY_ID=rc.ID)>0
 	UNION
-	SELECT 0,'" . DBEscapeString( _( 'All Courses' ) ) . "',NULL,2,NULL
+	SELECT 0,'" . DBEscapeString( _( 'All Subjects' ) ) . "',NULL,2,NULL
 	FROM report_card_comments
 	WHERE SCHOOL_ID='" . UserSchool() . "'
 	AND COURSE_ID='0'
@@ -1075,11 +1075,11 @@ if ( ! isset( $_REQUEST['_ROSARIO_PDF'] ) )
 		);
 	}
 
-	// Add All Courses & Course-specific comments scales tipmessage.
+	// Add All Courses & Subject-specific comments scales tipmessage.
 	elseif ( ! empty( $commentsA_RET )
 		&& GetMP( $_REQUEST['mp'], 'DOES_COMMENTS' ) == 'Y' )
 	{
-		// Course-specific.
+		// Subject-specific.
 		$where = " AND CATEGORY_ID='" . (int) $_REQUEST['tab_id'] . "'";
 
 		if ( $_REQUEST['tab_id'] == '0' )
@@ -1251,7 +1251,7 @@ $LO_columns = [ 'FULL_NAME' => _( 'Student' ), 'STUDENT_ID' => sprintf( _( '%s I
 
 if ( $_REQUEST['include_inactive'] == 'Y' )
 {
-	$LO_columns += [ 'ACTIVE' => _( 'School Status' ), 'ACTIVE_SCHEDULE' => _( 'Course Status' ) ];
+	$LO_columns += [ 'ACTIVE' => _( 'School Status' ), 'ACTIVE_SCHEDULE' => _( 'Subject Status' ) ];
 }
 
 $LO_columns += [
