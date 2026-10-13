@@ -9,12 +9,12 @@ feature. Registrar and Finance authority remain separate.
 
 | Workflow | Menu | Local URL |
 | --- | --- | --- |
-| Applicant registration/correction | Public | http://localhost:8090/registration.php |
-| Registrar queue | Students > Online Applications | http://localhost:8090/Modules.php?modname=Custom/ApplicationReview.php |
-| Grade-based fees | Student Billing > Registration Fees | http://localhost:8090/Modules.php?modname=Custom/RegistrationFees.php |
-| Applicant manual payment | Approval email/payment link | http://localhost:8090/registration-payment.php?token=APPROVAL_TOKEN |
-| Finance queue | Student Billing > Application Payments | http://localhost:8090/Modules.php?modname=Custom/FinanceApplications.php |
-| SMTP test | Users > Email Test | http://localhost:8090/Modules.php?modname=Custom/EmailTest.php |
+| Applicant registration/correction | Public | http://localhost:8400/registration.php |
+| Registrar queue | Students > Online Applications | http://localhost:8400/Modules.php?modname=Custom/ApplicationReview.php |
+| Grade-based fees | Student Billing > Registration Fees | http://localhost:8400/Modules.php?modname=Custom/RegistrationFees.php |
+| Applicant manual payment | Approval email/payment link | http://localhost:8400/registration-payment.php?token=APPROVAL_TOKEN |
+| Finance queue | Student Billing > Application Payments | http://localhost:8400/Modules.php?modname=Custom/FinanceApplications.php |
+| SMTP test | Users > Email Test | http://localhost:8400/Modules.php?modname=Custom/EmailTest.php |
 
 Approval requires a configured fee for the selected school/year/grade. It records
 that fee, payment instructions and a random payment token. Rejection requires a
@@ -37,10 +37,10 @@ nosniff and sandbox headers.
 
 ## Configure SMTP locally
 
-No external delivery has been verified. Automated tests use a synthetic SMTP
-server on the isolated Docker network, with certificate verification and fake
-authentication credentials. Fixture credentials in database/tests have no real
-account or delivery privileges.
+The isolated automated suite still uses a synthetic SMTP server with fake
+credentials. In addition, real Gmail delivery was verified on the local
+`Stable/sis` baseline on 12–13 October 2026 using a mailbox controlled by the tester.
+No real credentials are stored in this repository.
 
 1. Copy `.env.smtp.example` to `.env.smtp` in the repository root. `.env.smtp` is
    ignored by Git. Restrict access to this file on your computer. Do not paste any
@@ -109,8 +109,9 @@ This conservatively avoids duplicate messages after an uncertain acceptance.
   including create/save/new-session resume, required uploads, invalid MIME/CSRF,
   submission, and read-only submitted applications.
 - All 95 main core SIS table checksums match the pre-Stage-2 backup.
-- Targeted PHP lint and Compose validation passed. No external SMTP acceptance or
-  mailbox delivery has been tested. An early HTTP harness CSRF-token assumption
+- Targeted PHP lint and Compose validation passed.
+- A later full lifecycle run on `Stable/sis` confirmed real Gmail Inbox delivery
+  of all five workflow notifications exactly once, plus SMTP failure/retry behavior. An early HTTP harness CSRF-token assumption
   and a database readiness race were fixed; the complete fresh-container suite passed on rerun.
 
 Tests live in database/tests/stage2-*.php and docker-compose.stage2.yaml. They
@@ -142,8 +143,8 @@ docker compose -f database/tests/docker-compose.stage2.yaml -p abugida-stage2 do
 Final handoff verification additionally passed fresh baseline installation and all
 001â€“006 and 014 migrations, 46 Stage 2 HTTP checks, 17 enrollment/login checks, the Finance
 form regression, six Grade 7â€“12 registration scenarios, ten direct SMTP checks,
-untrusted TLS rejection, and targeted PHP lint. SMTP delivery was accepted only by
-the local TLS/authenticated fixture, not an external mailbox. The student
+untrusted TLS rejection, and targeted PHP lint. The original isolated suite used only the local TLS/authenticated fixture. The later
+validated `Stable/sis` lifecycle additionally confirmed real Gmail Inbox delivery. The student
 portal on the integration branch is the Abugida Student Portal; the original Stage 2 results do not certify the combined branch. See [the Windows setup guide](../deployment/windows-registration-setup.md).
 
 Stage 2 code: ProgramFunctions/AbugidaEmail.fnc.php,
@@ -168,3 +169,31 @@ The local commit also includes the already-completed, previously uncommitted
 Stage 1 dependencies: database/README-registration.md, migration runner and its
 migration-config.php/migrations.php tests, registration-schema.inc.php and
 online-registration.md. No Stage 1 schema migration files were changed.
+
+
+## Stable/sis real-mail validation — 12–13 October 2026
+
+A full synthetic applicant lifecycle confirmed delivery of all five workflow emails
+to a controlled Gmail inbox:
+
+1. application correction request;
+2. application approved/payment instructions;
+3. payment correction request;
+4. payment verified;
+5. account created with generated username/temporary credential.
+
+The natural failure path was also exercised: a payment-rejection notification hit an
+SMTP connection failure after the Finance decision had committed. **Retry notification
+only** changed delivery to SENT on the second attempt without creating another Finance
+decision or audit transition.
+
+Targeted follow-up on 13 October confirmed:
+
+- sender display name derives from configured platform branding;
+- SMTP diagnostic subject and body derive from configured platform branding;
+- public URLs use the active local address `http://localhost:8400`;
+- legacy `Abugida SIS` wording is absent from the received diagnostic message.
+
+Do not resend historical SENT notifications solely to test branding. Create a fresh
+diagnostic email or a fresh synthetic workflow event when new mail behavior must be
+verified.
