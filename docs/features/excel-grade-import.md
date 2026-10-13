@@ -161,21 +161,10 @@ There is no GPA conversion.
 - `.xlsx` only;
 - first worksheet only;
 - one final percentage per student, subject / section, and semester;
-- no Moodle grade synchronization in this feature;
-- no student-facing dashboard in this feature.
+- no Moodle grade synchronization in this feature.
 
-## Planned next phase
-
-The next student-facing phase will expose the official SIS information already stored in Abugida through a student dashboard. Planned student views include:
-
-- current enrolled courses;
-- Semester 1 and Semester 2 percentage grades;
-- payment status and balances;
-- student profile / enrollment information;
-- relevant registration and academic status;
-- important school notices or account information where appropriate.
-
-The student-facing dashboard will be read-only for official academic and finance information unless a specific workflow explicitly allows student action.
+The Student Portal is now implemented separately and exposes imported official
+percentages and calculated ranks read-only to the authenticated student.
 
 
 ## Browser navigation compatibility
@@ -186,3 +175,12 @@ Grade selection and automatic Subject / Section loading work through both:
 - RosarioSIS sidebar / AJAX navigation.
 
 The Grade Import JavaScript initializes immediately when the module is injected through sidebar navigation rather than relying only on the original page `DOMContentLoaded` event.
+
+
+## Validated import run — 13 October 2026
+
+The `Stable/sis` end-to-end test confirmed rejection of missing selections/file,
+legacy `.xls`, malformed/oversized workbooks, unknown or out-of-roster students,
+score 101, and duplicate IDs. Name mismatch produced a warning while Student ID
+remained authoritative. Eight valid imports were previewed before confirmation, and
+the eight audit rows matched the eight resulting official grade rows.
