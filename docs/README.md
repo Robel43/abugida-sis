@@ -16,9 +16,6 @@ docs/
 │   ├── branch-workflow.md
 │   └── ci-workflow.md
 ├── features/
-│   ├── online-registration.md
-│   ├── online-registration-ui-fayda.md
-│   └── registration-approval-payment-workflow.md
 ├── workflows/
 ├── database/
 ├── integration/
@@ -111,14 +108,3 @@ A feature is not considered complete until:
 - the Pull Request is merged into `develop`.
 
 Normal developers must not push or merge feature work into `main`.
-
-
-## Current Implemented Feature Documentation
-
-The current `develop` branch includes documentation for the online registration and payment workflow:
-
-- `features/online-registration.md` - applicant-facing registration, draft/resume behavior, uploads, and security notes.
-- `features/online-registration-ui-fayda.md` - responsive UI and required Fayda ID upload.
-- `features/registration-approval-payment-workflow.md` - Registrar/Finance queues, grade-based fees, payment verification, final activation, email notifications, and audit history.
-
-Database migrations `001` through `006` support the current registration workflow and should be applied in numeric order.
