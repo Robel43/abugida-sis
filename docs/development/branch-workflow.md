@@ -285,10 +285,10 @@ The fix must also return to `develop` so future releases retain it.
 
 | Work | Push directly to | Merge destination |
 | --- | --- | --- |
-| New feature | own `feature/*` branch | `develop` |
-| Bug fix | own `fix/*` branch | `develop` |
-| Documentation task | own `docs/*` branch | `develop` |
-| Refactor | own `refactor/*` branch | `develop` |
+| New feature | own `feature/*` branch | `Stable/sis` |
+| Bug fix | own `fix/*` branch | `Stable/sis` |
+| Documentation task | own `docs/*` branch | `Stable/sis` |
+| Refactor | own `refactor/*` branch | `Stable/sis` |
 | Production release | not a normal developer action | project owner later promotes `Stable/sis` -> `develop` -> `main` |
 
 ## 16. Developer checklist before merging to Stable/sis
