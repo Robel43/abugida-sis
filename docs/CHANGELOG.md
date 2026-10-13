@@ -7,12 +7,13 @@ All significant Abugida SIS changes should be recorded in this file.
 ## Unreleased - Scheduling terminology
 
 ### Changed
-- Academic terminology is now applied globally across authenticated administrator, teacher, parent, and student interfaces.
-- User-facing **Subject/Subjects** is presented as **Grade/Grades**.
-- User-facing **Course/Courses** is presented as **Subject/Subjects**.
-- User-facing **Course Period/Course Periods** is presented as **Section/Sections**.
-- Dynamic page content and user-visible accessibility/title attributes receive the same mapping.
-- Internal database, URL, request, PHP, SQL, and integration identifiers remain unchanged.
+- Academic terminology is now aligned semantically across applicable administrator, teacher, parent, and student interfaces.
+- RosarioSIS academic **Subject/Subjects** labels are presented as **Grade/Grades**.
+- RosarioSIS academic **Course/Courses** labels are presented as **Subject/Subjects**.
+- RosarioSIS academic **Course Period/Course Periods** labels are presented as **Section/Sections**.
+- Scheduling, Grades, Attendance, Eligibility, shared navigation, academic chooser, print/report surfaces, and the student portal were included in the terminology audit.
+- Unrelated meanings such as an email **Subject** are intentionally unchanged.
+- Internal database, URL, request, PHP, SQL, permission, and integration identifiers remain unchanged.
 
 ## 2026-10-13 - Stable/sis validated baseline
 
