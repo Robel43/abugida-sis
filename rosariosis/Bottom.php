@@ -54,7 +54,7 @@ if ( empty( $_REQUEST['bottomfunc'] ) ) : ?>
 
 				case 'course':
 
-					$back_text = _( 'Course List' );
+					$back_text = _( 'Subject List' );
 				break;
 
 				default:
