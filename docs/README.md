@@ -25,6 +25,27 @@ docs/
 
 Create subdirectories when the first document for that category is added.
 
+## Current validated baseline
+
+As of 13 October 2026, the current validated working baseline is:
+
+```text
+Stable/sis
+```
+
+The full synthetic applicant-to-student lifecycle, real Gmail SMTP delivery,
+Student Portal isolation, grade import/ranking, report authorization, billing
+reconciliation checks, paid semester re-registration, zero-fee future-year
+re-registration, responsive UI, and targeted post-regression fixes have been
+validated. See:
+
+- `docs/features/registration-integration.md`
+- `docs/features/ui-2026-refresh.md`
+- `docs/features/stage2-testing-smtp.md`
+- `docs/CHANGELOG.md`
+
+Local Docker examples use `http://localhost:8400`.
+
 ## Required Documentation for Features
 
 Each implemented feature should document:
