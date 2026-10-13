@@ -335,7 +335,7 @@ if ( isset( $_REQUEST['student_id'] ) && $_REQUEST['student_id'] !== 'new' )
 
 	$columns = [
 		'PERIOD_TITLE' => _( 'Period' ),
-		'COURSE' => _( 'Course' ),
+		'COURSE' => _( 'Subject' ),
 		'ATTENDANCE_CODE' => _( 'Attendance Code' ),
 		'ATTENDANCE_TEACHER_CODE' => _( 'Teacher\'s Entry' ),
 		'ATTENDANCE_REASON' => _( 'Office Comment' ),
@@ -354,7 +354,7 @@ if ( isset( $_REQUEST['student_id'] ) && $_REQUEST['student_id'] !== 'new' )
 
 	DrawHeader( $headerl, $headerr );
 
-	ListOutput( $schedule_RET, $columns, 'Course', 'Courses', [], [], [ 'valign-middle' => true ] );
+	ListOutput( $schedule_RET, $columns, 'Subject', 'Subjects', [], [], [ 'valign-middle' => true ] );
 
 	echo '</form>';
 }
