@@ -35,8 +35,8 @@ else
 		_( 'Not' ) . '</label>
 	<label><select name="w_' . $last_year . 'course_period_id_which"
 		class="onchange-widget-course-title-update" autocomplete="off">
-	<option value="course_period"> ' . _( 'Course Period' ) . '</option>
-	<option value="course"> ' . _( 'Course' ) . '</option>
+	<option value="course_period"> ' . _( 'Section' ) . '</option>
+	<option value="course"> ' . _( 'Grade' ) . '</option>
 	<option value="subject"> ' . _( 'Subject' ) . '</option>
 	</select></label>';
 
