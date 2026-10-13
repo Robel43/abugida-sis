@@ -8,20 +8,21 @@ The workflow is intentionally simple:
 
 - developers work independently on feature branches;
 - developers test their own work locally;
-- completed feature branches are merged into `develop`;
-- `main` is off limits for normal developer work;
-- only the project owner/maintainer promotes tested integrated code from `develop` to `main`.
+- `Stable/sis` is the current validated working baseline;
+- feature/fix branches start from `Stable/sis` and return there only after testing;
+- `develop` and `main` are not changed until the project owner explicitly promotes the stable line.
 
 ## Branch Model
 
 ```text
-feature/*, fix/*, docs/*
-          |
-          v
-       develop
-          |
-          v
-         main
+Stable/sis
+   |
+   +--> feature/*, fix/*, docs/*
+             |
+             +--> tested merge back to Stable/sis
+
+Later, by project-owner decision:
+Stable/sis -> develop -> main
 ```
 
 `main` is controlled by the project owner/maintainer.
@@ -39,21 +40,22 @@ Developers must not:
 
 Only the project owner/maintainer should merge `develop` into `main` for a release.
 
-## 2. develop
+## 2. Stable/sis
 
-`develop` is the shared integration branch.
+`Stable/sis` is the current validated baseline. It is the starting point for new work
+and the destination for a feature/fix only after focused regression passes.
 
-Developers use it as the starting point for new work and as the destination for completed work.
-
-Developers should not build features directly on `develop`.
-
-Instead:
+Do not develop directly on `Stable/sis`. Instead:
 
 ```text
-develop -> feature branch -> local test -> push feature branch -> PR -> develop
+Stable/sis -> feature branch -> local test -> push -> PR -> Stable/sis
 ```
 
-There is no mandatory code reviewer. The developer who owns a feature may merge their own Pull Request into `develop` after completing local testing and documentation.
+## 3. develop
+
+`develop` remains the long-term integration branch. It is intentionally left
+unchanged for now. The project owner will decide when to promote `Stable/sis` into
+`develop`.
 
 ## 3. Branch naming
 
@@ -82,11 +84,11 @@ Use short lowercase names separated by hyphens.
 
 ## 4. Start a new feature
 
-Always update `develop` first:
+Always update `Stable/sis` first:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 ```
 
 Then create your branch:
@@ -153,15 +155,15 @@ Developers must not push normal feature work directly to:
 
 ```text
 origin/main
-origin/develop
+origin/Stable/sis
 ```
 
-## 7. Open a Pull Request to develop
+## 7. Open a Pull Request to Stable/sis
 
 Create a Pull Request on GitHub:
 
 ```text
-base: develop
+base: Stable/sis
 compare: feature/payment-verification
 ```
 
@@ -178,15 +180,15 @@ Before merging their own PR, the developer must confirm:
 - no passwords, secrets, database dumps, uploaded documents, receipts, or student photos are committed;
 - the branch has no unresolved merge conflicts.
 
-Then the developer may merge the PR into `develop`.
+Then the developer may merge the PR into `Stable/sis`.
 
 ## 8. If develop changed during feature development
 
 Update the local feature branch before merging:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 git checkout feature/payment-verification
 git merge develop
 ```
@@ -208,8 +210,8 @@ The existing Pull Request updates automatically after the push.
 Update local `develop`:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 ```
 
 Delete the completed local branch:
@@ -222,13 +224,13 @@ The remote feature branch can also be deleted from GitHub after merge.
 
 ## 10. Start the next feature
 
-Always start the next task from the latest `develop`.
+Always start the next task from the latest `Stable/sis`.
 
 Do not branch from a completed feature branch.
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 git checkout -b feature/next-feature
 ```
 
@@ -237,13 +239,13 @@ git checkout -b feature/next-feature
 The normal path is:
 
 ```text
-feature/* -> develop -> main
+Stable/sis -> feature/* -> Stable/sis; later Stable/sis -> develop -> main
 ```
 
 Developers are responsible for:
 
 ```text
-feature branch -> develop
+feature branch -> Stable/sis
 ```
 
 The project owner/maintainer is responsible for:
@@ -273,10 +275,10 @@ The fix must also return to `develop` so future releases retain it.
 
 | Situation | Pull from |
 | --- | --- |
-| Starting a normal feature | `origin/develop` |
+| Starting a normal feature | `origin/Stable/sis` |
 | Continuing feature work | own feature branch |
-| Updating feature with team changes | `origin/develop` |
-| Checking latest integrated version | `origin/develop` |
+| Updating feature with team changes | `origin/Stable/sis` |
+| Checking latest integrated version | `origin/Stable/sis` |
 | Checking stable release | `origin/main` |
 
 ## 14. Push and merge rules
@@ -287,7 +289,7 @@ The fix must also return to `develop` so future releases retain it.
 | Bug fix | own `fix/*` branch | `develop` |
 | Documentation task | own `docs/*` branch | `develop` |
 | Refactor | own `refactor/*` branch | `develop` |
-| Production release | not a normal developer action | project owner merges `develop` -> `main` |
+| Production release | not a normal developer action | project owner later promotes `Stable/sis` -> `develop` -> `main` |
 
 ## 15. Developer checklist before merging to develop
 
@@ -308,8 +310,8 @@ The fix must also return to `develop` so future releases retain it.
 
 ```powershell
 # Update integration branch
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 
 # Create feature branch
 git checkout -b feature/student-application
@@ -338,8 +340,8 @@ After local testing and documentation are complete, the developer may merge the 
 Then:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 git branch -d feature/student-application
 ```
 
