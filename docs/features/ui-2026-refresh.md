@@ -104,7 +104,7 @@ Recommended viewport checks:
 360px
 ```
 
-The validated `feature/online-registration-integration` branch remains the functional baseline.
+The validated `Stable/sis` branch remains the functional baseline.
 
 
 ## Phase 1 browser-test fixes
@@ -529,3 +529,35 @@ Targeted retest required before PR readiness:
 - 360px and 480px landing menu must expose all hidden navigation items;
 - Forgot Password must show the student-reset-disabled message inline with no Success modal;
 - Rollover warning must remain a warning modal, and the greyed-item explanation must remain inline with no queued Success modal.
+
+
+## Final acceptance and targeted fixes — 13 October 2026
+
+The complete browser/user-flow regression and targeted retest are now complete on
+`Stable/sis`.
+
+Resolved findings:
+
+- completed-registration **Student login** now routes to `index.php?login=1`;
+- ordinary status badges such as **Upcoming** are excluded from the feedback-modal
+  enhancer and remain inline;
+- local notification URLs follow the active localhost port instead of retaining an
+  obsolete development port;
+- SMTP sender display name falls back to configured platform branding rather than
+  the legacy product name;
+- the SMTP diagnostic subject/body also use configured platform branding;
+- sidebar submenu text uses higher-contrast near-white text with a stronger active
+  state for readability.
+
+Targeted retest passed on 13 October 2026:
+
+- Active applicant login CTA opened the login form on port 8400;
+- future-year **Upcoming** profile badge stayed inline with no dialog;
+- fresh SMTP diagnostic contained `http://localhost:8400/registration.php`;
+- Gmail sender, subject and body displayed the configured name **Select Academy SIS**;
+- student submenu labels rendered near-white on the configured blue sidebar, with
+  the active item white on a dark backing;
+- mobile landing Menu accessibility retest passed at 360px and 480px.
+
+The full UI regression also confirmed no document-level horizontal overflow on the
+representative public, student, and staff screens at 1440/1024/830/768/480/360.
