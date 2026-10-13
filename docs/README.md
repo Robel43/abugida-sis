@@ -133,8 +133,8 @@ A feature is not considered complete until:
 
 Normal developers must not push or merge feature work into `main`.
 
-## Scheduling Terminology
+## Academic Terminology
 
-Abugida SIS uses school-facing terminology on the Scheduling setup page: **Grade -> Subject -> Section**. The underlying RosarioSIS data model remains `course_subjects -> courses -> course_periods`.
+Abugida SIS uses the school-facing hierarchy **Grade -> Subject -> Section** across applicable administrator, teacher, parent, and student interfaces. The underlying RosarioSIS data model remains `course_subjects -> courses -> course_periods`.
 
-See `features/scheduling-terminology.md` for the mapping and validation scope.
+See `features/scheduling-terminology.md` for the semantic mapping, role coverage, safety rules, and validation matrix.
