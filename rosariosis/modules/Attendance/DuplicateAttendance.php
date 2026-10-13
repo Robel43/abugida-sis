@@ -277,9 +277,9 @@ if ( isset( $_REQUEST['search_modfunc'] )
 		echo '<thead><tr><th class="column_heading"><input type="checkbox" value="Y" name="controller" class="onclick-checkall" data-name-like="deletecheck" /> &nbsp</th>';
 
 		echo '<th>' . _( 'Student' ) . ' (' . sprintf( _( '%s ID' ), Config( 'NAME' ) ) . ')</th>
-			<th>' . _( 'Course' ) . ' (' . _( 'Course Period ID' ) . ')</th>
-			<th>' . _( 'Course Start Date' ) . '</th>
-			<th>' . _( 'Course End Date' ) . '</th>
+			<th>' . _( 'Subject' ) . ' (' . _( 'Section ID' ) . ')</th>
+			<th>' . _( 'Subject Start Date' ) . '</th>
+			<th>' . _( 'Subject End Date' ) . '</th>
 			<th>' . _( 'Attendance Date' ) . '</th></tr></thead><tbody>';
 
 		$URIcount = 0;
