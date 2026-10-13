@@ -15,7 +15,7 @@ if ( $current_user_profile === 'teacher' )
 	if ( SchoolInfo( 'SCHOOLS_NB' ) > 1 )
 	{
 		// Only show header if more than 1 school
-		DrawHeader( CheckBoxOnclick( 'all_schools', _( 'List Courses For All Schools' ) ) );
+		DrawHeader( CheckBoxOnclick( 'all_schools', _( 'List Subjects For All Schools' ) ) );
 	}
 
 	if ( $_REQUEST['all_schools'] == 'Y' )
@@ -31,8 +31,8 @@ if ( $current_user_profile === 'teacher' )
 	}
 
 	$columns = [
-		'TITLE' => _( 'Course' ),
-		'COURSE_PERIOD' => _( 'Course Period' ),
+		'TITLE' => _( 'Subject' ),
+		'COURSE_PERIOD' => _( 'Section' ),
 		'ROOM' => _( 'Room' ),
 		'MARKING_PERIOD_ID' => _( 'Marking Period' ),
 	];
@@ -64,8 +64,8 @@ if ( $current_user_profile === 'teacher' )
 	ListOutput(
 		$schedule_RET,
 		$columns,
-		'Course Period',
-		'Course Periods',
+		'Section',
+		'Sections',
 		false,
 		$group
 	);
