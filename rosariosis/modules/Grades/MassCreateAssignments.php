@@ -317,7 +317,7 @@ if ( ! $_REQUEST['modfunc'] )
 		// Fix URL encode assignment_type value to encode "/"
 		echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&assignment_type=' . urlencode( $_REQUEST['assignment_type'] ) . '&table=gradebook_assignments' ) . '" method="POST">';
 
-		$submit_button = SubmitButton( _( 'Create Assignment for Selected Course Periods' ) );
+		$submit_button = SubmitButton( _( 'Create Assignment for Selected Sections' ) );
 
 		DrawHeader(
 			_( 'New Assignment' ),
@@ -433,7 +433,7 @@ if ( ! $_REQUEST['modfunc'] )
 	{
 		echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&table=gradebook_assignment_types' ) . '" method="POST">';
 
-		$submit_button = SubmitButton( _( 'Create Assignment Type for Selected Courses' ) );
+		$submit_button = SubmitButton( _( 'Create Assignment Type for Selected Subjects' ) );
 
 		DrawHeader(
 			_( 'New Assignment Type' ),
@@ -551,8 +551,8 @@ if ( ! $_REQUEST['modfunc'] )
 		{
 			$columns = [
 				'COURSE_ID' => MakeChooseCheckbox( 'required', '', 'c_arr' ),
-				'TITLE' => _( 'Course' ),
-				'SUBJECT' => _( 'Subject' ),
+				'TITLE' => _( 'Subject' ),
+				'SUBJECT' => _( 'Grade' ),
 			];
 
 			// Display the courses list.
@@ -602,10 +602,10 @@ if ( ! $_REQUEST['modfunc'] )
 
 			$columns = [
 				'COURSE_PERIOD_ID' => MakeChooseCheckbox( 'required', '', 'cp_arr' ),
-				'COURSE' => _( 'Course' ),
+				'COURSE' => _( 'Subject' ),
 				'TITLE' => _( 'Period' ) . ' ' . _( 'Days' ) . ' - ' . _( 'Short Name' ) . ' - ' . _( 'Teacher' ),
 				'MARKING_PERIOD_ID' => _( 'Marking Period' ),
-				// 'SUBJECT' => _( 'Subject' ),
+				// 'SUBJECT' => _( 'Grade' ),
 			];
 
 			// Display the course periods list.
