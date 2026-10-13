@@ -573,7 +573,7 @@ echo '</select>';
 if ( $_REQUEST['grade_id'] && empty( $course_periods ) )
 {
 	echo '<div class="abg-field-help">' . sprintf(
-	_( 'No course periods were found for the selected grade (%s). Make sure the course is created under the matching grade subject in Scheduling > Courses.' ),
+	_( 'No sections were found for the selected grade (%s). Make sure the subject is created under the matching grade in Scheduling > Subjects.' ),
 	AttrEscape( DBGetOne( "SELECT TITLE FROM school_gradelevels WHERE ID='" . (int) $_REQUEST['grade_id'] . "' LIMIT 1" ) )
 ) . '</div>';
 }
