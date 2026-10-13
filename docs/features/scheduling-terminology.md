@@ -2,13 +2,11 @@
 
 ## Purpose
 
-Abugida SIS presents the RosarioSIS academic hierarchy using terminology that matches the school's operating model.
+Abugida SIS uses school-facing academic terminology consistently across the authenticated SIS while preserving the RosarioSIS internal data model.
 
-The terminology is applied consistently across the authenticated application for all role types, including administrators, teachers, parents, and students.
+## Terminology mapping
 
-## User-facing terminology
-
-| RosarioSIS internal concept | Abugida SIS label |
+| RosarioSIS internal concept | Abugida SIS user-facing term |
 | --- | --- |
 | Subject / Subjects | Grade / Grades |
 | Course / Courses | Subject / Subjects |
@@ -16,84 +14,80 @@ The terminology is applied consistently across the authenticated application for
 
 Examples:
 
-- RosarioSIS **Subject: Grade 7** is displayed as **Grade: Grade 7**.
-- RosarioSIS **Course: English** is displayed as **Subject: English**.
-- RosarioSIS **Course Period: 7A** is displayed as **Section: 7A**.
-- A page or menu originally titled **Courses** is displayed as **Subjects**.
+- Grade 7 is presented as a **Grade**.
+- English is presented as a **Subject**.
+- 7A is presented as a **Section**.
+- The RosarioSIS **Courses** setup page is presented as **Subjects**.
+- **Course List** is presented as **Subject List**.
+- **Choose a Course** is presented as **Choose a Subject**.
 
-The mapping also applies inside longer user-visible phrases. For example, **Course List** becomes **Subject List**, **Choose a Course** becomes **Choose a Subject**, and **Parent Course Period** becomes **Parent Section**.
+## Scope
 
-## Implementation strategy
+The terminology is applied semantically to academic UI surfaces rather than by globally replacing every occurrence of the words "course" and "subject".
 
-The terminology is implemented in the global Abugida authenticated UI layer:
+That distinction is important because some unrelated features legitimately use words such as **Subject** (for example, an email subject). Those meanings must not be renamed.
 
-`rosariosis/assets/js/abugida-2026.js`
+The audited UI coverage includes:
 
-That script is loaded by the RosarioSIS application shell for authenticated users. It updates rendered text nodes and user-visible attributes such as titles, ARIA labels, placeholders, alternative text, and button values.
-
-A MutationObserver applies the same mapping to content loaded or inserted dynamically after the initial page render.
-
-This approach provides one terminology policy across modules and roles instead of maintaining separate wording changes in individual RosarioSIS modules.
-
-## Safety / compatibility
-
-This is strictly a presentation-layer change.
-
-The following internal identifiers are intentionally unchanged:
-
-- `course_subjects`
-- `courses`
-- `course_periods`
-- `subject_id`
-- `course_id`
-- `course_period_id`
-- PHP function and class names
-- SQL queries
-- URLs and request parameter names
-- database schema
-- Moodle/integration identifiers
-
-The terminology layer does not rewrite `href`, `name`, `id`, `data-*`, form field keys, JavaScript code, CSS, `code`, `pre`, or `textarea` content.
-
-This separation is deliberate so the UI terminology can change without changing the RosarioSIS data model or breaking business logic and integrations.
+- shared staff navigation and back-navigation;
+- teacher current-section selector;
+- administrator, teacher, and parent Scheduling menus;
+- Scheduling setup, student schedules, requests, add/drop, mass scheduling, and print screens;
+- shared academic chooser;
+- Grades, report-card, grade-import, grade-entry, teacher-completion, and student-grade screens;
+- Attendance academic labels;
+- Eligibility academic labels;
+- Student portal navigation, dashboard, and enrolled-subject page.
 
 ## Role consistency
 
-The same mapping is applied regardless of authenticated role:
+The same academic objects use the same labels for every applicable role:
 
 - Administrator
 - Teacher
 - Parent
 - Student
 
-Role permissions and menu visibility remain unchanged. Only the wording presented to the user changes.
+Role permissions and visibility are not changed. A role may see fewer modules, but when the same academic object is shown it uses the same Abugida terminology.
+
+## Technical safety
+
+This is a presentation-label change only.
+
+The following remain unchanged:
+
+- database table names such as `course_subjects`, `courses`, and `course_periods`;
+- request keys such as `subject_id`, `course_id`, and `course_period_id`;
+- PHP function/class names;
+- SQL queries and column names;
+- URLs and module filenames;
+- permission keys;
+- Moodle/integration identifiers;
+- stored academic records.
+
+There is no database migration.
+
+Keeping internal identifiers unchanged prevents the terminology change from breaking scheduling, grading, attendance, reporting, student lifecycle, or future Moodle synchronization logic.
 
 ## Sidebar readability
 
-Sidebar group headings such as **Reports** and **Setup** use a high-contrast light treatment so they remain readable against the blue navigation background.
+Sidebar group headings such as **Reports** and **Setup** use a higher-contrast light color against the blue navigation background.
 
-## Database changes
+## Validation matrix
 
-None.
+For each available role, verify representative screens and confirm:
 
-## Validation checklist
+1. RosarioSIS **Subject** hierarchy labels display as **Grade**.
+2. RosarioSIS **Course** academic labels display as **Subject**.
+3. RosarioSIS **Course Period** academic labels display as **Section**.
+4. Plural forms display as **Grades**, **Subjects**, and **Sections**.
+5. Student portal uses **My Subjects**, **Active Subjects**, and **Enrolled Subjects**.
+6. Scheduling setup shows the hierarchy **Grade -> Subject -> Section**.
+7. Scheduling search/chooser options use **Grade / Subject / Section**.
+8. Attendance, Eligibility, Grades, and reports use **Subject** and **Section** consistently.
+9. Email **Subject** and other unrelated uses of the word remain unchanged.
+10. Links, forms, filters, create/edit/delete actions, print actions, permissions, and saved records continue to work.
 
-For each available role, verify representative screens under Scheduling, Grades, Students, reports, and portal pages.
+## Print/export note
 
-Confirm:
-
-1. **Courses** is presented as **Subjects**.
-2. **Course** is presented as **Subject**.
-3. **Subjects** is presented as **Grades**.
-4. **Subject** is presented as **Grade**.
-5. **Course Periods** is presented as **Sections**.
-6. **Course Period** is presented as **Section**.
-7. Longer phrases use the same terminology.
-8. Dynamically loaded content receives the same mapping.
-9. Links, forms, saved records, IDs, filters, and actions still work normally.
-10. No database migration is required.
-11. Admin, teacher, parent, and student users see the same terminology for the same academic objects.
-
-## Print/PDF note
-
-The global terminology layer covers the authenticated browser interface. Server-generated PDF content that bypasses the browser JavaScript should be validated separately before relying on the renamed terminology in exported documents.
+Browser and server-generated print/report screens that contain academic labels are included in the semantic audit where those labels are generated by the affected modules. PDF/export flows should still be included in regression testing because they may use separate rendering paths.
