@@ -48,7 +48,7 @@ The page supports:
 - downloading the supporting document;
 - downloading Fayda ID;
 - approving an application for payment;
-- entering the amount to be paid;
+- using the configured grade-based registration fee;
 - entering payment instructions;
 - rejecting an application with a mandatory reason;
 - seeing payment progress;
@@ -151,6 +151,32 @@ PAYMENT_SUBMITTED
   -> PAYMENT_SUBMITTED
 ```
 
+## Grade-based Registration Fees
+
+Registration fees are configured internally under:
+
+```text
+Student Billing -> Registration Fees
+```
+
+The fee is stored per grade level and is used when the Registrar approves an application for payment. Grade matching supports standard and ordinal grade labels.
+
+Apply:
+
+```text
+database/migrations/006_grade_registration_fees.sql
+```
+
+## Secure Payment Access
+
+Approved applicants can use a tokenized payment link rather than relying only on phone-number lookup. The payment access token is introduced by:
+
+```text
+database/migrations/005_payment_access_token.sql
+```
+
+The secure link can be included in approval email notifications.
+
 ## Email Notifications
 
 Where outgoing email is configured, the workflow sends applicant email notifications for:
@@ -160,6 +186,8 @@ Where outgoing email is configured, the workflow sends applicant email notificat
 - payment rejection;
 - payment verification;
 - final account creation.
+
+The project also includes an Abugida SMTP helper, diagnostic error logging, and an internal email test utility. SMTP credentials must be supplied through deployment configuration and must never be committed.
 
 ## Permanent Student Creation
 
@@ -199,13 +227,16 @@ The log records:
 
 ## Database Migration
 
-Apply:
+Apply all registration migrations in numeric order:
 
 ```text
+database/migrations/001_online_registration.sql
+database/migrations/002_add_fayda_id_upload.sql
+database/migrations/003_add_study_approach.sql
 database/migrations/004_registration_approval_payment_workflow.sql
+database/migrations/005_payment_access_token.sql
+database/migrations/006_grade_registration_fees.sql
 ```
-
-after migrations 001-003.
 
 Local PowerShell:
 
