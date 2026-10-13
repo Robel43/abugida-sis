@@ -17,6 +17,95 @@
 		return Array.prototype.slice.call((root || document).querySelectorAll(selector));
 	}
 
+
+	/*
+	 * Abugida academic terminology layer.
+	 *
+	 * RosarioSIS internal data model remains unchanged:
+	 * course_subjects -> courses -> course_periods.
+	 * Only rendered, user-visible terminology is changed:
+	 * Subject -> Grade, Course -> Subject, Course Period -> Section.
+	 */
+	var terminologyMap = {
+		'course periods': 'sections',
+		'course period': 'section',
+		'courses': 'subjects',
+		'course': 'subject',
+		'subjects': 'grades',
+		'subject': 'grade'
+	};
+
+	var terminologyPattern = /\\b(course periods|course period|courses|course|subjects|subject)\\b/gi;
+
+	function terminologyCase(source, replacement) {
+		if (source === source.toUpperCase()) return replacement.toUpperCase();
+		if (source === source.toLowerCase()) return replacement.toLowerCase();
+		if (source.charAt(0) === source.charAt(0).toUpperCase()) {
+			return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+		}
+		return replacement;
+	}
+
+	function applyTerminologyToString(value) {
+		if (!value || typeof value !== 'string') return value;
+		return value.replace(terminologyPattern, function (match) {
+			var replacement = terminologyMap[match.toLowerCase()];
+			return replacement ? terminologyCase(match, replacement) : match;
+		});
+	}
+
+	function applyTerminology(root) {
+		var scope = root && root.nodeType ? root : document;
+		var skipTags = { SCRIPT: true, STYLE: true, NOSCRIPT: true, CODE: true, PRE: true, TEXTAREA: true };
+
+		function updateElementAttributes(element) {
+			['title', 'aria-label', 'placeholder', 'alt'].forEach(function (attribute) {
+				if (!element.hasAttribute || !element.hasAttribute(attribute)) return;
+				var current = element.getAttribute(attribute);
+				var updated = applyTerminologyToString(current);
+				if (updated !== current) element.setAttribute(attribute, updated);
+			});
+
+			if ((element.tagName === 'INPUT' || element.tagName === 'BUTTON') &&
+				element.hasAttribute && element.hasAttribute('value')) {
+				var type = (element.getAttribute('type') || '').toLowerCase();
+				if (element.tagName === 'BUTTON' || type === 'button' || type === 'submit' || type === 'reset') {
+					var currentValue = element.getAttribute('value');
+					var updatedValue = applyTerminologyToString(currentValue);
+					if (updatedValue !== currentValue) element.setAttribute('value', updatedValue);
+				}
+			}
+		}
+
+		if (scope.nodeType === 1 && !skipTags[scope.tagName]) {
+			updateElementAttributes(scope);
+		}
+
+		var walkerRoot = scope.nodeType === 9 ? scope.body : scope;
+		if (!walkerRoot) return;
+
+		var walker = document.createTreeWalker(
+			walkerRoot,
+			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+			null
+		);
+
+		var node;
+		while ((node = walker.nextNode())) {
+			if (node.nodeType === 1) {
+				if (!skipTags[node.tagName]) updateElementAttributes(node);
+				continue;
+			}
+
+			var parent = node.parentElement;
+			if (!parent || skipTags[parent.tagName]) continue;
+
+			var currentText = node.nodeValue;
+			var updatedText = applyTerminologyToString(currentText);
+			if (updatedText !== currentText) node.nodeValue = updatedText;
+		}
+	}
+
 	function ensureShellHelpers() {
 		if (!q('.abg-menu-backdrop')) {
 			var backdrop = document.createElement('div');
@@ -289,6 +378,7 @@
 
 	function refresh(root) {
 		ensureShellHelpers();
+		applyTerminology(root || document);
 		enhanceMessages(root || document);
 		wrapWideTables(root || document);
 	}
