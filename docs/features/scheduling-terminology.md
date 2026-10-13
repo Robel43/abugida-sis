@@ -54,3 +54,7 @@ Verify the Scheduling setup page shows:
 5. Add, edit, delete, search, and chooser flows use the same terminology.
 
 Underlying records and IDs must remain unchanged.
+
+## Sidebar readability
+
+Sidebar group headings such as **Reports** and **Setup** use a high-contrast light blue/white treatment so they remain readable against the blue navigation background.
