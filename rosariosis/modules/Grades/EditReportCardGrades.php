@@ -374,7 +374,7 @@ if ( UserStudentID() )
 			];
 
 			$LO_columns = [
-				'COURSE_TITLE' => _( 'Course' ),
+				'COURSE_TITLE' => _( 'Subject' ),
 			];
 
 			// MP has Course Periods?
@@ -386,7 +386,7 @@ if ( UserStudentID() )
 			if ( $mp_has_course_periods )
 			{
 				// Add Course Periods select input.
-				$LO_columns['COURSE_PERIOD_ID'] = _( 'Course Period' );
+				$LO_columns['COURSE_PERIOD_ID'] = _( 'Section' );
 			}
 
 			// Build forms based on tab selected.
