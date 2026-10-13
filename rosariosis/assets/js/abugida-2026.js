@@ -231,11 +231,11 @@
 
 	function enhanceMessages(root) {
 		var scope = root && root.querySelectorAll ? root : document;
-		var selector = '#body .abg-feedback-error, #body .abg-feedback-warning, #body .abg-feedback-success, #body .error, #body .warning, #body .note, #body .updated';
+		var selector = '#body .abg-feedback-error, #body .abg-feedback-warning, #body .abg-feedback-success, #body .error, #body .warning:not(.abg-badge):not(.abg-status):not(.abg-rereg-status), #body .note, #body .updated';
 		var nodes = qa(selector, scope);
 
 		if (root && root.nodeType === 1 && root.matches &&
-			root.matches('.abg-feedback-error, .abg-feedback-warning, .abg-feedback-success, .error, .warning, .note, .updated') &&
+			root.matches('.abg-feedback-error, .abg-feedback-warning, .abg-feedback-success, .error, .warning:not(.abg-badge):not(.abg-status):not(.abg-rereg-status), .note, .updated') &&
 			root.closest('#body')) {
 			nodes.unshift(root);
 		}
@@ -243,6 +243,7 @@
 		nodes.forEach(function (node) {
 			if (node.dataset.abgEnhanced === '1') return;
 			if (node.closest('.abg-modal, .abg-toast')) return;
+			if (node.matches('.abg-badge, .abg-status, .abg-rereg-status')) return;
 
 			node.dataset.abgEnhanced = '1';
 			var html = cleanMessageHTML(node);
