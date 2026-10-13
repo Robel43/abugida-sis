@@ -760,7 +760,7 @@ else
 			echo '<tr><td>' . SelectInput(
 				Config( 'COURSE_WIDGET_METHOD' ),
 				'values[config][COURSE_WIDGET_METHOD]',
-				_( 'Course Widget' ),
+				_( 'Subject Widget' ),
 				$course_widget_options,
 				false
 			) . '</td></tr>';
