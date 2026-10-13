@@ -104,7 +104,7 @@ if ( $_REQUEST['modfunc'] != 'choose_course' )
 		// @since 12.9 Use button() with "+" icon instead of text link
 		echo '</div>' . button(
 			'add',
-			_( 'Choose a Course' ),
+			_( 'Choose a Subject' ),
 			URLEscape( $popup_url ),
 			'colorbox'
 		) . '</td></tr>';
