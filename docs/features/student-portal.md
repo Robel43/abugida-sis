@@ -250,3 +250,25 @@ This workflow retains the student's existing account and Student ID. See:
 ```text
 docs/features/student-reregistration.md
 ```
+
+
+## Full lifecycle validation — 13 October 2026
+
+The portal was validated with the permanent student created by the public
+registration/Finance/Registrar workflow. All six pages loaded correctly:
+
+- Dashboard;
+- My Courses;
+- My Grades;
+- Payments;
+- My Profile;
+- Re-Registration.
+
+Before and after course/grade/billing data was populated, adding another student's
+`student_id` to direct URLs did not change the authenticated student context.
+The final synthetic academic results displayed S1 87.50% rank 1/8, S2 82.50%
+rank 2/8, and Full Year 85.00% rank 1/8.
+
+Future-year Grade 9 enrollment correctly appeared as **Upcoming** in My Profile and
+remained an inline status badge after the UI feedback-selector fix. No warning modal
+was generated for that ordinary status.
