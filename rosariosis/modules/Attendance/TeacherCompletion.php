@@ -212,7 +212,7 @@ else
 		$RET,
 		[
 			'FULL_NAME' => _( 'Teacher' ),
-			'CP_TITLE' => _( 'Course Period' ),
+			'CP_TITLE' => _( 'Section' ),
 			'COMPLETED' => _( 'Completed' ),
 		],
 		sprintf( _( 'Teacher who takes %s attendance' ), $period_title ),
