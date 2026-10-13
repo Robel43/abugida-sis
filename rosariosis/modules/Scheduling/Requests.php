@@ -158,7 +158,7 @@ if ( ! $_REQUEST['modfunc']
 		ORDER BY c.TITLE", $functions );
 
 	$columns = [
-		'COURSE' => _( 'Grade' ),
+		'COURSE' => _( 'Subject' ),
 		'WITH_TEACHER_ID' => _( 'Teacher' ),
 		'WITH_PERIOD_ID' => _( 'Period' ),
 	];
@@ -189,7 +189,7 @@ if ( ! $_REQUEST['modfunc']
 	DrawHeader( '', SubmitButton() );
 
 	$link['add']['span'] = '<span class="nobr"> <label for="subject_id" class="a11y-hidden">' .
-		_( 'Subject' ) . '</label>' . $subjects .
+		_( 'Grade' ) . '</label>' . $subjects .
 		' <label>' . _( 'Subject Title' ) .
 		' <input type="text" id="course_title" name="course_title" class="onkey-course-title"></label></span>
 		<div id="courses_div"></div>';
