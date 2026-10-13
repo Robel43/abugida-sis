@@ -31,7 +31,7 @@ if ( $_REQUEST['modfunc'] === 'save' )
 	// @since 5.5 Display Title of: Subject, Course, Course Period.
 	$display_title_sql = 'c.TITLE';
 
-	$display_title_column = _( 'Course' );
+	$display_title_column = _( 'Subject' );
 
 	if ( ! empty( $_REQUEST['display_title'] ) )
 	{
@@ -39,7 +39,7 @@ if ( $_REQUEST['modfunc'] === 'save' )
 		{
 			$display_title_sql = 'cs.TITLE';
 
-			$display_title_column = _( 'Subject' );
+			$display_title_column = _( 'Grade' );
 		}
 	}
 
@@ -255,7 +255,7 @@ if ( $_REQUEST['modfunc'] === 'save' )
 		{
 			$error[] = sprintf(
 				_( 'No %s were found.' ),
-				mb_strtolower( ngettext( 'Course Period', 'Course Periods', 0 ) )
+				mb_strtolower( ngettext( 'Section', 'Sections', 0 ) )
 			);
 
 			echo ErrorMessage( $error );
@@ -401,9 +401,9 @@ if ( ! $_REQUEST['modfunc'] )
 			'display_title',
 			_( 'Display Title of' ),
 			[
-				'subject' => _( 'Subject' ),
-				'course' => _( 'Course' ),
-				'course_period' => _( 'Course Period' ),
+				'subject' => _( 'Grade' ),
+				'course' => _( 'Subject' ),
+				'course_period' => _( 'Section' ),
 			],
 			false,
 			'',
