@@ -1,7 +1,8 @@
 # Online registration integration
 
-`feature/online-registration-integration` combines the grading/portal/re-registration
-branch with the transactional registration and SMTP/outbox branch. The merge retains
+`Stable/sis` is now the current validated combined baseline. It contains the
+registration/SMTP workflow together with grading, portal, reporting,
+re-registration, branding, and the responsive UI layer. The merge retains
 the semester percentage model, XLSX import, class rank and reports, student dashboard,
 courses/grades/payments/profile, re-registration, and secure receipt endpoint.
 
@@ -33,10 +34,10 @@ Executed during integration:
   behavior. Subsequent browser testing found and fixed XLSX namespace parsing and the
   manual Class Rank AJAX submit action.
 
-At merge time the integration execution account could not access Docker or WSL.
-Browser tests on the user's updated Docker app and read-only MariaDB checks were
-subsequently completed on 2026-10-11 as described below. The isolated transaction/
-concurrency and HTTP suites remain separate and have not been rerun.
+The earlier integration verification was followed by a complete browser/user-flow
+acceptance run on 12–13 October 2026. The original isolated transaction/concurrency
+and HTTP suites remain separate historical evidence; the final acceptance run used
+the normal local Docker application and synthetic records.
 
 Run the offline checks with PHP + PDO SQLite:
 
@@ -91,7 +92,38 @@ Verified on the merged app:
   request hides the new-request form. Future semester eligibility is independent
   of the sidebar semester. The future-semester date renders as text.
 
-Limitations: browser Save as PDF output itself, concurrent duplicate submissions,
-production PDF conversion, SMTP mailbox delivery and isolated Docker automated
-transaction/HTTP suites have not been verified. Synthetic records are intentionally
+Earlier integration limitations included SMTP mailbox delivery and broader
+end-to-end validation. Those were subsequently addressed on `Stable/sis` for real
+Gmail delivery and the complete synthetic lifecycle. Native PDF conversion and raw
+concurrent/stale-request replay were not part of the final acceptance run. Synthetic records are intentionally
 retained in the local test database; these tests did not change real students' grades.
+
+
+## Full stable-baseline acceptance — 12–13 October 2026
+
+A second complete synthetic lifecycle on `Stable/sis` used applicant
+`ABG-APP-2026-000008`, which became student `ABG9`. It verified:
+
+- public registration validation, draft resume, rejection/correction/resubmission;
+- Registrar approval and ETB 5,000 manual-payment flow;
+- Finance rejection, corrected receipt, verification and final account creation;
+- five workflow emails delivered once to a controlled Gmail inbox;
+- natural SMTP failure followed by safe notification-only retry with no duplicated
+  Finance decision;
+- student login using the delivered credentials;
+- all six Student Portal pages and authenticated student-ID isolation;
+- eight official grade imports with validation/audit;
+- S1 87.50% rank 1/8, S2 82.50% rank 2/8, Full Year 85.00% rank 1/8;
+- teacher report authorization and forged unassigned-course denial;
+- explicit billing-ledger reconciliation using synthetic tuition/payment records;
+- paid semester re-registration and zero-fee future-year Grade 9 re-registration
+  while retaining the same Student ID/login;
+- duplicate protection and one final-confirmation audit per target;
+- responsive coverage at 1440/1024/830/768/480/360.
+
+Targeted fixes after that run corrected the completed-registration login URL,
+status-badge/modal collision, localhost mail URL handling, SMTP display-name/test
+branding, and submenu contrast. The targeted retest passed on 13 October 2026.
+
+The applicant/re-registration receipt workflows do not automatically post to the
+RosarioSIS billing ledger; that remains a separate explicit financial record path.
