@@ -176,12 +176,12 @@ if ( UserStudentID()
 	AND e.SCHOOL_DATE BETWEEN '" . $start_date . "'
 	AND '" . $end_date . "'", [ 'ELIGIBILITY_CODE' => '_makeLower' ] );
 
-	$columns = [ 'COURSE_TITLE' => _( 'Course' ), 'ELIGIBILITY_CODE' => _( 'Grade' ) ];
+	$columns = [ 'COURSE_TITLE' => _( 'Subject' ), 'ELIGIBILITY_CODE' => _( 'Grade' ) ];
 
 	// Two Lists on same page: export only first, no search.
 	$LO_options = [ 'search' => false, 'save' => '0' ];
 
-	ListOutput( $RET, $columns, 'Course', 'Courses', [], [], $LO_options );
+	ListOutput( $RET, $columns, 'Subject', 'Subjects', [], [], $LO_options );
 }
 
 /**
