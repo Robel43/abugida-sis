@@ -170,9 +170,9 @@ if ( isset( $_REQUEST['course_modfunc'] )
 
 		ListOutput(
 			$subjects_RET,
-			[ 'TITLE' => _( 'Subject' ) ],
-			'Subject',
-			'Subjects',
+			[ 'TITLE' => _( 'Grade' ) ],
+			'Grade',
+			'Grades',
 			$link,
 			[],
 			$LO_options
@@ -187,15 +187,15 @@ if ( isset( $_REQUEST['course_modfunc'] )
 
 		ListOutput(
 			$courses_RET,
-			[ 'TITLE' => _( 'Course' ) ],
-			'Course',
-			'Courses',
+			[ 'TITLE' => _( 'Subject' ) ],
+			'Grade',
+			'Grades',
 			$link,
 			[],
 			$LO_options
 		);
 
-		$columns = [ 'TITLE' => _( 'Course Period' ) ];
+		$columns = [ 'TITLE' => _( 'Section' ) ];
 
 		$link = [];
 
@@ -231,8 +231,8 @@ if ( isset( $_REQUEST['course_modfunc'] )
 		ListOutput(
 			$periods_RET,
 			$columns,
-			'Course Period',
-			'Course Periods',
+			'Section',
+			'Sections',
 			$link,
 			[],
 			$LO_options
@@ -709,7 +709,7 @@ if ( $_REQUEST['modfunc'] === 'delete'
 
 	if ( $_REQUEST['course_period_id'] )
 	{
-		$table = _( 'Course Period' );
+		$table = _( 'Section' );
 
 		$delete_sql = CoursePeriodDeleteSQL( $_REQUEST['course_period_id'] );
 
@@ -717,7 +717,7 @@ if ( $_REQUEST['modfunc'] === 'delete'
 	}
 	elseif ( $_REQUEST['course_id'] )
 	{
-		$table = _( 'Course' );
+		$table = _( 'Subject' );
 
 		$delete_sql = CourseDeleteSQL( $_REQUEST['course_id'] );
 
@@ -725,7 +725,7 @@ if ( $_REQUEST['modfunc'] === 'delete'
 	}
 	elseif ( $_REQUEST['subject_id'] )
 	{
-		$table = _( 'Subject' );
+		$table = _( 'Grade' );
 
 		$delete_sql = "DELETE FROM course_subjects
 			WHERE SUBJECT_ID='" . (int) $_REQUEST['subject_id'] . "'
@@ -1418,7 +1418,7 @@ if (  ( ! $_REQUEST['modfunc']
 				// Parent Course Period.
 				$header .= '<td colspan="2"><div id="course_div">' . $parent . '</div> ' .
 				$popup_link .
-				'<span class="legend-gray">' . _( 'Parent Course Period' ) . '</span></td>';
+				'<span class="legend-gray">' . _( 'Parent Section' ) . '</span></td>';
 			}
 
 			if ( AllowEdit()
@@ -1448,7 +1448,7 @@ if (  ( ! $_REQUEST['modfunc']
 					FROM course_subjects
 					WHERE SUBJECT_ID='" . (int) $_REQUEST['subject_id'] . "'" ) );
 
-				$title = $subject_title . ' - ' . _( 'New Course' );
+				$title = $subject_title . ' - ' . _( 'New Subject' );
 
 				$RET = [];
 			}
@@ -1496,7 +1496,7 @@ if (  ( ! $_REQUEST['modfunc']
 				$header .= '<tr><td colspan="3">' . SelectInput(
 					$_REQUEST['subject_id'],
 					'tables[courses][' . $_REQUEST['course_id'] . '][SUBJECT_ID]',
-					_( 'Subject' ),
+					_( 'Grade' ),
 					$subject_options,
 					false
 				) . '</td></tr>';
@@ -1525,7 +1525,7 @@ if (  ( ! $_REQUEST['modfunc']
 			}
 			else
 			{
-				$title = _( 'New Subject' );
+				$title = _( 'New Grade' );
 			}
 
 			echo '<form action="' . URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&subject_id=' . $_REQUEST['subject_id']  ) . '" method="POST">';
@@ -1566,9 +1566,9 @@ if (  ( ! $_REQUEST['modfunc']
 	{
 		$choose_a_header_html = _( 'Choose a' ) . ' ' .
 			( $_REQUEST['subject_id'] ? ( $_REQUEST['course_id'] ?
-				( $_REQUEST['last_year'] == 'true' ? _( 'Last Year Course Period' ) : _( 'Course Period' ) ) :
-				( $_REQUEST['last_year'] == 'true' ? _( 'Last Year Course' ) : _( 'Course' ) ) ) :
-			( $_REQUEST['last_year'] == 'true' ? _( 'Last Year Subject' ) : _( 'Subject' ) ) );
+				( $_REQUEST['last_year'] == 'true' ? _( 'Last Year Section' ) : _( 'Section' ) ) :
+				( $_REQUEST['last_year'] == 'true' ? _( 'Last Year Subject' ) : _( 'Subject' ) ) ) :
+			( $_REQUEST['last_year'] == 'true' ? _( 'Last Year Grade' ) : _( 'Grade' ) ) );
 
 		if ( $_REQUEST['modname'] === 'Scheduling/Schedule.php' )
 		{
@@ -1602,7 +1602,7 @@ if (  ( ! $_REQUEST['modfunc']
 	}
 	elseif ( empty( $_REQUEST['subject_id'] ) )
 	{
-		DrawHeader( _( 'Courses' ) );
+		DrawHeader( _( 'Subjects' ) );
 	}
 
 	DrawHeader(
@@ -1629,7 +1629,7 @@ if (  ( ! $_REQUEST['modfunc']
 		}
 	}
 
-	$columns = [ 'TITLE' => _( 'Subject' ) ];
+	$columns = [ 'TITLE' => _( 'Grade' ) ];
 	$link = [];
 	$link['TITLE']['link'] = 'Modules.php?modname=' . $_REQUEST['modname'];
 
@@ -1716,7 +1716,7 @@ if (  ( ! $_REQUEST['modfunc']
 			}
 		}
 
-		$columns = [ 'TITLE' => _( 'Course' ) ];
+		$columns = [ 'TITLE' => _( 'Subject' ) ];
 
 		$link = [];
 
@@ -1749,8 +1749,8 @@ if (  ( ! $_REQUEST['modfunc']
 		ListOutput(
 			$courses_RET,
 			$columns,
-			'Course',
-			'Courses',
+			'Grade',
+			'Grades',
 			$link,
 			[],
 			$LO_options
@@ -1822,7 +1822,7 @@ if (  ( ! $_REQUEST['modfunc']
 				}
 			}
 
-			$columns = [ 'TITLE' => _( 'Course Period' ) ];
+			$columns = [ 'TITLE' => _( 'Section' ) ];
 
 			$link = [];
 
