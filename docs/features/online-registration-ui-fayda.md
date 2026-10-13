@@ -57,5 +57,5 @@ The original `001_online_registration.sql` remains the baseline migration for th
 ## Local URL
 
 ```text
-http://localhost:8090/registration.php
+http://localhost:8400/registration.php
 ```
