@@ -19,7 +19,7 @@ if ( empty( $_REQUEST['search_modfunc'] ) )
 else
 {
 	$columns = [
-		'COURSE_TITLE' => _( 'Course' ),
+		'COURSE_TITLE' => _( 'Subject' ),
 		'WITH_FULL_NAME' => '<span class="a11y-hidden">' . _( 'Request' ) . '</span>',
 	];
 
