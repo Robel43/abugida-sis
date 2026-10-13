@@ -33,7 +33,7 @@ function AbugidaMailConfig(): array
 {
     $fromName = trim((string)AbugidaMailSetting('ABUGIDA_SMTP_FROM_NAME', 'AbugidaMailFromName'));
 
-    if ($fromName === '') {
+    if ($fromName === '' || strcasecmp($fromName, 'Abugida SIS') === 0) {
         $fromName = AbugidaBranding()['platform_name'];
     }
 
