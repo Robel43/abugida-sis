@@ -28,7 +28,7 @@ $menu['Scheduling']['admin'] = [
 	'Scheduling/IncompleteSchedules.php' => _( 'Incomplete Schedules' ),
 	'Scheduling/AddDrop.php' => _( 'Add / Drop Report' ),
 	2 => _( 'Setup' ),
-	'Scheduling/Courses.php' => _( 'Subjects' ),
+	'Scheduling/Courses.php' => _( 'Courses' ),
 	'Scheduling/Scheduler.php' => _( 'Run Scheduler' ),
 ] + issetVal( $menu['Scheduling']['admin'], [] );
 
@@ -37,7 +37,7 @@ $menu['Scheduling']['teacher'] = [
 	'default' => 'Scheduling/Schedule.php',
 	'Scheduling/Schedule.php' => _( 'Schedule' ),
 	// Activate Courses for Teachers & Parents & Students.
-	'Scheduling/Courses.php' => _( 'Subjects' ),
+	'Scheduling/Courses.php' => _( 'Courses' ),
 	1 => _( 'Reports' ),
 	'Scheduling/PrintSchedules.php' => _( 'Print Schedules' ),
 	'Scheduling/PrintClassLists.php' => _( 'Print Class Lists' ),
@@ -50,7 +50,7 @@ $menu['Scheduling']['parent'] = [
 	'Scheduling/Schedule.php' => _( 'Schedule' ),
 	'Scheduling/Requests.php' => _( 'Student Requests' ),
 	// Activate Courses for Teachers & Parents & Students.
-	'Scheduling/Courses.php' => _( 'Subjects' ),
+	'Scheduling/Courses.php' => _( 'Courses' ),
 	1 => _( 'Reports' ),
 	// Activate Print Schedules for parents and students.
 	'Scheduling/PrintSchedules.php' => _( 'Print Schedules' ),
