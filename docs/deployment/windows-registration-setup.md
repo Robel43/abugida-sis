@@ -1,9 +1,10 @@
 # Registration feature: Windows Docker installation and testing
 
-Use branch `feature/online-registration-integration`. This delivers Stage 1 registration,
-Stage 2 Registrar/Finance review and notifications, and the existing final Registrar
-confirmation/student account flow. The integration branch also includes semester percentage grading, Excel import,
-class rank/reports, the Student Portal, and existing-student re-registration.
+Use branch `Stable/sis`. This is the current validated baseline. It includes public
+registration, Registrar/Finance review and notifications, final Registrar account
+creation, semester percentage grading, Excel import, class rank/reports, the Student
+Portal, billing views, re-registration, the 2026 responsive UI/branding layer, and
+the tested SMTP workflow.
 There is no online payment gateway; Finance verifies uploaded receipts.
 
 GitHub contains source and migrations, not the developer's MariaDB database, student
@@ -18,12 +19,12 @@ Its default school, template student and template staff are upstream demonstrati
 Install Git and Docker Desktop with Linux containers enabled. Run PowerShell from a
 writable directory. Docker supplies PHP 8.1/Apache and MariaDB 10.11; host PHP is optional.
 Use a current Docker Compose v2 supporting optional `env_file` entries (2.24.0 or newer).
-Ports 8090 and 3307 must be free.
+Ports 8400 and 3307 must be free.
 
 ```powershell
-git clone --branch feature/online-registration-integration https://github.com/Robel43/abugida-sis.git
+git clone --branch Stable/sis https://github.com/Robel43/abugida-sis.git
 Set-Location abugida-sis
-git checkout feature/online-registration-integration
+git checkout Stable/sis
 git branch --show-current
 Copy-Item rosariosis/config.inc.sample.php rosariosis/config.inc.php
 ```
@@ -53,10 +54,10 @@ docker compose exec -T db sh -c 'MYSQL_PWD=$MARIADB_PASSWORD mariadb -u"$MARIADB
 ```
 
 Wait for `SELECT 1` to succeed. On a **new, empty** database, open
-[InstallDatabase.php](http://localhost:8090/InstallDatabase.php). It installs the baseline
+[InstallDatabase.php](http://localhost:8400/InstallDatabase.php). It installs the baseline
 English database. The optional language-translation SQL is not included in this
 feature package; retain English. Do not run installation over an existing database.
-Open [index.php](http://localhost:8090/index.php), log in with upstream template
+Open [index.php](http://localhost:8400/index.php), log in with upstream template
 `admin` / `admin`, and change that password immediately under **Users â†’ My Preferences**.
 Preserve existing databases; never use `docker compose down -v` or delete volumes.
 
@@ -145,8 +146,8 @@ ABUGIDA_SMTP_AUTH=true
 ABUGIDA_SMTP_USERNAME=your-school-account@example.com
 ABUGIDA_SMTP_PASSWORD=REPLACE_LOCALLY_WITH_APP_PASSWORD
 ABUGIDA_SMTP_FROM=your-school-account@example.com
-ABUGIDA_SMTP_FROM_NAME=Abugida SIS
-ABUGIDA_BASE_URL=http://localhost:8090
+ABUGIDA_SMTP_FROM_NAME=
+ABUGIDA_BASE_URL=http://localhost:8400
 ABUGIDA_PAYMENT_INSTRUCTIONS="Use your demonstration bank details and include the application reference. Upload the receipt afterward."
 ```
 
@@ -170,8 +171,8 @@ docker compose up -d --force-recreate web
 This recreates the web container to load its environment and preserves the database
 volume and bind-mounted source/uploads. Use **Users â†’ Email Test** to send a test to
 your own mailbox and read its sanitized diagnostics. SMTP server acceptance is not
-proof that mail reached the inbox; check spam and server logs. Real Gmail/institutional
-delivery must be verified in your environment.
+proof that mail reached the inbox; check spam and server logs. Real Gmail delivery was verified on the validated local baseline on 13 October 2026.
+For any new environment, still verify delivery to a mailbox you control.
 
 Registrar/Finance decisions commit before delivery. Their outbox panel provides
 **Retry notification only** for PENDING/FAILED messages. Delivered notifications
@@ -187,7 +188,7 @@ use the standard administrative password-reset procedure.
 Use synthetic names, test phone numbers, an email inbox you control, and non-sensitive
 PDF/PNG/JPEG documents. Record the generated application reference locally.
 
-- [ ] Open [online registration](http://localhost:8090/registration.php).
+- [ ] Open [online registration](http://localhost:8400/registration.php).
 - [ ] Start an application; select Grade 7â€“12 and Online or Distance Learning; save a draft.
 - [ ] Close the applicant session, resume with the same phone number, and verify saved fields.
 - [ ] Upload the supporting document and Fayda ID (synthetic), then submit.
@@ -202,19 +203,19 @@ PDF/PNG/JPEG documents. Record the generated application reference locally.
 - [ ] As Registrar, open the verified application and click **Final Confirm & Create Student Account**.
 - [ ] Confirm ACTIVE, the permanent Student ID, username and current-school/year enrollment.
 - [ ] Confirm the account-created email containing the generated username and temporary password.
-- [ ] Log in at [index.php](http://localhost:8090/index.php) using those credentials; change the password.
+- [ ] Log in at [index.php](http://localhost:8400/index.php) using those credentials; change the password.
 - [ ] Verify the Abugida Student Dashboard and My Courses, My Grades, Payments, My Profile, and Re-Registration menus.
 
 Staff URLs after login:
 
 ```text
-http://localhost:8090/Modules.php?modname=Custom/ApplicationReview.php
-http://localhost:8090/Modules.php?modname=Custom/FinanceApplications.php
-http://localhost:8090/Modules.php?modname=Custom/RegistrationFees.php
-http://localhost:8090/Modules.php?modname=Custom/EmailTest.php
+http://localhost:8400/Modules.php?modname=Custom/ApplicationReview.php
+http://localhost:8400/Modules.php?modname=Custom/FinanceApplications.php
+http://localhost:8400/Modules.php?modname=Custom/RegistrationFees.php
+http://localhost:8400/Modules.php?modname=Custom/EmailTest.php
 ```
 
-The applicant payment URL is `http://localhost:8090/registration-payment.php?token=...`;
+The applicant payment URL is `http://localhost:8400/registration-payment.php?token=...`;
 obtain the actual token only from that synthetic application's approval link.
 
 ## Focused automated tests
@@ -270,3 +271,34 @@ available and have students change credentials immediately. Use synthetic data a
 controlled inboxes. Docker exposes development ports and public default credentials;
 production deployment, secure identity recovery, HTTPS and SMTP deliverability are
 outside this feature's tested scope.
+
+
+## Validated end-to-end baseline — 13 October 2026
+
+The `Stable/sis` branch completed a full synthetic lifecycle on the local Docker
+environment at `http://localhost:8400`:
+
+- new public applicant, draft save/resume and validation;
+- Registrar rejection/correction/resubmission and approval;
+- payment receipt validation, Finance rejection/replacement/verification;
+- final Registrar confirmation creating one permanent student/account/enrollment;
+- successful login using the emailed generated credentials;
+- six Student Portal pages with URL student-ID isolation;
+- Excel grade import validation and eight official grade records;
+- Semester 1 average 87.50%, Semester 2 average 82.50%, Full Year 85.00%, with
+  competition-rank ties and no GPA;
+- teacher report authorization and forged course-period denial;
+- paid semester re-registration and zero-fee future-year re-registration;
+- duplicate request/finalization protection;
+- responsive checks at 1440/1024/830/768/480/360;
+- real Gmail receipt of the five workflow emails;
+- SMTP failure/retry behavior without duplicating the workflow decision;
+- SMTP diagnostic sender, subject, body, and URL branded as the configured platform.
+
+The application registration/re-registration receipt workflows remain separate from
+the RosarioSIS billing ledger. Manual SIS billing records were used to verify portal
+charge/payment/balance reconciliation; no automatic posting from applicant receipt
+verification to billing has been established.
+
+Native PDF conversion was not part of the final acceptance run; print-ready HTML is
+available when the converter is unavailable.
