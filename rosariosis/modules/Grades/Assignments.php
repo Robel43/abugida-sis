@@ -839,7 +839,7 @@ if ( ! $_REQUEST['modfunc'] )
 		$header .= '<td>' . CheckboxInput(
 			issetVal( $RET['COURSE_ID'] ),
 			'tables[' . $_REQUEST['assignment_id'] . '][COURSE_ID]',
-			_( 'Apply to all Periods for this Course' ),
+			_( 'Apply to all Periods for this Subject' ),
 			'',
 			$_REQUEST['assignment_id'] == 'new'
 		) . '</td>';
