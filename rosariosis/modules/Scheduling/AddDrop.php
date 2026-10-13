@@ -52,8 +52,8 @@ ORDER BY DATE DESC", [
 $columns = [
 	'FULL_NAME' => _( 'Student' ),
 	'STUDENT_ID' => sprintf( _( '%s ID' ), Config( 'NAME' ) ),
-	'COURSE_TITLE' => _( 'Course' ),
-	'TITLE' => _( 'Course Period' ),
+	'COURSE_TITLE' => _( 'Subject' ),
+	'TITLE' => _( 'Section' ),
 	'START_DATE' => _( 'Enrolled' ),
 	'END_DATE' => _( 'Dropped' ),
 ];
