@@ -1,9 +1,11 @@
 # Abugida SIS
 
-For the completed registration feature, use
+For the current validated system, use
 [the Windows Docker installation and testing guide](docs/deployment/windows-registration-setup.md)
-on branch `feature/online-registration-integration`. It covers MariaDB initialization,
-migrations 001–006 and 014, SMTP, and registration, percentage grading, and the Abugida Student Portal.
+on branch `Stable/sis`. This branch is the current tested baseline and includes public
+registration, Registrar/Finance review, SMTP notifications, student account creation,
+percentage grading, Excel grade import, class rank/reports, the Student Portal,
+billing views, and student re-registration.
 
 Abugida SIS is a student information and school administration platform designed for secondary-school operations. It is being developed to support student registration, finance, academic records, staff roles, reporting, and integration with Moodle 4.5 for teaching, assessment, enrolment, and grade synchronization.
 
@@ -286,7 +288,7 @@ Current development stack:
 - Apache
 - MariaDB 10.11
 - Docker Compose
-- Web URL: `http://localhost:8090`
+- Web URL: `http://localhost:8400`
 - MariaDB host port: `3307`
 
 ## Repository Structure
@@ -319,13 +321,17 @@ Docker Desktop must be running.
 
 ## 1. Clone the repository
 
-Developers should clone the repository and work from `develop`:
+The current validated baseline is `Stable/sis`. New feature or fix branches should
+start from `Stable/sis` until the project owner decides to promote the accumulated
+stable work into `develop`.
+
+Clone the repository and switch to the validated baseline:
 
 ```powershell
 git clone https://github.com/Robel43/abugida-sis.git
 cd abugida-sis
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 ```
 
 The `main` branch is the stable release branch and is off limits for normal developer work.
@@ -394,7 +400,7 @@ abugida-db
 For a new database, open:
 
 ```text
-http://localhost:8090/InstallDatabase.php
+http://localhost:8400/InstallDatabase.php
 ```
 
 Complete the database installation once.
@@ -402,7 +408,7 @@ Complete the database installation once.
 Then open:
 
 ```text
-http://localhost:8090/
+http://localhost:8400/
 ```
 
 Do not run the database installer again against an already initialized database unless you intentionally intend to rebuild it.
@@ -444,7 +450,7 @@ unless you intentionally want to remove the local database volume and start agai
 
 Abugida SIS uses a simple feature-branch workflow.
 
-## Permanent branches
+## Long-term branches
 
 ### `main`
 
@@ -463,18 +469,15 @@ Only the project owner/maintainer controls releases from `develop` into `main`.
 
 ### `develop`
 
-`develop` is the shared integration branch.
+`develop` remains the long-term integration branch, but it is intentionally not the
+current working baseline.
 
-Developers should:
+### `Stable/sis`
 
-- pull the latest `develop` before starting a task;
-- create their own feature/fix branch from `develop`;
-- build and test locally on that branch;
-- document the change under `docs/`;
-- push their branch to GitHub;
-- merge the completed branch into `develop` through a Pull Request.
-
-There is no mandatory code-review step. The developer responsible for the feature may merge their own Pull Request into `develop` after confirming that the feature works locally and its documentation is complete.
+`Stable/sis` is the current validated baseline. New feature/fix branches should
+start from it. After testing and documentation, approved changes may be merged back
+into `Stable/sis`. Do not merge `Stable/sis` into `develop` until the project
+owner explicitly chooses to promote the current stable line.
 
 ## Feature branches
 
@@ -494,8 +497,8 @@ docs/branching-guide
 Start a feature:
 
 ```powershell
-git checkout develop
-git pull origin develop
+git checkout Stable/sis
+git pull origin Stable/sis
 git checkout -b feature/payment-verification
 ```
 
@@ -556,15 +559,15 @@ For the next task, always start again from the latest `develop`.
 
 ## Release flow
 
-The normal flow is:
+The current flow is:
 
 ```text
-feature/* -> develop -> main
+Stable/sis -> feature/* -> tested merge back to Stable/sis
+                           |
+                           +-> develop -> main   (later, by project-owner decision)
 ```
 
-Developers control their feature work up to `develop`.
-
-The project owner/maintainer controls the move from `develop` to `main`.
+`Stable/sis` remains the recovery/test baseline until that promotion decision.
 
 A release should only move to `main` after the integrated system has been tested and accepted.
 
@@ -625,4 +628,11 @@ Production credentials must never be committed to GitHub.
 
 ## Project Status
 
-Abugida SIS is under active development. Planned work includes registrar workflow customization, finance workflow, role-based access control, Moodle integration, grade synchronization, grade-review workflow, reporting, and audit logging.
+As of 13 October 2026, `Stable/sis` is the validated baseline. A full synthetic
+applicant-to-student lifecycle was completed, including Registrar correction,
+payment correction, Finance verification, permanent account creation, student login,
+student-data isolation, Excel grade import, semester/full-year rank, staff report
+authorization, billing reconciliation checks, paid semester re-registration,
+zero-fee future-year re-registration, duplicate protection, responsive UI checks,
+and real Gmail SMTP delivery. Follow-up work remains under active development,
+including Moodle synchronization and several non-blocking UX/legacy-page observations.
