@@ -36,8 +36,8 @@ else
 	<label><select name="w_' . $last_year . 'course_period_id_which"
 		class="onchange-widget-course-title-update" autocomplete="off">
 	<option value="course_period"> ' . _( 'Section' ) . '</option>
-	<option value="course"> ' . _( 'Grade' ) . '</option>
-	<option value="subject"> ' . _( 'Subject' ) . '</option>
+	<option value="course"> ' . _( 'Subject' ) . '</option>
+	<option value="subject"> ' . _( 'Grade' ) . '</option>
 	</select></label>';
 
 	// @since 12.0 Use colorBox instead of popup window
