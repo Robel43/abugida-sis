@@ -601,7 +601,7 @@ elseif ( isset( $_GET['submitted'] ) )
 					<?php } elseif ( $applicant['STATUS'] === 'ACTIVE' ) { ?>
 						<strong>Registration completed.</strong>
 						<p>Your student account has been created. Username: <b><?php echo abugida_reg_h( $applicant['GENERATED_USERNAME'] ); ?></b></p>
-						<a class="button primary" href="index.php">Student login</a>
+						<a class="button primary" href="index.php?login=1">Student login</a>
 					<?php } ?>
 				</div>
 				<div class="grid">
