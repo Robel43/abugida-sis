@@ -4,6 +4,15 @@ All significant Abugida SIS changes should be recorded in this file.
 
 ## Unreleased
 
+## Unreleased - Scheduling terminology
+
+### Changed
+- Scheduling setup menu/page label changed from **Courses** to **Subjects**.
+- User-facing **Subject** labels changed to **Grade**.
+- User-facing **Course** labels changed to **Subject**.
+- User-facing **Course Period** labels changed to **Section/Sections**.
+- Internal database and request identifiers remain unchanged.
+
 ## 2026-10-13 - Stable/sis validated baseline
 
 ### Added
