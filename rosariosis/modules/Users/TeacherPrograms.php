@@ -76,7 +76,7 @@ if ( UserStaffID() )
 	}
 
 	// @since 12.5 CSP remove unsafe-inline Javascript
-	$period_select = '<label for="period" class="a11y-hidden">' . _( 'Course Periods' ) . '</label>
+	$period_select = '<label for="period" class="a11y-hidden">' . _( 'Sections' ) . '</label>
 		<select name="period" id="period" autocomplete="off" class="onchange-ajax-post-form">';
 
 	$optgroup = $current_cp_found = false;
