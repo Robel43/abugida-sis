@@ -177,7 +177,7 @@ else
 
 	ListOutput(
 		$RET,
-		[ 'FULL_NAME' => _( 'Teacher' ), 'CP_TITLE' => _( 'Course Period' ), 'COMPLETED' => _( 'Completed' ) ],
+		[ 'FULL_NAME' => _( 'Teacher' ), 'CP_TITLE' => _( 'Section' ), 'COMPLETED' => _( 'Completed' ) ],
 		sprintf( _( 'Teacher who enters grades for %s' ), $period_title ),
 		sprintf( _( 'Teachers who enter grades for %s' ), $period_title ),
 		false,
