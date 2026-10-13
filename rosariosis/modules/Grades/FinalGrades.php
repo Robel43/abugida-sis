@@ -146,7 +146,7 @@ if ( $_REQUEST['modfunc'] === 'save' )
 
 		if ( ! empty( $RET ) )
 		{
-			$columns = [ 'FULL_NAME' => _( 'Student' ), 'COURSE_TITLE' => _( 'Course' ) ];
+			$columns = [ 'FULL_NAME' => _( 'Student' ), 'COURSE_TITLE' => _( 'Subject' ) ];
 
 			if ( isset( $_REQUEST['elements']['teacher'] )
 				&& $_REQUEST['elements']['teacher'] === 'Y' )
@@ -513,7 +513,7 @@ if ( $_REQUEST['modfunc'] === 'save' )
 						);
 					}
 
-					DrawHeader( _( 'Course-specific Comments' ), $tipmessage );
+					DrawHeader( _( 'Subject-specific Comments' ), $tipmessage );
 				}
 			}
 
